@@ -9,6 +9,7 @@ public class Map
 	public short xspawn, yspawn, zspawn;
 	public byte headingspawn, pitchspawn;
 	private uint physicsCount;
+	private bool physicsSuspended = false;
 	
 	public Map()
 	{
@@ -21,22 +22,18 @@ public class Map
 		physicsCount = 0;
 		Spacecraft.Log("Generating map...");
 		
-		xdim = 32; ydim = 32; zdim = 32;
-		xspawn = 128; yspawn = 128; zspawn = 128;
+		xdim = 64;
+		ydim = 32;
+		zdim = 64;
+		xspawn = (short)(16*xdim);  // center spawn
+		yspawn = (short)(16*ydim);
+		zspawn = (short)(16*zdim);
 		_data = new byte[xdim * ydim * zdim];
 		for(short x = 0; x < xdim; ++x) {
-			for(short y = 0; y < ydim; ++y) {
-				SetTile(x, y, 0, Block.Wood);
-			}
-		}
-		for(short x = 0; x < xdim; ++x) {
 			for(short z = 0; z < zdim; ++z) {
-				SetTile(x, 0, z, Block.Brick);
-			}
-		}
-		for(short y = 0; y < ydim; ++y) {
-			for(short z = 0; z < zdim; ++z) {
-				SetTile(0, y, z, Block.Rock);
+				for(short y = 0; y < ydim/2; ++y) {
+					SetTile(x, y, z, Block.Dirt);
+				}
 			}
 		}
 	}
@@ -79,6 +76,7 @@ public class Map
 	
 	public void Physics(Server srv)
 	{
+		if(physicsSuspended) return;
 		// run twice per second
 		physicsCount++;
 		
@@ -152,6 +150,7 @@ public class Map
 	
 	public void Dehydrate(Server srv)
 	{
+		physicsSuspended = true;
 		for(short x = 0; x < xdim; ++x) {
 			for(short y = 0; y < ydim; ++y) {
 		 		for(short z = 0; z < zdim; ++z) {
@@ -161,6 +160,7 @@ public class Map
 				}
 			}
 		}
+		physicsSuspended = false;
 	}
 	
 	public void SetSend(Server srv, short x, short y, short z, byte tile)

@@ -42,7 +42,21 @@ public class Connection
 	
 	public void ReadCallback(IAsyncResult ar)
 	{
-		int bytesRead = client.GetStream().EndRead(ar);
+		int bytesRead;
+		try {
+			bytesRead = client.GetStream().EndRead(ar);
+		}
+		catch(System.IO.IOException) {
+			if(_connected) {
+				Spacecraft.Log(name + " disconnected");
+				_connected = false;
+				if(_player != null) {
+					MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
+					serv.SendAll(PacketDespawnPlayer(_player));
+				}
+			}
+			return;
+		}
 		if(bytesRead == 0) {
 			if(_connected) {
 				Spacecraft.Log(name + " disconnected");
@@ -171,8 +185,16 @@ public class Connection
 			}
 		}
 		
-		byte[] levelFinalize = new byte[] { 0x04, 0, 32, 0, 32, 0, 32 };
-		Send(levelFinalize);
+		byte[] xdim = BitConverter.GetBytes(Host2Net(serv.map.xdim));
+		byte[] ydim = BitConverter.GetBytes(Host2Net(serv.map.ydim));
+		byte[] zdim = BitConverter.GetBytes(Host2Net(serv.map.zdim));
+		
+		byte[] levelFin = new byte[PacketLen.LevelFinish];
+		levelFin[0] = Packet.LevelFinish;
+		levelFin[1] = xdim[0]; levelFin[2] = xdim[1];
+		levelFin[3] = ydim[0]; levelFin[4] = ydim[1];
+		levelFin[5] = zdim[0]; levelFin[6] = zdim[1];
+		Send(levelFin);
 	}
 	
 	private void SendServerInfo() {
