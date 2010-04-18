@@ -100,6 +100,21 @@ public class Map
 							SetSend(srv, x, y, z, Block.Dirt);
 						}
 					}
+					
+					if(tile == Block.Water || tile == Block.Lava)
+					{ // Water/lava spreading.
+						for( short diffX = -1; diffX  < 1; diffX++) 
+						{
+							for( short diffZ = -1; diffZ < 1; diffZ++) 
+							{
+								if (GetTile(x + diffX, y + diffZ) == Block.Air) 
+								{
+									SetTile(x + diffX, y, z + diffZ, tile)
+								}
+							}
+						}
+					}
+					
 				}
 			}
 		}
