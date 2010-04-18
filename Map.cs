@@ -109,19 +109,19 @@ public class Map
 						// water & lava
 						if(tile == Block.Water || tile == Block.Lava) {
 							if (GetTile((short)(x + 1), y, z) == Block.Air) {
-								FluidList.Add(new PositionBlock((short)(x + 1), y, z, Block.Air));
+								FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
 							}
 							if (GetTile((short)(x - 1), y, z) == Block.Air) {
-								FluidList.Add(new PositionBlock((short)(x - 1), y, z, Block.Air));
+								FluidList.Add(new PositionBlock((short)(x - 1), y, z, tile));
 							}
 							if (GetTile(x, (short)(y - 1), z) == Block.Air) {
-								FluidList.Add(new PositionBlock(x, (short)(y - 1), z, Block.Air));
+								FluidList.Add(new PositionBlock(x, (short)(y - 1), z, tile));
 							}
 							if (GetTile(x, y, (short)(z + 1)) == Block.Air) {
-								FluidList.Add(new PositionBlock(x, y, (short)(z + 1), Block.Air));
+								FluidList.Add(new PositionBlock(x, y, (short)(z + 1), tile));
 							}
 							if (GetTile(x, y, (short)(z - 1)) == Block.Air) {
-								FluidList.Add(new PositionBlock(x, y, (short)(z - 1), Block.Air));
+								FluidList.Add(new PositionBlock(x, y, (short)(z - 1), tile));
 							}
 						}
 					}
