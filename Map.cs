@@ -110,7 +110,7 @@ public class Map
 							{
 								if (GetTile(x + diffX, y, z + diffZ) == Block.Air) 
 								{
-									SetTile(x + diffX, y, z + diffZ, tile)
+									SetTile(x + diffX, y, z + diffZ, tile);
 								}
 							}
 						}
