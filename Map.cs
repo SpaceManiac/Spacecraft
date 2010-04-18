@@ -108,7 +108,7 @@ public class Map
 						{
 							for( short diffZ = -1; diffZ < 1; diffZ++) 
 							{
-								if (GetTile(x + diffX, y + diffZ) == Block.Air) 
+								if (GetTile(x + diffX, y, z + diffZ) == Block.Air) 
 								{
 									SetTile(x + diffX, y, z + diffZ, tile)
 								}
