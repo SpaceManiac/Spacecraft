@@ -34,7 +34,7 @@ public class Connection
 		serv = srv;
 		_player = null;
 		_netbuffer = new byte[256];
-		buffer = new byte[2048];
+		buffer = new byte[512];
 		bufsize = 0;
 		
 		client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
@@ -175,12 +175,17 @@ public class Connection
 				for(uint i = 0; i < serv.map.data.Length; i += 1024) {
 					byte[] packet = new byte[1028];
 					packet[0] = 0x03;
-					packet[1] = 4;
-					packet[2] = 0;
+					
+					long remaining = serv.map.data.Length - i;
+					if(remaining > 1024) remaining = 1024;
+					byte[] len = BitConverter.GetBytes(Host2Net((short)(remaining)));
+					
+					packet[1] = len[0];
+					packet[2] = len[1];
 					memstr.Read(packet, 3, 1024);
+					
 					uint percent = (uint)(100.0 * i / serv.map.data.Length);
-					packet[1026] = (byte)(percent >> 2);
-					packet[1027] = (byte)(percent & 0xff);
+					packet[1027] = (byte)(percent);
 					Send(packet);
 				}
 			}
