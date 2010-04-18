@@ -150,17 +150,18 @@ public class Map
 	
 	public void Dehydrate(Server srv)
 	{
-		physicsSuspended = true;
+		//physicsSuspended = true;
 		for(short x = 0; x < xdim; ++x) {
 			for(short y = 0; y < ydim; ++y) {
 		 		for(short z = 0; z < zdim; ++z) {
 					if(GetTile(x,y,z) == Block.Water || GetTile(x,y,z) == Block.Lava) {
-						SetSend(srv, x, y, z, Block.Air);
+						SetTile(srv, x, y, z, Block.Air);
 					}
 				}
 			}
 		}
-		physicsSuspended = false;
+		SetSend(0,0,0,GetTile(0,0,0))
+		//physicsSuspended = false;
 	}
 	
 	public void SetSend(Server srv, short x, short y, short z, byte tile)
