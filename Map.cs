@@ -100,13 +100,14 @@ public class Map
 							SetSend(srv, x, y, z, Block.Dirt);
 						}
 					}
-					
 					if(physicsCount % 2 == 0) {
 						if(tile == Block.Water || tile == Block.Lava) {
-							for(short diffX = -1; diffX  < 1; diffX++) {
-								for(short diffZ = -1; diffZ < 1; diffZ++) {
-									if (GetTile((short)(x + diffX), y, (short)(z + diffZ)) == Block.Air) {
-										SetSend(srv, (short)(x + diffX), y, (short)(z + diffZ), tile);
+							for(short diffX = -1; diffX <= 1; diffX++) {
+								for(short diffZ = -1; diffZ <= 1; diffZ++) {
+									for(short diffY = -1; diffY <= 0; diffY++) {
+										if (GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)) == Block.Air) {
+											SetSend(srv, (short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), tile);
+										}
 									}
 								}
 							}
