@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections;
 
 public class Map
 {
@@ -80,6 +81,10 @@ public class Map
 	{
 		// run twice per second
 		physicsCount++;
+		
+		ArrayList FluidList = new ArrayList();
+		ArrayList SpongeList = new ArrayList();
+		
 		for(short x = 0; x < xdim; ++x) {
 			for(short y = 0; y < ydim; ++y) {
 		 		for(short z = 0; z < zdim; ++z) {
@@ -101,13 +106,33 @@ public class Map
 						}
 					}
 					if(physicsCount % 2 == 0) {
+						// water & lava
 						if(tile == Block.Water || tile == Block.Lava) {
-							for(short diffX = -1; diffX <= 1; diffX++) {
-								for(short diffZ = -1; diffZ <= 1; diffZ++) {
-									for(short diffY = -1; diffY <= 0; diffY++) {
-										if (GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)) == Block.Air) {
-											SetSend(srv, (short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), tile);
-										}
+							if (GetTile((short)(x + 1), y, z) == Block.Air) {
+								FluidList.Add(new PositionBlock((short)(x + 1), y, z, Block.Air));
+							}
+							if (GetTile((short)(x - 1), y, z) == Block.Air) {
+								FluidList.Add(new PositionBlock((short)(x - 1), y, z, Block.Air));
+							}
+							if (GetTile(x, (short)(y - 1), z) == Block.Air) {
+								FluidList.Add(new PositionBlock(x, (short)(y - 1), z, Block.Air));
+							}
+							if (GetTile(x, y, (short)(z + 1)) == Block.Air) {
+								FluidList.Add(new PositionBlock(x, y, (short)(z + 1), Block.Air));
+							}
+							if (GetTile(x, y, (short)(z - 1)) == Block.Air) {
+								FluidList.Add(new PositionBlock(x, y, (short)(z - 1), Block.Air));
+							}
+						}
+					}
+					// sponges
+					if(tile == Block.Sponge) {
+						for(short diffX = -2; diffX <= 2; diffX++) {
+							for(short diffY = -2; diffY <= 2; diffY++) {
+								for(short diffZ = -2; diffZ <= 2; diffZ++) {
+									byte t2 = GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ));
+									if(t2 == Block.Water || t2 == Block.Lava) {
+										SpongeList.Add(new PositionBlock((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
 									}
 								}
 							}
@@ -116,10 +141,31 @@ public class Map
 				}
 			}
 		}
+		
+		foreach(PositionBlock task in FluidList) {
+			SetSend(srv, task.x, task.y, task.z, task.tile);
+		}
+		foreach(PositionBlock task in SpongeList) {
+			SetSend(srv, task.x, task.y, task.z, task.tile);
+		}
+	}
+	
+	public void Dehydrate(Server srv)
+	{
+		for(short x = 0; x < xdim; ++x) {
+			for(short y = 0; y < ydim; ++y) {
+		 		for(short z = 0; z < zdim; ++z) {
+					if(GetTile(x,y,z) == Block.Water || GetTile(x,y,z) == Block.Lava) {
+						SetSend(srv, x, y, z, Block.Air);
+					}
+				}
+			}
+		}
 	}
 	
 	public void SetSend(Server srv, short x, short y, short z, byte tile)
 	{
+		if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 		SetTile(x, y, z, tile);
 		srv.SendAll(Connection.PacketSetBlock(x, y, z, tile));
 	}
@@ -131,13 +177,13 @@ public class Map
 	
 	public void SetTile(short x, short y, short z, byte tile)
 	{
-		if(x >= xdim || y >= ydim || z >= zdim) return;
+		if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 		_data[BlockIndex(x, y, z)] = tile;
 	}
 	
 	public byte GetTile(short x, short y, short z)
 	{
-		if(x >= xdim || y >= ydim || z >= zdim) return Block.Adminium;
+		if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return Block.Adminium;
 		return _data[BlockIndex(x, y, z)];
 	}
 	

@@ -402,6 +402,12 @@ public class Connection
 				} else { 
 					Message(Color.DarkRed + "Must be mod+");
 				}
+			} else if(cmd == "dehydrate") {
+				if(Player.IsModPlus(name)) {
+					serv.map.Dehydrate(serv);
+				} else { 
+					Message(Color.DarkRed + "Must be mod+");
+				}
 			} else {
 				Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
 			}

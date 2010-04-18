@@ -41,9 +41,7 @@
     <Compile Include="Map.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Robot.cs" />
+    <Compile Include="PositionBlock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <None Include="server.properties" />
-  </ItemGroup>
 </Project>
