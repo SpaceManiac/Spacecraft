@@ -42,7 +42,15 @@ public class Connection
 	
 	public void ReadCallback(IAsyncResult ar)
 	{
-		int bytesRead = client.GetStream().EndRead(ar);
+		try {
+			int bytesRead = client.GetStream().EndRead(ar);
+		}
+		catch (IOException e)
+		{
+			Spacecraft.log(e.ToString());
+			return;
+		}
+		
 		if(bytesRead == 0) {
 			if(_connected) {
 				Spacecraft.Log(name + " disconnected");
