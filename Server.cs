@@ -114,7 +114,30 @@ public class Server
 	
 	private void Heartbeat()
 	{
-		string postcontent = 
+		StringBuilder builder = new StringBuilder();
+		
+		builder.Append("port=");
+		builder.Append(port.ToString());
+		
+		builder.Append("&users=");
+		builder.Append(connections.Count);
+	
+		builder.Append("&max=");
+		builder.Append(maxplayers);
+		
+		builder.Append("&name=");
+		builder.Append(name);
+	
+		builder.Append("&public=");
+		builder.Append("false");
+		
+		builder.Append("&version=7");
+		
+		builder.Append("&salt=");
+		builder.Append(salt.ToString());
+		
+	
+		string postcontent = builder.ToString() /*
 			"port=" + port +
 			"&users=" + connections.Count +
 			"&max=" + maxplayers +
@@ -122,7 +145,7 @@ public class Server
 			"&public=" + "false" +
 			"&version=7" +
 			"&salt=" + salt;
-		               
+		               */
 		byte[] post = Encoding.ASCII.GetBytes(postcontent);
 		
 		HttpWebRequest req = (HttpWebRequest) WebRequest.Create("http://minecraft.net/heartbeat.jsp");
