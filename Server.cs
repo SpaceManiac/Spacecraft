@@ -81,7 +81,7 @@ public class Server
 			beattimer.Start();
 			Heartbeat();
 			
-			phystimer = new System.Timers.Timer(1000);
+			phystimer = new System.Timers.Timer(500);
 			phystimer.Elapsed += new ElapsedEventHandler(PhysTimer);
 			phystimer.Start();
 			
@@ -137,7 +137,7 @@ public class Server
 		builder.Append(salt.ToString());
 		
 	
-		string postcontent = builder.ToString() /*
+		string postcontent = builder.ToString(); /*
 			"port=" + port +
 			"&users=" + connections.Count +
 			"&max=" + maxplayers +

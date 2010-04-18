@@ -84,7 +84,7 @@ public class Map
 			for(short y = 0; y < ydim; ++y) {
 		 		for(short z = 0; z < zdim; ++z) {
 					byte tile = GetTile(x, y, z);
-					if(physicsCount % 5 == 0) {
+					if(physicsCount % 10 == 0) {
 						// grass
 						bool lit = true;
 						for(short y2 = (short)(y + 1); y2 < ydim; ++y2) {
@@ -99,7 +99,6 @@ public class Map
 						if(tile == Block.Grass && !lit && Server.rnd.NextDouble() < 0.7) {
 							SetSend(srv, x, y, z, Block.Dirt);
 						}
-						
 					}
 				}
 			}
