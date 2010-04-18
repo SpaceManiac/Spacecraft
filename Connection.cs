@@ -46,9 +46,10 @@ public class Connection
 		try {
 			bytesRead = client.GetStream().EndRead(ar);
 		}
-		catch(System.IO.IOException) {
+		catch(IOException e) {
 			if(_connected) {
-				Spacecraft.Log(name + " disconnected");
+				Spacecraft.Log(name + " disconnected [exception]");
+				Spacecraft.Log(e.ToString());
 				_connected = false;
 				if(_player != null) {
 					MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
