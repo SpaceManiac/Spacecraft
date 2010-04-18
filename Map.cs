@@ -101,20 +101,17 @@ public class Map
 						}
 					}
 					
-					if(tile == Block.Water || tile == Block.Lava)
-					{ // Water/lava spreading.
-						for( short diffX = -1; diffX  < 1; diffX++) 
-						{
-							for( short diffZ = -1; diffZ < 1; diffZ++) 
-							{
-								if (GetTile(x + diffX, y, z + diffZ) == Block.Air) 
-								{
-									SetTile(x + diffX, y, z + diffZ, tile)
+					if(physicsCount % 2 == 0) {
+						if(tile == Block.Water || tile == Block.Lava) {
+							for(short diffX = -1; diffX  < 1; diffX++) {
+								for(short diffZ = -1; diffZ < 1; diffZ++) {
+									if (GetTile((short)(x + diffX), y, (short)(z + diffZ)) == Block.Air) {
+										SetSend(srv, (short)(x + diffX), y, (short)(z + diffZ), tile);
+									}
 								}
 							}
 						}
 					}
-					
 				}
 			}
 		}
