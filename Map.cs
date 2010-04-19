@@ -141,7 +141,8 @@ public class Map
 			SetSend(srv, task.x, task.y, task.z, task.tile);
 		}
 		foreach(PositionBlock task in SpongeList) {
-			if(GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava) {
+            if (GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava || GetTile(task.x, task.y, task.z) == Block.StillWater)
+            {
 				SetSend(srv, task.x, task.y, task.z, task.tile);
 			}
 		}

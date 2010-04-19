@@ -1,15 +1,25 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player
 {
+    public enum RankEnum { Banned = -1, Guest, Builder, Mod, Admin }
+
+    public static ArrayList ids = new ArrayList();
+    
+    /// <summary>
+    /// A series of lists containing all players of the given rank.
+    /// </summary>
+    public static Dictionary<RankEnum, List<string>> RankedPlayers = new Dictionary<RankEnum, List<string>>();
+    
+    
+    public RankEnum Rank;
 	public byte pid;
 	public string name;
 	public Int16 x, y, z;
 	public byte heading;
 	public byte pitch;
-	public static ArrayList ids = new ArrayList();
-	
 	public bool placing;
 	public byte placeType;
 	
@@ -24,9 +34,19 @@ public class Player
 			if(!ids.Contains(i)) {
 				ids.Add(i);
 				pid = i;
-				return;
+                break;
 			}
 		}
+
+        foreach (RankEnum key in RankedPlayers.Keys)
+        {
+            if (RankedPlayers[key].Contains(username))
+            {
+                Rank = key;
+                break;
+            }
+        }
+
 	}
 	
 	~Player()
@@ -36,12 +56,12 @@ public class Player
 	
 	public static bool IsAdmin(string name)
 	{
-		return (name == "SpaceManiac");
+        return RankedPlayers[RankEnum.Admin].Contains(name);
 	}
 	
 	public static bool IsModPlus(string name)
 	{
-		return (name == "Blocky" || IsAdmin(name));
+        return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
 	}
 	
 	public bool PositionUpdate(Int16 X, Int16 Y, Int16 Z, byte Heading, byte Pitch)
@@ -52,4 +72,8 @@ public class Player
 		pitch = Pitch;
 		return r;
 	}
+
+
+
+
 }

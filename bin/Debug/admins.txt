@@ -1,0 +1,2 @@
+Admin=SpaceManiac,Blocky
+Mod=AtkinsSJ

@@ -135,10 +135,10 @@ public class Connection
         MD5CryptoServiceProvider x = new MD5CryptoServiceProvider();
         byte[] data = Encoding.ASCII.GetBytes(Value);
         data = x.ComputeHash(data);
-        string ret = "";
-        for (int i=0; i < data.Length; i++)
-                ret += data[i].ToString("x2").ToLower();
-        return ret;
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < data.Length; i++)
+            ret.Append(data[i].ToString("x2").ToLower());
+        return ret.ToString();
 	}
 	
 	
@@ -237,7 +237,7 @@ public class Connection
 	
 	public void Kick(string reason) {
 		Spacecraft.Log(name + " was kicked: " + reason);
-		MsgAll(name + " was kicked!");
+        MsgAll(Color.Escape + Color.Red + " was kicked!");
 		_connected = false;
 		Send(PacketKick(reason));
 	}
@@ -298,6 +298,7 @@ public class Connection
 		}
 		Send(PacketTeleportSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
 		MsgAll(Color.Escape + Color.Yellow + name + " has joined!");
+        Message("You're a " + player.Rank.ToString());
 	}
 	
 	private void HandleBlock(byte[] packet)
@@ -449,15 +450,27 @@ public class Connection
 				} else { 
 					Message(Color.DarkRed + "Must be mod+");
 				}
-			} else if(cmd == "dehydrate") {
-				if(Player.IsModPlus(name)) {
-					serv.map.Dehydrate(serv);
-				} else { 
-					Message(Color.DarkRed + "Must be mod+");
-				}
-			} else {
-				Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
-			}
+            }
+            else if (cmd == "dehydrate")
+            {
+                if (Player.IsModPlus(name))
+                {
+                    serv.map.Dehydrate(serv);
+                }
+                else
+                {
+                    Message(Color.DarkRed + "Must be mod+");
+                }
+            }
+            else if (cmd == "myself")
+            {
+                
+                    //Message(Color.DarkRed);
+            }
+            else
+            {
+                Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
+            }
 		} else {
 			MsgAll(name + ": " + msg);
 			Spacecraft.Log(name + ": " + msg);

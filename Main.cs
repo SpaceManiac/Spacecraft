@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 
 class Spacecraft
 {
@@ -10,7 +11,7 @@ class Spacecraft
 	{
 		Log("Spacecraft is starting...");
 		
-		string[] files = new string[] { "banned.txt", "banned-ip.txt", "admins.txt" };
+		string[] files = new string[] { "banned.txt", "banned-ip.txt", "admins.txt",  };
 		foreach(string file in files) {
 			if(!File.Exists(file)) {
 				Log("Note: " + file + " does not exist, creating.");
@@ -34,12 +35,45 @@ class Spacecraft
 		}
 		
 		Block.MakeNames();
-		
+
+        InitializeRanks();
+
 		Server serv = new Server();
 		serv.Start();
 		Spacecraft.Log("Bye!");
 		Environment.Exit(0);
 	}
+
+    private static void InitializeRanks()
+    {
+        StreamReader Reader = new StreamReader("admins.txt");
+        string[] Lines = Reader.ReadToEnd().Split(new string[] {System.Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var line in Lines)
+        {
+            string[] parts;
+            string rank;
+            parts = line.Split('=');
+
+            rank = parts[0].Substring(0, 1).ToUpper() + parts[0].Substring(1, parts[0].Length - 1);
+
+            Player.RankEnum assignedRank = (Player.RankEnum)Enum.Parse(typeof(Player.RankEnum), rank);
+
+            if (!Player.RankedPlayers.ContainsKey(assignedRank) || Player.RankedPlayers[assignedRank] != null)
+            {
+                Player.RankedPlayers[assignedRank] = new List<string>();
+            }
+
+            string[] people = parts[1].Split(',');
+
+            for (int i = 0; i < people.Length; i++)
+            {
+                string name = people[i];
+                Player.RankedPlayers[assignedRank].Add(name);
+            }
+
+        }
+    }
 	
 	public static void Log(string text)
 	{
