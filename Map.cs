@@ -103,9 +103,9 @@ public class Map
 							SetSend(srv, x, y, z, Block.Dirt);
 						}
 					}
-					if(physicsCount % 2 == 0) {
-						// water & lava
-						if(tile == Block.Water || tile == Block.Lava) {
+					// water & lava
+					if(tile == Block.Water || tile == Block.Lava) {
+						if(tile != Block.Lava || physicsCount % 2 == 0) {
 							if (GetTile((short)(x + 1), y, z) == Block.Air) {
 								FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
 							}
@@ -128,10 +128,7 @@ public class Map
 						for(short diffX = -2; diffX <= 2; diffX++) {
 							for(short diffY = -2; diffY <= 2; diffY++) {
 								for(short diffZ = -2; diffZ <= 2; diffZ++) {
-									byte t2 = GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ));
-									if(t2 == Block.Water || t2 == Block.Lava) {
-										SpongeList.Add(new PositionBlock((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
-									}
+									SpongeList.Add(new PositionBlock((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
 								}
 							}
 						}
@@ -144,24 +141,25 @@ public class Map
 			SetSend(srv, task.x, task.y, task.z, task.tile);
 		}
 		foreach(PositionBlock task in SpongeList) {
-			SetSend(srv, task.x, task.y, task.z, task.tile);
+			if(GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava) {
+				SetSend(srv, task.x, task.y, task.z, task.tile);
+			}
 		}
 	}
 	
 	public void Dehydrate(Server srv)
 	{
-		//physicsSuspended = true;
+		physicsSuspended = true;
 		for(short x = 0; x < xdim; ++x) {
 			for(short y = 0; y < ydim; ++y) {
 		 		for(short z = 0; z < zdim; ++z) {
 					if(GetTile(x,y,z) == Block.Water || GetTile(x,y,z) == Block.Lava) {
-						SetTile(srv, x, y, z, Block.Air);
+						SetSend(srv, x, y, z, Block.Air);
 					}
 				}
 			}
 		}
-		SetSend(0,0,0,GetTile(0,0,0))
-		//physicsSuspended = false;
+		physicsSuspended = false;
 	}
 	
 	public void SetSend(Server srv, short x, short y, short z, byte tile)

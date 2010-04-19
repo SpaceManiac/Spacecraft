@@ -46,27 +46,16 @@ public class Connection
 		try {
 			bytesRead = client.GetStream().EndRead(ar);
 		}
-		catch(IOException e) {
-			if(_connected) {
-				Spacecraft.Log(name + " disconnected [exception]");
-				Spacecraft.Log(e.ToString());
-				_connected = false;
-				if(_player != null) {
-					MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
-					serv.SendAll(PacketDespawnPlayer(_player));
-				}
-			}
+		catch(IOException) {
+			_Disconnect();
+			return;
+		}
+		catch(InvalidOperationException) {
+			_Disconnect();
 			return;
 		}
 		if(bytesRead == 0) {
-			if(_connected) {
-				Spacecraft.Log(name + " disconnected");
-				_connected = false;
-				if(_player != null) {
-					MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
-					serv.SendAll(PacketDespawnPlayer(_player));
-				}
-			}
+			_Disconnect();
 			return;
 		}
 		
@@ -106,7 +95,17 @@ public class Connection
 		}
 		
 		// read again
-		client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
+		try {
+			client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
+		}
+		catch(IOException) {
+			_Disconnect();
+			return;
+		}
+		catch(InvalidOperationException) {
+			_Disconnect();
+			return;
+		}
 	}
 	
 	// ===================================================================
@@ -156,9 +155,29 @@ public class Connection
 	// ===================================================================
 	// nonstatic helpers
 	
+	private void _Disconnect()
+	{
+		if(_connected) {
+			Spacecraft.Log(name + " disconnected");
+			_connected = false;
+			if(_player != null) {
+				MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
+				serv.SendAll(PacketDespawnPlayer(_player));
+			}
+		}
+	}
+	
 	public void Send(byte[] data)
 	{
-		client.GetStream().Write(data, 0, data.Length);
+		try {
+			client.GetStream().Write(data, 0, data.Length);
+		}
+		catch(InvalidOperationException) {
+			_Disconnect();
+		}
+		catch(IOException) {
+			_Disconnect();
+		}
 	}
 	
 	private void SendMap()
@@ -368,21 +387,21 @@ public class Connection
 				}
 			} else if(cmd == "place") {
 				if(Player.IsModPlus(name)) {
-					if(_player.placing) {
-						_player.placing = false;
-						Message(Color.Teal + "No longer placing");
-					} else {
-						if(args == "") {
-							Message(Color.DarkRed + "No block specified");
+					if(args == "") {
+						if(_player.placing) {
+							_player.placing = false;
+							Message(Color.Teal + "No longer placing");
 						} else {
-							string b = args;
-							if(Block.Names.Contains(b)) {
-								_player.placing = true;
-								_player.placeType = (byte)(Block.Names[b]);
-								Message(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
-							} else {
-								Message(Color.DarkRed + "Unknown block " + b);
-							}
+							Message(Color.DarkRed + "No block specified");
+						}
+					} else {
+						string b = args;
+						if(Block.Names.Contains(b)) {
+							_player.placing = true;
+							_player.placeType = (byte)(Block.Names[b]);
+							Message(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
+						} else {
+							Message(Color.DarkRed + "Unknown block " + b);
 						}
 					}
 				} else {
@@ -441,6 +460,7 @@ public class Connection
 			}
 		} else {
 			MsgAll(name + ": " + msg);
+			Spacecraft.Log(name + ": " + msg);
 		}
 	}
 	
