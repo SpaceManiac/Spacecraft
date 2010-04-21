@@ -38,30 +38,17 @@ public class Player
             }
         }
 
-        foreach (RankEnum key in RankedPlayers.Keys)
-        {
-            if (RankedPlayers[key].Contains(username))
-            {
+        foreach (RankEnum key in RankedPlayers.Keys) {
+            if (RankedPlayers[key].Contains(username)) {
                 Rank = key;
                 break;
             }
         }
-
     }
     
     ~Player()
     {
         ids.Remove(pid);
-    }
-    
-    public static bool IsAdmin(string name)
-    {
-        return RankedPlayers[RankEnum.Admin].Contains(name);
-    }
-    
-    public static bool IsModPlus(string name)
-    {
-        return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
     }
     
     public bool PositionUpdate(Int16 X, Int16 Y, Int16 Z, byte Heading, byte Pitch)
@@ -72,8 +59,38 @@ public class Player
         pitch = Pitch;
         return r;
     }
-
-
-
-
+	
+    // static stuff
+	
+	public static string RankColor(RankEnum rank)
+	{
+		switch(rank) {
+			case RankEnum.Banned: return Color.Red;
+			case RankEnum.Guest: return Color.White;
+			case RankEnum.Builder: return Color.Green;
+			case RankEnum.Mod: return Color.Yellow;
+			case RankEnum.Admin: return Color.Blue;
+		}
+		return Color.Teal;
+	}
+	
+    public static bool IsAdmin(string name)
+    {
+        return RankedPlayers[RankEnum.Admin].Contains(name);
+    }
+    
+    public static bool IsModPlus(string name)
+    {
+        return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
+    }
+	
+	public static bool IsBuilderPlus(string name)
+	{
+		return (IsModPlus(name) || RankedPlayers[RankEnum.Builder].Contains(name));
+	}
+	
+	public static bool IsBanned(string name)
+	{
+		return RankedPlayers[RankEnum.Banned].Contains(name);
+	}
 }

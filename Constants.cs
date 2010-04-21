@@ -55,9 +55,23 @@ public class Block
     public const byte Obsidian             = 0x31;
     
     public static Hashtable Names;
+	
+	public static bool IsFluid(byte block) {
+		return (block == Water || block == StillWater || block == Lava || block == StillLava);
+	}
+	public static bool IsDecoration(byte block) {
+		return (block == YellowFlower || block == RedFlower || block == BrownMushroom || block == RedMushroom);
+	}
     
-    public static bool IsSolid(byte block) {
-        return !(block == Air || block == Leaves || block == Glass);
+	public static bool IsTransparent(byte block) {
+		return (IsDecoration(block) || block == Glass || block == Leaves || block == Air);
+	}
+	public static bool IsOpaque(byte block) {
+		return !IsTransparent(block);
+	}
+	
+	public static bool IsSolid(byte block) {
+        return (block != Air && !IsFluid(block) && !IsDecoration(block));
     }
     
     public static void MakeNames() {
@@ -153,4 +167,42 @@ public class Color
     public const string Pink = "&d";
     public const string Yellow = "&e";
     public const string White = "&f";
+}
+
+public class HelpText
+{
+	public const string Me = "/me: third-person roleplay-like actions";
+	public const string Help = "/help: displays help information";
+	public const string Myself = "/myself: does nothing"; // :P
+	public const string Teleport = "/teleport: teleports you to a player (builder+)";
+	public const string TP = "/tp: teleports you to a player (builder+)";
+	public const string Bring = "/bring: teleports a player to you (mod+)";
+	public const string Broadcast = "/broadcast: broadcast a message in yellow text (mod+)";
+	public const string Say = "/say: broadcast a message in yellow text (mod+)";
+	public const string Kick = "/kick: kick a player (mod+)";
+	public const string K = "/k: kick a player (mod+)";
+	public const string Place = "/place: place special blocks (mod+)";
+	public const string Dehydrate = "/dehydrate: remove all liquid in case of flood (mod+)";
+	public const string Exit = "/exit: safely shut the server down (admin)";
+	public const string SetSpawn = "/setspawn: set the global spawn point (admin)";
+		
+	public static string Lookup(string s) {
+        switch(s.ToLower()) {
+            case "me": return Me;
+			case "help": return Help;
+			case "myself": return Myself;
+			case "teleport": return Teleport;
+			case "tp": return TP;
+			case "bring": return Bring;
+			case "broadcast": return Broadcast;
+			case "say": return Say;
+			case "kick": return Kick;
+			case "k": return K;
+			case "place": return Place;
+			case "dehydrate": return Dehydrate;
+			case "exit": return Exit;
+			case "setspawn": return SetSpawn;
+        }
+        return "";
+    }
 }

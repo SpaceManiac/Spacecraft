@@ -191,19 +191,20 @@ public class Connection
                 compress.Write(serv.map.data, 0, serv.map.Length);
                 memstr.Seek(0, SeekOrigin.Begin);
                 
-                for(uint i = 0; i < memstr.Length; i += 1024) {
+				int len = serv.map.Length;
+                for(int i = 0; i < len; i += 1024) {
                     byte[] packet = new byte[1028];
                     packet[0] = 0x03;
                     
-                    long remaining = memstr.Length - i;
+                    int remaining = len - i;
                     if(remaining > 1024) remaining = 1024;
-                    byte[] len = BitConverter.GetBytes(Host2Net((short)(remaining)));
+                    byte[] lenb = BitConverter.GetBytes(Host2Net((short)remaining));
                     
-                    packet[1] = len[0];
-                    packet[2] = len[1];
-                    memstr.Read(packet, 3, 1024);
+                    packet[1] = lenb[0];
+                    packet[2] = lenb[1];
+                    memstr.Read(packet, 3, remaining);
                     
-                    packet[1027] = (byte)(100.0 * i / memstr.Length);
+                    packet[1027] = (byte)(100.0 * i / len);
                     Send(packet);
                 }
             }
@@ -297,7 +298,7 @@ public class Connection
         }
         Send(PacketTeleportSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
         MsgAll(Color.Escape + Color.Yellow + name + " has joined!");
-        Message("You're a " + player.Rank.ToString());
+        Message(Color.Yellow + "You're a " + Player.RankColor(_player.Rank) + player.Rank.ToString() + Color.Yellow + ". See /help for info");
     }
     
     private void HandleBlock(byte[] packet)
@@ -366,17 +367,43 @@ public class Connection
                     }
                 }
             } else if(cmd == "help") {
-                Message(Color.DarkRed + "/help is coming soon");
-            } else if(cmd == "magic") {
-                if(Player.IsAdmin(name)) {
-                    MsgAll(Color.Yellow + name + " used MAGIC!");
-                    for(short x = 0; x < serv.map.xdim; ++x) {
-                        for(short z = 0; z < serv.map.zdim; ++z) {
-                            serv.map.SetSend(serv, x, 0, z, Block.Dirt);
-                        }
-                    }
+                if(args == "") {
+					Message(Color.Teal + "You are a " + Player.RankColor(_player.Rank) + player.Rank.ToString());
+					string commands = "You can use:";
+					commands += " /help /me /myself";
+					if(player.Rank >= Player.RankEnum.Builder) {
+						commands += " /teleport /tp";
+					}
+					if(player.Rank >= Player.RankEnum.Mod) {
+						commands += " /dehydrate /bring /broadcast /k /kick /place /say";
+					}
+					if(player.Rank == Player.RankEnum.Admin) {
+						commands += " /exit /setspawn";
+					}
+					Message(Color.Teal + commands);
+				} else {
+					if(args[0] == '/') args = args.Substring(1);
+					string help = HelpText.Lookup(args);
+					if(help == "") {
+						Message(Color.DarkRed + "No help text on /" + args);
+					} else {
+						Message(Color.Teal + help);
+					}
+				}
+			} else if(cmd == "bring") {
+                if(Player.IsModPlus(name)) {
+					if(args == "") {
+						Message(Color.DarkRed + "No player specified");
+					} else {
+                    	Connection c = serv.GetConnection(args);
+						if(c == null) {
+							Message(Color.DarkRed + "No such player " + args);
+						} else {
+							c.Send(PacketTeleportSelf(_player.x, _player.y, _player.z, _player.heading, _player.pitch));
+						}
+					}
                 } else {
-                    Message(Color.DarkRed + "Must be server admin");
+                    Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "exit") {
                 if(Player.IsAdmin(name)) {
@@ -385,6 +412,15 @@ public class Connection
                 } else {
                     Message(Color.DarkRed + "Must be server admin");
                 }
+			} else if(cmd == "setspawn") {
+				if(Player.IsAdmin(name)) {
+					serv.map.xspawn = _player.x;
+					serv.map.yspawn = _player.y;
+					serv.map.zspawn = _player.z;
+					Message(Color.Teal + "Spawn point set");
+				} else {
+					Message(Color.DarkRed + "Must be server admin");
+				}
             } else if(cmd == "place") {
                 if(Player.IsModPlus(name)) {
                     if(args == "") {
@@ -408,7 +444,7 @@ public class Connection
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "tp" || cmd == "teleport") {
-                if(Player.IsModPlus(name)) {
+                if(Player.IsBuilderPlus(name)) {
                     if(args == "") {
                         Message(Color.DarkRed + "No player specified");
                     } else {
@@ -421,7 +457,7 @@ public class Connection
                         }
                     }
                 } else {
-                    Message(Color.DarkRed + "Must be mod+");
+                    Message(Color.DarkRed + "Must be builder+");
                 }
             } else if(cmd == "kick" || cmd == "k") {
                 if(Player.IsModPlus(name)) {
@@ -449,25 +485,15 @@ public class Connection
                 } else { 
                     Message(Color.DarkRed + "Must be mod+");
                 }
-            }
-            else if (cmd == "dehydrate")
-            {
-                if (Player.IsModPlus(name))
-                {
+            } else if (cmd == "dehydrate") {
+                if (Player.IsModPlus(name)) {
                     serv.map.Dehydrate(serv);
-                }
-                else
-                {
+                } else {
                     Message(Color.DarkRed + "Must be mod+");
                 }
-            }
-            else if (cmd == "myself")
-            {
-                
-                    //Message(Color.DarkRed);
-            }
-            else
-            {
+            } else if (cmd == "myself") {
+                // Message(Color.DarkRed);
+            } else {
                 Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
             }
         } else {

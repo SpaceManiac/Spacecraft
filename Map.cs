@@ -91,7 +91,7 @@ public class Map
                         // grass
                         bool lit = true;
                         for(short y2 = (short)(y + 1); y2 < ydim; ++y2) {
-                            if(Block.IsSolid(GetTile(x, y2, z))) {
+                            if(Block.IsOpaque(GetTile(x, y2, z))) {
                                 lit = false;
                                 break;
                             }
@@ -106,20 +106,23 @@ public class Map
                     // water & lava
                     if(tile == Block.Water || tile == Block.Lava) {
                         if(tile != Block.Lava || physicsCount % 2 == 0) {
-                            if (GetTile((short)(x + 1), y, z) == Block.Air) {
-                                FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
-                            }
-                            if (GetTile((short)(x - 1), y, z) == Block.Air) {
-                                FluidList.Add(new PositionBlock((short)(x - 1), y, z, tile));
-                            }
+							byte under = GetTile(x, (short)(y - 1), z);
+							if (!Block.IsFluid(under) && under != Block.Air) {
+	                            if (GetTile((short)(x + 1), y, z) == Block.Air) {
+	                                FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
+	                            }
+	                            if (GetTile((short)(x - 1), y, z) == Block.Air) {
+	                                FluidList.Add(new PositionBlock((short)(x - 1), y, z, tile));
+	                            }
+	                            if (GetTile(x, y, (short)(z + 1)) == Block.Air) {
+	                                FluidList.Add(new PositionBlock(x, y, (short)(z + 1), tile));
+	                            }
+	                            if (GetTile(x, y, (short)(z - 1)) == Block.Air) {
+	                                FluidList.Add(new PositionBlock(x, y, (short)(z - 1), tile));
+	                            }
+							}
                             if (GetTile(x, (short)(y - 1), z) == Block.Air) {
                                 FluidList.Add(new PositionBlock(x, (short)(y - 1), z, tile));
-                            }
-                            if (GetTile(x, y, (short)(z + 1)) == Block.Air) {
-                                FluidList.Add(new PositionBlock(x, y, (short)(z + 1), tile));
-                            }
-                            if (GetTile(x, y, (short)(z - 1)) == Block.Air) {
-                                FluidList.Add(new PositionBlock(x, y, (short)(z - 1), tile));
                             }
                         }
                     }
