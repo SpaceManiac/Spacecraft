@@ -11,9 +11,11 @@ using System.Timers;
 public class Server
 {
     private ArrayList connections;
+	private ArrayList mobs;
     private bool firstbeat;
     private System.Timers.Timer beattimer;
     private System.Timers.Timer phystimer;
+    private System.Timers.Timer mobtimer;
     private TcpListener srv;
     
     public static Random rnd;
@@ -28,6 +30,7 @@ public class Server
     
     public Server()
     {
+		mobs = new ArrayList();
         rnd = new Random();
         salt = rnd.Next(100000, 999999);
         srv = null;
@@ -80,6 +83,10 @@ public class Server
             phystimer.Elapsed += new ElapsedEventHandler(PhysTimer);
             phystimer.Start();
             
+            mobtimer = new System.Timers.Timer(1000.0 / 30);
+            mobtimer.Elapsed += new ElapsedEventHandler(MobTimer);
+            mobtimer.Start();
+            
             OnExit.WaitOne();
         }
         catch(SocketException e)
@@ -106,6 +113,13 @@ public class Server
     {
         map.Physics(this);
     }
+	
+	private void MobTimer(object x, ElapsedEventArgs y)
+	{
+		for(int i = 0; i < mobs.Count; ++i) {
+			((Robot)(mobs[i])).Update(this);
+		}
+	}
     
     private void Heartbeat()
     {
@@ -181,6 +195,22 @@ public class Server
         connections.Add(new Connection(client, this));
         srv.BeginAcceptTcpClient(new AsyncCallback(AcceptClient), srv);
     }
+	
+	public void SpawnMob(Player at)
+	{
+		SpawnMob(at, "Mob");
+	}
+	
+	public void SpawnMob(Player at, string name)
+	{
+		Robot m = new Robot(name);
+		m.x = at.x;
+		m.y = at.y;
+		m.z = at.z;
+		mobs.Add(m);
+		SendAll(Connection.PacketSpawnPlayer(m));
+		Spacecraft.Log("Spawning mob " + name);
+	}
     
     public void LoadMap()
     {
@@ -235,6 +265,9 @@ public class Server
             }
             r.Add(c.player);
         }
+		for(int i = 0; i < mobs.Count; ++i) {
+			r.Add(mobs[i]);
+		}
         return r;
     }
     

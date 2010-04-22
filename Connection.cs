@@ -266,7 +266,7 @@ public class Connection
         byte unused = packet[130];
         _name = username;
         
-        string[] allowed = new string[] { "SpaceManiac", "Kerma", "mortar", "Blackduck606", "Cliffy1000", "Blocky", "AtkinsSJ", "demize" };
+        string[] allowed = new string[] { "SpaceManiac", "Kerma", "mortar", "Blackduck606", "Cliffy1000", "Blocky", "AtkinsSJ", "demize", "Darkaruki" };
         
         bool canplay = false;
         for(int i = 0; i < allowed.Length; ++i) {
@@ -278,11 +278,11 @@ public class Connection
             return;
         }
         
-        if(MD5sum(serv.salt + username) != key) {
+        /*if(MD5sum(serv.salt + username) != key) {
             Spacecraft.Log(name + " (" + addr + ") wasn't verified");
             Kick("The name wasn't verified by minecraft.net!");
             return;
-        }
+        }*/
         
         _player = new Player(username);
         Spacecraft.Log(name + " (" + addr + ") has joined! pid = " + player.pid);
@@ -345,7 +345,27 @@ public class Connection
     private void HandleMessage(byte[] packet)
     {
         string msg = ExtractString(packet, 2);
-        if(msg[0] == '/') {
+		if(msg[0] == '@') {
+			// private messages
+			int i = msg.IndexOf(' ');
+			string username = msg.Substring(1);
+			string message = "";
+			if(i > 0) {
+				username = msg.Substring(1, i - 1);
+				if(i != msg.Length - 1) {
+					message = msg.Substring(i + 1);
+				}
+			}
+			if(message != "") {
+				Connection c = serv.GetConnection(username);
+				if(c == null) {
+					Message(Color.DarkRed + "No such user " + username);
+				} else {
+					Message(Color.Purple + "2 " + username + "] " + message);
+					c.Message(Color.Purple + name + "> " + message);
+				}
+			}
+		} else if(msg[0] == '/') {
             int i = msg.IndexOf(' ');
             string cmd = msg.Substring(1);
             string args = "";
@@ -370,7 +390,7 @@ public class Connection
                 if(args == "") {
 					Message(Color.Teal + "You are a " + Player.RankColor(_player.Rank) + player.Rank.ToString());
 					string commands = "You can use:";
-					commands += " /help /me /myself";
+					commands += " /help /me /status";
 					if(player.Rank >= Player.RankEnum.Builder) {
 						commands += " /teleport /tp";
 					}
@@ -491,9 +511,13 @@ public class Connection
                 } else {
                     Message(Color.DarkRed + "Must be mod+");
                 }
-            } else if (cmd == "myself") {
-                // Message(Color.DarkRed);
-            } else {
+            } else if(cmd == "mob") {
+                if (Player.IsModPlus(name)) {
+					serv.SpawnMob(_player);
+                } else {
+                    Message(Color.DarkRed + "Must be mod+");
+                }
+			} else {
                 Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
             }
         } else {
