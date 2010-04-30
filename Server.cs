@@ -25,11 +25,16 @@ public class Server
     public int maxplayers;
     public string name;
     public string motd;
-    
+
+
+    static public Server theServ;
     public static ManualResetEvent OnExit = new ManualResetEvent(false);
     
     public Server()
     {
+        if (theServ != null)
+        { return; }
+        theServ = this;
 		mobs = new ArrayList();
         rnd = new Random();
         salt = rnd.Next(100000, 999999);

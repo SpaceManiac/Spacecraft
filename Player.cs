@@ -81,12 +81,13 @@ public class Player
     
     public static bool IsModPlus(string name)
     {
-        return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
+       // return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
+        return false;
     }
 	
 	public static bool IsBuilderPlus(string name)
 	{
-		return (IsModPlus(name) || RankedPlayers[RankEnum.Builder].Contains(name));
+        return (IsModPlus(name));// || RankedPlayers[RankEnum.Builder].Contains(name));
 	}
 	
 	public static bool IsBanned(string name)
