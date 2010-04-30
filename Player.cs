@@ -14,7 +14,7 @@ public class Player
     public static Dictionary<RankEnum, List<string>> RankedPlayers = new Dictionary<RankEnum, List<string>>();
     
     
-    public RankEnum Rank;
+    public RankEnum rank;
     public byte pid;
     public string name;
     public Int16 x, y, z;
@@ -38,9 +38,10 @@ public class Player
             }
         }
 
+		rank = RankEnum.Guest;
         foreach (RankEnum key in RankedPlayers.Keys) {
             if (RankedPlayers[key].Contains(username)) {
-                Rank = key;
+                rank = key;
                 break;
             }
         }
@@ -72,25 +73,5 @@ public class Player
 			case RankEnum.Admin: return Color.Blue;
 		}
 		return Color.Teal;
-	}
-	
-    public static bool IsAdmin(string name)
-    {
-        return RankedPlayers[RankEnum.Admin].Contains(name);
-    }
-    
-    public static bool IsModPlus(string name)
-    {
-        return (IsAdmin(name) || RankedPlayers[RankEnum.Mod].Contains(name));
-    }
-	
-	public static bool IsBuilderPlus(string name)
-	{
-		return (IsModPlus(name) || RankedPlayers[RankEnum.Builder].Contains(name));
-	}
-	
-	public static bool IsBanned(string name)
-	{
-		return RankedPlayers[RankEnum.Banned].Contains(name);
 	}
 }

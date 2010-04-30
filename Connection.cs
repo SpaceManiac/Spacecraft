@@ -229,7 +229,7 @@ public class Connection
         InsertString(packet, 2, serv.name);
         InsertString(packet, 66, serv.motd);
         packet[130] = 0x00;
-        if(Player.IsModPlus(_player.name)) {
+        if(_player.rank >= Player.RankEnum.Mod) {
             packet[130] = 0x64;
         }
         Send(packet);
@@ -266,25 +266,20 @@ public class Connection
         byte unused = packet[130];
         _name = username;
         
-        string[] allowed = new string[] { "SpaceManiac", "Kerma", "mortar", "Blackduck606", "Cliffy1000", "Blocky", "AtkinsSJ", "demize", "Darkaruki" };
-        
-        bool canplay = false;
-        for(int i = 0; i < allowed.Length; ++i) {
-            if(allowed[i] == username) canplay = true;
-        }
-        if(!canplay) {
-            Spacecraft.Log(name + " (" + addr + ") wasn't on the allowed list");
-            Kick("Sorry, server isn't functional yet!");
-            return;
-        }
-        
         /*if(MD5sum(serv.salt + username) != key) {
             Spacecraft.Log(name + " (" + addr + ") wasn't verified");
             Kick("The name wasn't verified by minecraft.net!");
             return;
         }*/
-        
+		
         _player = new Player(username);
+        
+        if(_player.rank == Player.RankEnum.Banned) {
+            Spacecraft.Log(name + " (" + addr + ") wasn't on the allowed list");
+            Kick("Sorry, you're not allowed on this server!");
+            return;
+        }
+        
         Spacecraft.Log(name + " (" + addr + ") has joined! pid = " + player.pid);
         SendServerInfo();
         SendMap();
@@ -297,8 +292,9 @@ public class Connection
             Send(PacketSpawnPlayer((Player)(players[i])));
         }
         Send(PacketTeleportSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
-        MsgAll(Color.Escape + Color.Yellow + name + " has joined!");
-        Message(Color.Yellow + "You're a " + Player.RankColor(_player.Rank) + player.Rank.ToString() + Color.Yellow + ". See /help for info");
+        Send(PacketSpawnSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
+		MsgAll(Color.Escape + Color.Yellow + name + " has joined!");
+        Message(Color.Yellow + "You're a " + Player.RankColor(_player.rank) + player.rank.ToString() + Color.Yellow + ". See /help for info");
     }
     
     private void HandleBlock(byte[] packet)
@@ -388,16 +384,16 @@ public class Connection
                 }
             } else if(cmd == "help") {
                 if(args == "") {
-					Message(Color.Teal + "You are a " + Player.RankColor(_player.Rank) + player.Rank.ToString());
+					Message(Color.Teal + "You are a " + Player.RankColor(_player.rank) + player.rank.ToString());
 					string commands = "You can use:";
 					commands += " /help /me /status";
-					if(player.Rank >= Player.RankEnum.Builder) {
+					if(player.rank >= Player.RankEnum.Builder) {
 						commands += " /teleport /tp";
 					}
-					if(player.Rank >= Player.RankEnum.Mod) {
+					if(player.rank >= Player.RankEnum.Mod) {
 						commands += " /dehydrate /bring /broadcast /k /kick /place /say";
 					}
-					if(player.Rank == Player.RankEnum.Admin) {
+					if(player.rank == Player.RankEnum.Admin) {
 						commands += " /exit /setspawn";
 					}
 					Message(Color.Teal + commands);
@@ -411,7 +407,7 @@ public class Connection
 					}
 				}
 			} else if(cmd == "bring") {
-                if(Player.IsModPlus(name)) {
+                if(_player.rank >= Player.RankEnum.Mod) {
 					if(args == "") {
 						Message(Color.DarkRed + "No player specified");
 					} else {
@@ -426,14 +422,14 @@ public class Connection
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "exit") {
-                if(Player.IsAdmin(name)) {
+                if(_player.rank == Player.RankEnum.Admin) {
                     serv.SendAll(PacketKick("Server is shutting down!"));
                     Server.OnExit.Set();
                 } else {
                     Message(Color.DarkRed + "Must be server admin");
                 }
 			} else if(cmd == "setspawn") {
-				if(Player.IsAdmin(name)) {
+				if(_player.rank == Player.RankEnum.Admin) {
 					serv.map.xspawn = _player.x;
 					serv.map.yspawn = _player.y;
 					serv.map.zspawn = _player.z;
@@ -442,7 +438,7 @@ public class Connection
 					Message(Color.DarkRed + "Must be server admin");
 				}
             } else if(cmd == "place") {
-                if(Player.IsModPlus(name)) {
+                if(_player.rank >= Player.RankEnum.Mod) {
                     if(args == "") {
                         if(_player.placing) {
                             _player.placing = false;
@@ -464,7 +460,7 @@ public class Connection
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "tp" || cmd == "teleport") {
-                if(Player.IsBuilderPlus(name)) {
+                if(_player.rank >= Player.RankEnum.Builder) {
                     if(args == "") {
                         Message(Color.DarkRed + "No player specified");
                     } else {
@@ -480,7 +476,7 @@ public class Connection
                     Message(Color.DarkRed + "Must be builder+");
                 }
             } else if(cmd == "kick" || cmd == "k") {
-                if(Player.IsModPlus(name)) {
+                if(_player.rank >= Player.RankEnum.Mod) {
                     if(args == "") {
                         Message(Color.DarkRed + "No player specified");
                     } else {
@@ -496,7 +492,7 @@ public class Connection
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "say" || cmd == "broadcast") {
-                if(Player.IsModPlus(name)) {
+                if(_player.rank >= Player.RankEnum.Mod) {
                     if(args == "") {
                         Message(Color.DarkRed + "No message specified");
                     } else {
@@ -506,19 +502,33 @@ public class Connection
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if (cmd == "dehydrate") {
-                if (Player.IsModPlus(name)) {
+                if (_player.rank >= Player.RankEnum.Mod) {
                     serv.map.Dehydrate(serv);
                 } else {
                     Message(Color.DarkRed + "Must be mod+");
                 }
             } else if(cmd == "mob") {
-                if (Player.IsModPlus(name)) {
+                if (_player.rank >= Player.RankEnum.Mod) {
 					serv.SpawnMob(_player);
                 } else {
                     Message(Color.DarkRed + "Must be mod+");
                 }
+			} else if(cmd == "resend") {
+		        SendServerInfo();
+		        SendMap();
+			} else if(cmd == "rerank") {
+                if (_player.rank >= Player.RankEnum.Mod) {
+					Spacecraft.LoadRanks();
+					Message(Color.Teal + "Ranks reloaded");
+                } else {
+                    Message(Color.DarkRed + "Must be mod+");
+                }
+			} else if(cmd == "clear") {
+				for(int ww = 0; ww < 20; ++ww) {
+					Message("");
+				}
 			} else {
-                Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
+				Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
             }
         } else {
             MsgAll(name + ": " + msg);
@@ -589,6 +599,23 @@ public class Connection
         packet[70] = bytez[0]; packet[71] = bytez[1];
         packet[72] = player.heading;
         packet[73] = player.pitch;
+        return packet;
+    }
+    
+    public static byte[] PacketSpawnSelf(short x, short y, short z, byte heading, byte pitch)
+    {
+        byte[] packet = new byte[PacketLen.SpawnPlayer];
+        packet[0] = Packet.SpawnPlayer;
+        packet[1] = 255;
+        InsertString(packet, 2, "MYNAME");
+        byte[] bytex = BitConverter.GetBytes(Host2Net(x));
+        byte[] bytey = BitConverter.GetBytes(Host2Net(y));
+        byte[] bytez = BitConverter.GetBytes(Host2Net(z));
+        packet[66] = bytex[0]; packet[67] = bytex[1];
+        packet[68] = bytey[0]; packet[69] = bytey[1];
+        packet[70] = bytez[0]; packet[71] = bytez[1];
+        packet[72] = heading;
+        packet[73] = pitch;
         return packet;
     }
     
