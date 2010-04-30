@@ -1,19 +1,22 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Connection.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Main.cs" ctype="Workbench">
     <Files>
-      <File FileName="Server.cs" Line="52" Column="35" />
-      <File FileName="Connection.cs" Line="195" Column="52" />
-      <File FileName="Player.cs" Line="74" Column="5" />
-      <File FileName="PositionBlock.cs" Line="12" Column="1" />
-      <File FileName="Map.cs" Line="29" Column="40" />
-      <File FileName="Constants.cs" Line="102" Column="40" />
+      <File FileName="Server.cs" Line="1" Column="1" />
+      <File FileName="Player.cs" Line="47" Column="14" />
+      <File FileName="Map.cs" Line="110" Column="55" />
+      <File FileName="Constants.cs" Line="1" Column="1" />
+      <File FileName="..\..\..\projects\Downstairs\spacecraft\bin\Debug\admins.txt" Line="4" Column="35" />
+      <File FileName="Main.cs" Line="40" Column="22" />
+      <File FileName="AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Robot.cs" Line="1" Column="1" />
+      <File FileName="Connection.cs" Line="269" Column="43" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
-            <Node name="Connection.cs" selected="True" />
+            <Node name="Main.cs" selected="True" />
           </Node>
         </State>
       </Pad>

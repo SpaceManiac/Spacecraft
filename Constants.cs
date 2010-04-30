@@ -1,6 +1,15 @@
 using System;
 using System.Collections;
 
+
+public enum Block2
+{
+    Air = 0x00,
+    Rock = 0x01,
+    Grass = 0x02,
+}
+
+
 public class Block
 {    
     public const byte Air                 = 0x00;
@@ -168,6 +177,8 @@ public class Color
     public const string Yellow = "&e";
     public const string White = "&f";
 }
+
+public enum RankEnum { Banned = -1, Guest, Builder, Mod, Admin }
 
 public class HelpText
 {

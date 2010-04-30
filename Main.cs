@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 class Spacecraft
 {
@@ -10,21 +11,17 @@ class Spacecraft
     public static void Main()
     {
         Log("Spacecraft is starting...");
-        
-        string[] files = new string[] { "banned.txt", "banned-ip.txt", "admins.txt",  };
-        foreach(string file in files) {
-            if(!File.Exists(file)) {
-                Log("Note: " + file + " does not exist, creating.");
-                File.Create(file);
-            }
+        if(!File.Exists("admins.txt")) {
+            Log("Note: admins.txt does not exist, creating.");
+            File.Create("admins.txt");
         }
         
-        if(!File.Exists("server.properties")) {
-            Log("Error: could not find server.properties!");
+        if(!File.Exists("properties.txt")) {
+            Log("Error: could not find properties.txt!");
             return;
         } else {
             Config = new Hashtable();
-            StreamReader input = new StreamReader("server.properties");
+            StreamReader input = new StreamReader("properties.txt");
             string line = null;
             while((line = input.ReadLine()) != null) {
                 int pos = line.IndexOf("=");
@@ -32,11 +29,12 @@ class Spacecraft
                 string val = line.Substring(pos + 1);
                 Config[key] = val;
             }
+			input.Close();
         }
         
         Block.MakeNames();
 
-        InitializeRanks();
+        LoadRanks();
 
         Server serv = new Server();
         serv.Start();
@@ -44,8 +42,9 @@ class Spacecraft
         Environment.Exit(0);
     }
 
-    private static void InitializeRanks()
+    public static void LoadRanks()
     {
+		Player.RankedPlayers.Clear();
         StreamReader Reader = new StreamReader("admins.txt");
         string[] Lines = Reader.ReadToEnd().Split(new string[] {System.Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
 

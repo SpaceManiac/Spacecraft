@@ -53,10 +53,10 @@ public class Server
             map.Load("level.dat");
         } else {
             map.Generate();
-            map.SetTile(0, 0, 0, Block.Books);
+            /*map.SetTile(0, 0, 0, Block.Books);
             map.SetTile(0, 1, 0, Block.Brick);
             map.SetTile(1, 0, 0, Block.MossyCobble);
-            map.SetTile(0, 0, 1, Block.Grass);
+            map.SetTile(0, 0, 1, Block.Grass);*/
             map.Save("level.dat");
         }
         
@@ -197,7 +197,7 @@ public class Server
     {
         TcpListener listener = (TcpListener) ar.AsyncState;
         TcpClient client = listener.EndAcceptTcpClient(ar);
-        connections.Add(new Connection(client, this));
+        connections.Add(new Connection(client));
         srv.BeginAcceptTcpClient(new AsyncCallback(AcceptClient), srv);
     }
 	

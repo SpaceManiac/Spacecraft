@@ -35,9 +35,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChatCommands.cs" />
+    <None Include="ChatCommands.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="NewPlayer.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Connection.cs" />
