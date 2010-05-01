@@ -49,7 +49,7 @@ public class ChatCommandHandling
 		}
     }
 
-    static public void GetHelp(string cmd)
+    static public string GetHelp(string cmd)
 	{
 		if (Commands.ContainsKey(cmd)) {
 			return Commands[cmd].HelpMsg;
@@ -58,9 +58,15 @@ public class ChatCommandHandling
 		}
 	}
 
-    static public void GetCommandList(Rank rank)
+    static public string GetCommandList(Rank rank)
 	{
-		return " (command list coming soon!)";
+		string result = "";
+		foreach(KeyValuePair<string, ChatCommands.ChatCommandBase> kvp in Commands) {
+			if(rank >= kvp.Value.RankNeeded) {
+				result += " " + kvp.Key;
+			}
+		}
+		return result;
 	}
 }
 
@@ -94,7 +100,7 @@ namespace ChatCommands
                 	sender.Message(Color.Teal + commands);
 				} else {
 					while(commands.Length > 60) {
-						int i = commands.LastIndexOf(' ', 0, 60);
+						int i = commands.LastIndexOf(' ', 60, 60);
 						sender.Message(Color.Teal + " " + commands.Substring(0, i));
 						commands = commands.Substring(i + 1);
 					}
@@ -131,7 +137,7 @@ namespace ChatCommands
             } else if (args == "") {
                 sender.Message(Color.DarkRed + "No /me message specified");
             } else {
-                sender.MsgAll(" * " + sender.player.name + " " + args);
+                Connection.MsgAll(" * " + sender.player.name + " " + args);
             }
         }
     }
@@ -174,7 +180,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-            Server.theServ.SendAll(PacketKick("Server is shutting down!"));
+            Server.theServ.SendAll(Connection.PacketKick("Server is shutting down!"));
             Server.OnExit.Set();
 		}
 	}
@@ -191,9 +197,9 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-			Server.theServ.map.xspawn = _player.x;
-			Server.theServ.map.yspawn = _player.y;
-			Server.theServ.map.zspawn = _player.z;
+			Server.theServ.map.xspawn = sender._player.x;
+			Server.theServ.map.yspawn = sender._player.y;
+			Server.theServ.map.zspawn = sender._player.z;
 			sender.Message(Color.Teal + "Spawn point set");
 		}
 	}
@@ -250,7 +256,7 @@ namespace ChatCommands
                 if(p == null) {
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
-                    sender.Send(PacketTeleportSelf(p.x, p.y, p.z, p.heading, p.pitch));
+                    sender.Send(Connection.PacketTeleportSelf(p.x, p.y, p.z, p.heading, p.pitch));
                 }
             }
 		}
@@ -276,7 +282,7 @@ namespace ChatCommands
                 if(c == null) {
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
-                    c.Kick("You were kicked by " + name);
+                    c.Kick("You were kicked by " + sender.name);
                 }
             }
 		}
@@ -314,7 +320,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-            Server.theServ.map.Dehydrate(serv);
+            Server.theServ.map.Dehydrate(Server.theServ);
 		}
 	}
 	
@@ -330,7 +336,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-			Server.theServ.SpawnMob(_player);
+			Server.theServ.SpawnMob(sender._player, args);
 		}
 	}
 	

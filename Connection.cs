@@ -248,7 +248,7 @@ public class Connection
         Send(PacketKick(reason));
     }
     
-    private void Message(string msg) {
+    public void Message(string msg) {
         Send(PacketMessage(msg));
     }
     
