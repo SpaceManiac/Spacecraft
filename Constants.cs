@@ -1,14 +1,12 @@
 using System;
 using System.Collections;
 
-
 public enum Block2
 {
     Air = 0x00,
     Rock = 0x01,
     Grass = 0x02,
 }
-
 
 public class Block
 {    
@@ -159,7 +157,6 @@ public class PacketLen
 
 public class Color
 {
-    public const string Escape = "";
     public const string Black = "&0";
     public const string DarkBlue = "&1";
     public const string DarkGreen = "&2";
@@ -178,42 +175,10 @@ public class Color
     public const string White = "&f";
 }
 
-public enum RankEnum { Banned = -1, Guest, Builder, Mod, Admin }
-
-public class HelpText
-{
-	public const string Me = "/me: third-person roleplay-like actions";
-	public const string Help = "/help: displays help information";
-	public const string Myself = "/myself: does nothing"; // :P
-	public const string Teleport = "/teleport: teleports you to a player (builder+)";
-	public const string TP = "/tp: teleports you to a player (builder+)";
-	public const string Bring = "/bring: teleports a player to you (mod+)";
-	public const string Broadcast = "/broadcast: broadcast a message in yellow text (mod+)";
-	public const string Say = "/say: broadcast a message in yellow text (mod+)";
-	public const string Kick = "/kick: kick a player (mod+)";
-	public const string K = "/k: kick a player (mod+)";
-	public const string Place = "/place: place special blocks (mod+)";
-	public const string Dehydrate = "/dehydrate: remove all liquid in case of flood (mod+)";
-	public const string Exit = "/exit: safely shut the server down (admin)";
-	public const string SetSpawn = "/setspawn: set the global spawn point (admin)";
-		
-	public static string Lookup(string s) {
-        switch(s.ToLower()) {
-            case "me": return Me;
-			case "help": return Help;
-			case "myself": return Myself;
-			case "teleport": return Teleport;
-			case "tp": return TP;
-			case "bring": return Bring;
-			case "broadcast": return Broadcast;
-			case "say": return Say;
-			case "kick": return Kick;
-			case "k": return K;
-			case "place": return Place;
-			case "dehydrate": return Dehydrate;
-			case "exit": return Exit;
-			case "setspawn": return SetSpawn;
-        }
-        return "";
-    }
+public enum Rank {
+	Banned = -1,
+	Guest,
+	Builder,
+	Mod,
+	Admin
 }

@@ -56,7 +56,7 @@ class Spacecraft
 
             rank = parts[0].Substring(0, 1).ToUpper() + parts[0].Substring(1, parts[0].Length - 1);
 
-            Player.RankEnum assignedRank = (Player.RankEnum)Enum.Parse(typeof(Player.RankEnum), rank);
+            Rank assignedRank = (Rank)Enum.Parse(typeof(Rank), rank);
 
             if (!Player.RankedPlayers.ContainsKey(assignedRank) || Player.RankedPlayers[assignedRank] != null)
             {
