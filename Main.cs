@@ -83,4 +83,19 @@ class Spacecraft
         //sw.WriteLine("      {0}  {1}", DateTime.Now.ToString("H:mm:ss"), text);
         Console.WriteLine("      {0}  {1}", DateTime.Now.ToString("H:mm:ss"), text);
     }
+	
+	public static string UrlEncode( string input ) {
+	     StringBuilder output = new StringBuilder();
+	     for( int i = 0; i < input.Length; i++ ) {
+	         if( ( input[i] >= '0' && input[i] <= '9' ) ||
+	             ( input[i] >= 'a' && input[i] <= 'z' ) ||
+	             ( input[i] >= 'A' && input[i] <= 'Z' ) ||
+	             input[i] == '-' || input[i] == '_' || input[i] == '.' || input[i] == '~' ) {
+	             output.Append(input[i]);
+	         } else if( Array.IndexOf<char>( reservedChars, input[i] ) != -1 ) {
+	             output.Append('%').Append(((int)input[i]).ToString( "X" ));
+	         }
+	     }
+	     return output.ToString();
+	 }
 }
