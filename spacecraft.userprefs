@@ -1,22 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Main.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ChatCommands.cs" ctype="Workbench">
     <Files>
-      <File FileName="Server.cs" Line="1" Column="1" />
-      <File FileName="Player.cs" Line="47" Column="14" />
-      <File FileName="Map.cs" Line="110" Column="55" />
-      <File FileName="Constants.cs" Line="1" Column="1" />
-      <File FileName="..\..\..\projects\Downstairs\spacecraft\bin\Debug\admins.txt" Line="4" Column="35" />
-      <File FileName="Main.cs" Line="40" Column="22" />
-      <File FileName="AssemblyInfo.cs" Line="1" Column="1" />
-      <File FileName="Robot.cs" Line="1" Column="1" />
-      <File FileName="Connection.cs" Line="269" Column="43" />
+      <File FileName="AssemblyInfo.cs" Line="13" Column="31" />
+      <File FileName="Connection.cs" Line="16" Column="41" />
+      <File FileName="Player.cs" Line="71" Column="20" />
+      <File FileName="ChatCommands.cs" Line="30" Column="6" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
-            <Node name="Main.cs" selected="True" />
+            <Node name="ChatCommands.cs" selected="True" />
           </Node>
         </State>
       </Pad>

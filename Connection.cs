@@ -12,7 +12,9 @@ public class Connection
 {
     private TcpClient client;
     private Server serv { get { return Server.theServ; } }
-    private Player _player;
+	
+	// temporary until stuff becomes saner!
+    public Player _player;
     private bool _connected;
     
     private byte[] _netbuffer;
@@ -152,6 +154,10 @@ public class Connection
         return Encoding.ASCII.GetString(packet, i, 64).TrimEnd();
     }
     
+    public static void MsgAll(string msg) {
+        Server.theServ.SendAll(PacketMessage(msg));
+    }
+    
     // ===================================================================
     // nonstatic helpers
     
@@ -161,7 +167,7 @@ public class Connection
             Spacecraft.Log(name + " disconnected");
             _connected = false;
             if(_player != null) {
-                MsgAll(Color.Escape + Color.Yellow + name + " has quit.");
+                MsgAll(Color.Yellow + name + " has quit.");
                 serv.SendAll(PacketDespawnPlayer(_player));
             }
         }
@@ -229,7 +235,7 @@ public class Connection
         InsertString(packet, 2, serv.name);
         InsertString(packet, 66, serv.motd);
         packet[130] = 0x00;
-        if(_player.rank >= Player.RankEnum.Mod) {
+        if(_player.rank >= Rank.Mod) {
             packet[130] = 0x64;
         }
         Send(packet);
@@ -237,16 +243,12 @@ public class Connection
     
     public void Kick(string reason) {
         Spacecraft.Log(name + " was kicked: " + reason);
-        MsgAll(Color.Escape + Color.Red + " was kicked!");
+        MsgAll(Color.Red + name + " was kicked!");
         _connected = false;
         Send(PacketKick(reason));
     }
     
-    private void MsgAll(string msg) {
-        serv.SendAll(PacketMessage(msg));
-    }
-    
-    private void Message(string msg) {
+    public void Message(string msg) {
         Send(PacketMessage(msg));
     }
     
@@ -274,7 +276,7 @@ public class Connection
 		
         _player = new Player(username);
         
-        if(_player.rank == Player.RankEnum.Banned) {
+        if(_player.rank == Rank.Banned) {
             Spacecraft.Log(name + " (" + addr + ") wasn't on the allowed list");
             Kick("Sorry, you're not allowed on this server!");
             return;
@@ -293,7 +295,7 @@ public class Connection
         }
         Send(PacketTeleportSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
         Send(PacketSpawnSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
-		MsgAll(Color.Escape + Color.Yellow + name + " has joined!");
+		MsgAll(Color.Yellow + name + " has joined!");
         Message(Color.Yellow + "You're a " + Player.RankColor(_player.rank) + player.rank.ToString() + Color.Yellow + ". See /help for info");
     }
     
@@ -353,12 +355,12 @@ public class Connection
 				}
 			}
 			if(message != "") {
-				Connection c = serv.GetConnection(username);
+				Connection c = Server.theServ.GetConnection(username);
 				if(c == null) {
 					Message(Color.DarkRed + "No such user " + username);
 				} else {
-					Message(Color.Purple + "2 " + username + "] " + message);
-					c.Message(Color.Purple + name + "> " + message);
+					Message(Color.Purple + ">" + username + "> " + message);
+					c.Message(Color.Purple + "[" + name + "] " + message);
 				}
 			}
 		} else if(msg[0] == '/') {
@@ -371,170 +373,17 @@ public class Connection
                     args = msg.Substring(i + 1);
                 }
             }
-            if(cmd == "me") {
-                if(msg == "/me /me") {
-                    Message(Color.Teal + "Red alert, /me /me found, PMing all players!");
-                    Message(Color.Teal + "Easter egg get!");
-                } else {
-                    if(args == "") {
-                        Message(Color.DarkRed + "No /me message specified");
-                    } else {
-                        MsgAll(" * " + name + " " + args);
-                    }
-                }
-            } else if(cmd == "help") {
-                if(args == "") {
-					Message(Color.Teal + "You are a " + Player.RankColor(_player.rank) + player.rank.ToString());
-					string commands = "You can use:";
-					commands += " /help /me /status";
-					if(player.rank >= Player.RankEnum.Builder) {
-						commands += " /teleport /tp";
-					}
-					if(player.rank >= Player.RankEnum.Mod) {
-						commands += " /dehydrate /bring /broadcast /k /kick /place /say";
-					}
-					if(player.rank == Player.RankEnum.Admin) {
-						commands += " /exit /setspawn";
-					}
-					Message(Color.Teal + commands);
-				} else {
-					if(args[0] == '/') args = args.Substring(1);
-					string help = HelpText.Lookup(args);
-					if(help == "") {
-						Message(Color.DarkRed + "No help text on /" + args);
-					} else {
-						Message(Color.Teal + help);
-					}
-				}
-			} else if(cmd == "bring") {
-                if(_player.rank >= Player.RankEnum.Mod) {
-					if(args == "") {
-						Message(Color.DarkRed + "No player specified");
-					} else {
-                    	Connection c = serv.GetConnection(args);
-						if(c == null) {
-							Message(Color.DarkRed + "No such player " + args);
-						} else {
-							c.Send(PacketTeleportSelf(_player.x, _player.y, _player.z, _player.heading, _player.pitch));
-						}
-					}
-                } else {
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-            } else if(cmd == "exit") {
-                if(_player.rank == Player.RankEnum.Admin) {
-                    serv.SendAll(PacketKick("Server is shutting down!"));
-                    Server.OnExit.Set();
-                } else {
-                    Message(Color.DarkRed + "Must be server admin");
-                }
-			} else if(cmd == "setspawn") {
-				if(_player.rank == Player.RankEnum.Admin) {
-					serv.map.xspawn = _player.x;
-					serv.map.yspawn = _player.y;
-					serv.map.zspawn = _player.z;
-					Message(Color.Teal + "Spawn point set");
-				} else {
-					Message(Color.DarkRed + "Must be server admin");
-				}
-            } else if(cmd == "place") {
-                if(_player.rank >= Player.RankEnum.Mod) {
-                    if(args == "") {
-                        if(_player.placing) {
-                            _player.placing = false;
-                            Message(Color.Teal + "No longer placing");
-                        } else {
-                            Message(Color.DarkRed + "No block specified");
-                        }
-                    } else {
-                        string b = args;
-                        if(Block.Names.Contains(b)) {
-                            _player.placing = true;
-                            _player.placeType = (byte)(Block.Names[b]);
-                            Message(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
-                        } else {
-                            Message(Color.DarkRed + "Unknown block " + b);
-                        }
-                    }
-                } else {
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-            } else if(cmd == "tp" || cmd == "teleport") {
-                if(_player.rank >= Player.RankEnum.Builder) {
-                    if(args == "") {
-                        Message(Color.DarkRed + "No player specified");
-                    } else {
-                        string pname = args;
-                        Player p = serv.GetPlayer(pname);
-                        if(p == null) {
-                            Message(Color.DarkRed + "No such player " + pname);
-                        } else {
-                            Send(PacketTeleportSelf(p.x, p.y, p.z, p.heading, p.pitch));
-                        }
-                    }
-                } else {
-                    Message(Color.DarkRed + "Must be builder+");
-                }
-            } else if(cmd == "kick" || cmd == "k") {
-                if(_player.rank >= Player.RankEnum.Mod) {
-                    if(args == "") {
-                        Message(Color.DarkRed + "No player specified");
-                    } else {
-                        string pname = args;
-                        Connection c = serv.GetConnection(pname);
-                        if(c == null) {
-                            Message(Color.DarkRed + "No such player " + pname);
-                        } else {
-                            c.Kick("You were kicked by " + name);
-                        }
-                    }
-                } else { 
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-            } else if(cmd == "say" || cmd == "broadcast") {
-                if(_player.rank >= Player.RankEnum.Mod) {
-                    if(args == "") {
-                        Message(Color.DarkRed + "No message specified");
-                    } else {
-                        MsgAll(Color.Yellow + args);
-                    }
-                } else { 
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-            } else if (cmd == "dehydrate") {
-                if (_player.rank >= Player.RankEnum.Mod) {
-                    serv.map.Dehydrate(serv);
-                } else {
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-            } else if(cmd == "mob") {
-                if (_player.rank >= Player.RankEnum.Mod) {
-					serv.SpawnMob(_player);
-                } else {
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-			} else if(cmd == "resend") {
-		        SendServerInfo();
-		        SendMap();
-			} else if(cmd == "rerank") {
-                if (_player.rank >= Player.RankEnum.Mod) {
-					Spacecraft.LoadRanks();
-					Message(Color.Teal + "Ranks reloaded");
-                } else {
-                    Message(Color.DarkRed + "Must be mod+");
-                }
-			} else if(cmd == "clear") {
-				for(int ww = 0; ww < 20; ++ww) {
-					Message("");
-				}
-			} else {
-				Message(Color.DarkRed + "Unknown command /" + cmd + ", see /help");
-            }
+            ChatCommandHandling.Execute(this, cmd, args);
         } else {
             MsgAll(name + ": " + msg);
             Spacecraft.Log(name + ": " + msg);
         }
     }
+	
+	public void ResendMap() {
+        SendServerInfo();
+        SendMap();
+	}
     
     // ===================================================================
     // static Packet* functions

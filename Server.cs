@@ -25,7 +25,8 @@ public class Server
     public int maxplayers;
     public string name;
     public string motd;
-
+	public string serverhash;
+	private bool justFlistBeated = false;
 
     static public Server theServ;
     public static ManualResetEvent OnExit = new ManualResetEvent(false);
@@ -110,6 +111,7 @@ public class Server
     private void BeatTimer(object x, ElapsedEventArgs y)
     {
         Heartbeat();
+		FlistBeat();
         map.Save("level.dat");
         GC.Collect();
     }
@@ -151,15 +153,7 @@ public class Server
         builder.Append(salt.ToString());
         
     
-        string postcontent = builder.ToString(); /*
-            "port=" + port +
-            "&users=" + connections.Count +
-            "&max=" + maxplayers +
-            "&name=" + name +
-            "&public=" + "false" +
-            "&version=7" +
-            "&salt=" + salt;
-                       */
+        string postcontent = builder.ToString();
         byte[] post = Encoding.ASCII.GetBytes(postcontent);
         
         HttpWebRequest req = (HttpWebRequest) WebRequest.Create("http://minecraft.net/heartbeat.jsp");
@@ -185,12 +179,67 @@ public class Server
                 Spacecraft.Log("Salt is " + salt);
                 Spacecraft.Log("To connect directly to this server, surf to: " + data);
                 StreamWriter outfile = File.CreateText("externalurl.txt");
+				int i = data.IndexOf('=');
+				serverhash = data.Substring(i + 1);
                 outfile.Write(data);
                 outfile.Close();
                 Spacecraft.Log("(This is also in externalurl.txt)");
                 firstbeat = false;
             }
         }
+    }
+	
+	private void FlistBeat() 
+    {
+		if(justFlistBeated) {
+			justFlistBeated = false;
+			return;
+		}
+		justFlistBeated = true;
+        StringBuilder builder = new StringBuilder();
+        builder.Append("name=");
+        builder.Append(name);
+        builder.Append("&motd=");
+        builder.Append(motd);
+        builder.Append("&hash=");
+		builder.Append(serverhash);
+        builder.Append("&max=");
+        builder.Append(maxplayers);
+        builder.Append("&users=");
+        builder.Append(connections.Count);
+        builder.Append("&public=true");
+        builder.Append("&server=spacecraft");
+		builder.Append("&port=");
+		builder.Append(port);
+		builder.Append("&players=");
+		string sep = "";
+		foreach(Player p in GetAllPlayers(false)) {
+			builder.Append(sep);
+			builder.Append(p.name);
+			sep = ",";
+		}
+		builder.Append("&data=spacecraft-0.0.0");
+    
+        string postcontent = builder.ToString();
+        byte[] post = Encoding.ASCII.GetBytes(postcontent);
+        
+        HttpWebRequest req = (HttpWebRequest) WebRequest.Create("http://list.fragmer.net/announce.php");
+        req.ContentType = "application/x-www-form-urlencoded";
+        req.Method = "POST";
+        req.ContentLength = post.Length;
+        Stream o = req.GetRequestStream();
+        o.Write(post, 0, post.Length);
+        o.Close();
+        
+        WebResponse resp = req.GetResponse();
+        if(resp == null) {
+            Spacecraft.Log("Error: unable to heartbeat with flist!");
+            return;
+        }
+        
+		// maybe this can be safely removed?
+        StreamReader sr = new StreamReader(resp.GetResponseStream());
+        string data = sr.ReadToEnd().Trim();
     }
         
     public void AcceptClient(IAsyncResult ar)
@@ -257,8 +306,13 @@ public class Server
             c.Send(data);
         }
     }
+	
+	public ArrayList GetAllPlayers()
+	{
+		return GetAllPlayers(true);
+	}
     
-    public ArrayList GetAllPlayers()
+    public ArrayList GetAllPlayers(bool m)
     {
         ArrayList r = new ArrayList();
         for(int i = 0; i < connections.Count; ++i) {
@@ -270,8 +324,10 @@ public class Server
             }
             r.Add(c.player);
         }
-		for(int i = 0; i < mobs.Count; ++i) {
-			r.Add(mobs[i]);
+		if(m) {
+			for(int i = 0; i < mobs.Count; ++i) {
+				r.Add(mobs[i]);
+			}
 		}
         return r;
     }

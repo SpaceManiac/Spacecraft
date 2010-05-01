@@ -4,17 +4,15 @@ using System.Collections.Generic;
 
 public class Player
 {
-    public enum RankEnum { Banned = -1, Guest, Builder, Mod, Admin }
-
     public static ArrayList ids = new ArrayList();
     
     /// <summary>
     /// A series of lists containing all players of the given rank.
     /// </summary>
-    public static Dictionary<RankEnum, List<string>> RankedPlayers = new Dictionary<RankEnum, List<string>>();
+    public static Dictionary<Rank, List<string>> RankedPlayers = new Dictionary<Rank, List<string>>();
     
     
-    public RankEnum rank;
+    public Rank rank;
     public byte pid;
     public string name;
     public Int16 x, y, z;
@@ -38,8 +36,8 @@ public class Player
             }
         }
 
-		rank = RankEnum.Guest;
-        foreach (RankEnum key in RankedPlayers.Keys) {
+		rank = Rank.Guest;
+        foreach (Rank key in RankedPlayers.Keys) {
             if (RankedPlayers[key].Contains(username)) {
                 rank = key;
                 break;
@@ -63,14 +61,14 @@ public class Player
 	
     // static stuff
 	
-	public static string RankColor(RankEnum rank)
+	public static string RankColor(Rank rank)
 	{
 		switch(rank) {
-			case RankEnum.Banned: return Color.Red;
-			case RankEnum.Guest: return Color.White;
-			case RankEnum.Builder: return Color.Green;
-			case RankEnum.Mod: return Color.Yellow;
-			case RankEnum.Admin: return Color.Blue;
+			case Rank.Banned: return Color.Red;
+			case Rank.Guest: return Color.White;
+			case Rank.Builder: return Color.Green;
+			case Rank.Mod: return Color.Yellow;
+			case Rank.Admin: return Color.Blue;
 		}
 		return Color.Teal;
 	}
