@@ -27,8 +27,12 @@ class Spacecraft
         LoadRanks();
 
         MinecraftServer serv = new MinecraftServer();
+		
         serv.Start();
+		
+        Thread.Sleep(100);
         Spacecraft.Log("Bye!");
+		Spacecraft.Log("");
         Environment.Exit(0);
     }
 
@@ -72,9 +76,14 @@ class Spacecraft
             File.Create("server.log");
         }*/
         StreamWriter sw = new StreamWriter("server.log", true);
-        sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
-        sw.Close();
-        Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+		if(text == "") {
+			sw.WriteLine();
+			Console.WriteLine();
+		} else {
+	        sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+	        Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+		}
+	    sw.Close();
     }
 	
 	/*public static string UrlEncode( string input ) {

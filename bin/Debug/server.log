@@ -65,3 +65,34 @@
 2010/05/02 15:54:48	Salt is 691809
 2010/05/02 15:54:48	To connect directly to this server, surf to: http://www.minecraft.net/play.jsp?server=f78217360040b55d6d98146da056fb2d
 2010/05/02 15:54:48	(This is also in externalurl.txt)
+2010/05/02 16:15:34	Spacecraft is starting...
+2010/05/02 16:15:34	Configging: verify-names=true
+2010/05/02 16:15:34	Configging: port=13000
+2010/05/02 16:15:34	Configging: public=false
+2010/05/02 16:15:34	Configging: server-name=Spacecraft Alpha
+2010/05/02 16:15:34	Configging: max-players=32
+2010/05/02 16:15:34	Configging: motd=Haldo there!
+2010/05/02 16:15:34	Loading level.dat...
+2010/05/02 16:15:34	Listening on port 13000
+2010/05/02 16:15:34	Server name is Spacecraft Alpha
+2010/05/02 16:15:34	Server MOTD is Haldo there!
+2010/05/02 16:15:37	Salt is 360490
+2010/05/02 16:15:37	To connect directly to this server, surf to: http://www.minecraft.net/play.jsp?server=f78217360040b55d6d98146da056fb2d
+2010/05/02 16:15:37	(This is also in externalurl.txt)
+2010/05/02 16:49:11	Spacecraft is starting...
+2010/05/02 16:49:11	Configging: server-name=Spacecraft Alpha
+2010/05/02 16:49:11	Configging: motd=Haldo there!
+2010/05/02 16:49:11	Configging: port=13000
+2010/05/02 16:49:11	Configging: verify-names=false
+2010/05/02 16:49:11	Configging: max-players=32
+2010/05/02 16:49:11	Configging: heartbeat=true
+2010/05/02 16:49:11	Configging: public=false
+2010/05/02 16:49:11	Configging: flist-heartbeat=true
+2010/05/02 16:49:11	Configging: flist-public=true
+2010/05/02 16:49:11	Loading level.dat...
+2010/05/02 16:49:11	Listening on port 13000
+2010/05/02 16:49:11	Server name is Spacecraft Alpha
+2010/05/02 16:49:11	Server MOTD is Haldo there!
+2010/05/02 16:49:14	Salt is 406032
+2010/05/02 16:49:14	To connect directly to this server, surf to: http://www.minecraft.net/play.jsp?server=f78217360040b55d6d98146da056fb2d
+2010/05/02 16:49:14	(This is also in externalurl.txt)

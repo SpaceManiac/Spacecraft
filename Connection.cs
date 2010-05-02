@@ -81,14 +81,13 @@ public class Connection
                 Array.Copy(buffer, packsize, temp, 0, bufsize);
                 buffer = temp;
                 
-                // FIXME: Magic numbers! What do these mean?
-                if(packet[0] == 0x00) {
+                if(packet[0] == Packet.Ident) {
                     HandleJoin(packet);
-                } else if(packet[0] == 0x05) {
+                } else if(packet[0] == Packet.PlayerSetBlock) {
                     HandleBlock(packet);
-                } else if(packet[0] == 0x08) {
+                } else if(packet[0] == Packet.PositionUpdate) {
                     HandlePosition(packet);
-                } else if(packet[0] == 0x0d) {
+                } else if(packet[0] == Packet.Message) {
                     HandleMessage(packet);
                 }
             } else {
@@ -268,16 +267,16 @@ public class Connection
         byte unused = packet[130];
         _name = username;
         
-        /*if(MD5sum(serv.salt + username) != key) {
+        if(Config.GetBool("verify-names", true) && MD5sum(serv.salt + username) != key) {
             Spacecraft.Log(name + " (" + addr + ") wasn't verified");
             Kick("The name wasn't verified by minecraft.net!");
             return;
-        }*/
+        }
 		
         _player = new Player(username);
         
         if(_player.rank == Rank.Banned) {
-            Spacecraft.Log(name + " (" + addr + ") wasn't on the allowed list");
+            Spacecraft.Log(name + " (" + addr + ") tried to connect, but is banned.");
             Kick("Sorry, you're not allowed on this server!");
             return;
         }

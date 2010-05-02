@@ -1,2 +1,21 @@
-# cool beans!
-port = 13001
+# Spacecraft configuration
+# Commented-out lines at the end are unused
+
+# Name and connection information
+server-name = Spacecraft Alpha
+motd = Haldo there!
+port = 13000
+verify-names = false
+max-players = 32
+
+# Minecraft.net heartbeat information
+heartbeat = true
+public = false
+
+# List.fragmer.net heartbeat information
+flist-heartbeat = true
+flist-public = true
+
+# max-connections = 3
+# admin-slot = false
+# grow-trees = true

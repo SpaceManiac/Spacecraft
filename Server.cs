@@ -21,7 +21,7 @@ public class MinecraftServer
     public static Random rnd;
     public int salt;
     public Map map;
-    public Int32 port;
+    public int port;
     public int maxplayers;
     public string name;
     public string motd;
@@ -33,18 +33,19 @@ public class MinecraftServer
     
     public MinecraftServer()
     {
-        if (theServ != null)
-        { return; }
+        if (theServ != null) return;
         theServ = this;
+		
 		mobs = new ArrayList();
         rnd = new Random();
         salt = rnd.Next(100000, 999999);
         srv = null;
-        port = 13000;
-        maxplayers = 16;
         firstbeat = true;
-        name = "Spacecraft Alpha";
-        motd = "Haldo there!";
+		
+        port = Config.GetInt("port", 25565);
+        maxplayers = Config.GetInt("max-players", 16);
+        name = Config.Get("server-name", "Minecraft Server");
+        motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
     }
     
     public void Start()
@@ -54,22 +55,10 @@ public class MinecraftServer
             map.Load("level.dat");
         } else {
             map.Generate();
-            /*map.SetTile(0, 0, 0, Block.Books);
-            map.SetTile(0, 1, 0, Block.Brick);
-            map.SetTile(1, 0, 0, Block.MossyCobble);
-            map.SetTile(0, 0, 1, Block.Grass);*/
             map.Save("level.dat");
         }
         
         try {
-            if(Config.Get("port") != null) {
-                //port = Convert.ToInt32(Spacecraft.Config["port"]);
-            }
-            
-            //int maxplayers = 16;
-            if(Config.Get("max-players") != null) {
-                //maxplayers = Convert.ToInt32(Spacecraft.Config["max-players"]);
-            }
             connections = new ArrayList();
             
             srv = new TcpListener(new IPEndPoint(IPAddress.Any, port));
@@ -124,13 +113,17 @@ public class MinecraftServer
 	
 	private void MobTimer(object x, ElapsedEventArgs y)
 	{
-		/*for(int i = 0; i < mobs.Count; ++i) {
-			((Robot)(mobs[i])).Update(this);
-		}*/
+		for(int i = 0; i < mobs.Count; ++i) {
+			((Robot)(mobs[i])).Update();
+		}
 	}
     
     private void Heartbeat()
     {
+		if(!Config.GetBool("heartbeat", true)) {
+			return;
+		}
+		
         StringBuilder builder = new StringBuilder();
         
         builder.Append("port=");
@@ -146,7 +139,11 @@ public class MinecraftServer
         builder.Append(name);
     
         builder.Append("&public=");
-        builder.Append("false");
+		if(Config.GetBool("public", false)) {
+        	builder.Append("true");
+		} else {
+			builder.Append("false");
+		}
         
         builder.Append("&version=7");
         
@@ -192,26 +189,45 @@ public class MinecraftServer
 	
 	private void FlistBeat() 
     {
+		if(!Config.GetBool("flist-heartbeat", true)) {
+			return;
+		}
+		
 		if(justFlistBeated) {
 			justFlistBeated = false;
 			return;
 		}
 		justFlistBeated = true;
+		
         StringBuilder builder = new StringBuilder();
         builder.Append("name=");
         builder.Append(name);
+		
         builder.Append("&motd=");
         builder.Append(motd);
+		
         builder.Append("&hash=");
 		builder.Append(serverhash);
+		
         builder.Append("&max=");
         builder.Append(maxplayers);
+		
         builder.Append("&users=");
         builder.Append(connections.Count);
-        builder.Append("&public=true");
+		
+        builder.Append("&public=");
+		
+		if(Config.GetBool("flist-public", false)) {
+			builder.Append("true");
+		} else {
+			builder.Append("false");
+		}
+		
         builder.Append("&server=spacecraft");
+		   
 		builder.Append("&port=");
 		builder.Append(port);
+		   
 		builder.Append("&players=");
 		string sep = "";
 		foreach(Player p in GetAllPlayers(false)) {
@@ -219,7 +235,8 @@ public class MinecraftServer
 			builder.Append(p.name);
 			sep = ",";
 		}
-		builder.Append("&data=spacecraft-0.0.0");
+		
+		builder.Append("&data=spacecraft");
     
         string postcontent = builder.ToString();
         byte[] post = Encoding.ASCII.GetBytes(postcontent);
