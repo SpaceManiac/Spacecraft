@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Web;
 
 class Spacecraft
 {
@@ -36,7 +37,7 @@ class Spacecraft
 
         LoadRanks();
 
-        Server serv = new Server();
+        MinecraftServer serv = new MinecraftServer();
         serv.Start();
         Spacecraft.Log("Bye!");
         Environment.Exit(0);
@@ -47,6 +48,7 @@ class Spacecraft
 		Player.RankedPlayers.Clear();
         StreamReader Reader = new StreamReader("admins.txt");
         string[] Lines = Reader.ReadToEnd().Split(new string[] {System.Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+        Reader.Close();
 
         foreach (var line in Lines)
         {
@@ -58,7 +60,7 @@ class Spacecraft
 
             Rank assignedRank = (Rank)Enum.Parse(typeof(Rank), rank);
 
-            if (!Player.RankedPlayers.ContainsKey(assignedRank) || Player.RankedPlayers[assignedRank] != null)
+            if (!Player.RankedPlayers.ContainsKey(assignedRank) || Player.RankedPlayers[assignedRank] == null)
             {
                 Player.RankedPlayers[assignedRank] = new List<string>();
             }
@@ -71,17 +73,19 @@ class Spacecraft
                 Player.RankedPlayers[assignedRank].Add(name);
             }
 
+            
         }
     }
     
     public static void Log(string text)
     {
-        if(!File.Exists("server.log")) {
+        /*if(!File.Exists("server.log")) {
             File.Create("server.log");
-        }
-        //StreamWriter sw = File.Open("server.log", FileMode.Append);
-        //sw.WriteLine("      {0}  {1}", DateTime.Now.ToString("H:mm:ss"), text);
-        Console.WriteLine("      {0}  {1}", DateTime.Now.ToString("H:mm:ss"), text);
+        }*/
+        StreamWriter sw = new StreamWriter("server.log", true);
+        sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+        sw.Close();
+        Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
     }
 	
 	/*public static string UrlEncode( string input ) {

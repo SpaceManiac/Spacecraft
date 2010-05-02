@@ -74,7 +74,7 @@ public class Map
         o.Close();
     }
     
-    public void Physics(Server srv)
+    public void Physics(MinecraftServer srv)
     {
         if(physicsSuspended) return;
         // run twice per second
@@ -96,10 +96,10 @@ public class Map
                                 break;
                             }
                         }
-                        if(tile == Block.Dirt && lit && Server.rnd.NextDouble() < 0.2) {
+                        if(tile == Block.Dirt && lit && MinecraftServer.rnd.NextDouble() < 0.2) {
                             SetSend(srv, x, y, z, Block.Grass);
                         }
-                        if(tile == Block.Grass && !lit && Server.rnd.NextDouble() < 0.7) {
+                        if(tile == Block.Grass && !lit && MinecraftServer.rnd.NextDouble() < 0.7) {
                             SetSend(srv, x, y, z, Block.Dirt);
                         }
                     }
@@ -151,7 +151,7 @@ public class Map
         }
     }
     
-    public void Dehydrate(Server srv)
+    public void Dehydrate(MinecraftServer srv)
     {
         physicsSuspended = true;
         for(short x = 0; x < xdim; ++x) {
@@ -166,7 +166,7 @@ public class Map
         physicsSuspended = false;
     }
     
-    public void SetSend(Server srv, short x, short y, short z, byte tile)
+    public void SetSend(MinecraftServer srv, short x, short y, short z, byte tile)
     {
         if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
         SetTile(x, y, z, tile);

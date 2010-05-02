@@ -11,7 +11,7 @@ using System.Threading;
 public class Connection
 {
     private TcpClient client;
-    private Server serv { get { return Server.theServ; } }
+    private MinecraftServer serv { get { return MinecraftServer.theServ; } }
 	
 	// temporary until stuff becomes saner!
     public Player _player;
@@ -155,7 +155,7 @@ public class Connection
     }
     
     public static void MsgAll(string msg) {
-        Server.theServ.SendAll(PacketMessage(msg));
+        MinecraftServer.theServ.SendAll(PacketMessage(msg));
     }
     
     // ===================================================================
@@ -355,7 +355,7 @@ public class Connection
 				}
 			}
 			if(message != "") {
-				Connection c = Server.theServ.GetConnection(username);
+				Connection c = MinecraftServer.theServ.GetConnection(username);
 				if(c == null) {
 					Message(Color.DarkRed + "No such user " + username);
 				} else {

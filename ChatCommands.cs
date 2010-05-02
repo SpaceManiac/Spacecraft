@@ -157,7 +157,7 @@ namespace ChatCommands
             if (args == "") {
                 sender.Message(Color.DarkRed + "No player specified");
             } else {
-                Connection c = Server.theServ.GetConnection(args);
+                Connection c = MinecraftServer.theServ.GetConnection(args);
                 if (c == null) {
                     sender.Message(Color.DarkRed + "No such player " + args);
                 } else {
@@ -180,8 +180,8 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-            Server.theServ.SendAll(Connection.PacketKick("Server is shutting down!"));
-            Server.OnExit.Set();
+            MinecraftServer.theServ.SendAll(Connection.PacketKick("Server is shutting down!"));
+            MinecraftServer.OnExit.Set();
 		}
 	}
 	
@@ -197,9 +197,9 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-			Server.theServ.map.xspawn = sender._player.x;
-			Server.theServ.map.yspawn = sender._player.y;
-			Server.theServ.map.zspawn = sender._player.z;
+			MinecraftServer.theServ.map.xspawn = sender._player.x;
+			MinecraftServer.theServ.map.yspawn = sender._player.y;
+			MinecraftServer.theServ.map.zspawn = sender._player.z;
 			sender.Message(Color.Teal + "Spawn point set");
 		}
 	}
@@ -252,7 +252,7 @@ namespace ChatCommands
                 sender.Message(Color.DarkRed + "No player specified");
             } else {
                 string pname = args;
-                Player p = Server.theServ.GetPlayer(pname);
+                Player p = MinecraftServer.theServ.GetPlayer(pname);
                 if(p == null) {
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
@@ -278,7 +278,7 @@ namespace ChatCommands
                 sender.Message(Color.DarkRed + "No player specified");
             } else {
                 string pname = args;
-                Connection c = Server.theServ.GetConnection(pname);
+                Connection c = MinecraftServer.theServ.GetConnection(pname);
                 if(c == null) {
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
@@ -320,7 +320,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-            Server.theServ.map.Dehydrate(Server.theServ);
+            MinecraftServer.theServ.map.Dehydrate(MinecraftServer.theServ);
 		}
 	}
 	
@@ -336,7 +336,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-			Server.theServ.SpawnMob(sender._player, args);
+			MinecraftServer.theServ.SpawnMob(sender._player, args);
 		}
 	}
 	
