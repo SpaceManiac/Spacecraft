@@ -62,12 +62,12 @@ public class MinecraftServer
         }
         
         try {
-            if(Spacecraft.Config["port"] != null) {
+            if(Config.Get("port") != null) {
                 //port = Convert.ToInt32(Spacecraft.Config["port"]);
             }
             
             //int maxplayers = 16;
-            if(Spacecraft.Config["max-players"] != null) {
+            if(Config.Get("max-players") != null) {
                 //maxplayers = Convert.ToInt32(Spacecraft.Config["max-players"]);
             }
             connections = new ArrayList();

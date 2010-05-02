@@ -7,7 +7,6 @@ using System.Web;
 
 class Spacecraft
 {
-    public static Hashtable Config;
         
     public static void Main()
     {
@@ -21,16 +20,7 @@ class Spacecraft
             Log("Error: could not find properties.txt!");
             return;
         } else {
-            Config = new Hashtable();
-            StreamReader input = new StreamReader("properties.txt");
-            string line = null;
-            while((line = input.ReadLine()) != null) {
-                int pos = line.IndexOf("=");
-                string key = line.Substring(0, pos);
-                string val = line.Substring(pos + 1);
-                Config[key] = val;
-            }
-			input.Close();
+			Config.Initialize();
         }
         
         Block.MakeNames();
