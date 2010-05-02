@@ -84,7 +84,7 @@ class Spacecraft
         Console.WriteLine("      {0}  {1}", DateTime.Now.ToString("H:mm:ss"), text);
     }
 	
-	public static string UrlEncode( string input ) {
+	/*public static string UrlEncode( string input ) {
 	     StringBuilder output = new StringBuilder();
 	     for( int i = 0; i < input.Length; i++ ) {
 	         if( ( input[i] >= '0' && input[i] <= '9' ) ||
@@ -97,5 +97,5 @@ class Spacecraft
 	         }
 	     }
 	     return output.ToString();
-	 }
+	 }*/
 }

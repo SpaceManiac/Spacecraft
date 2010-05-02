@@ -101,10 +101,10 @@ namespace ChatCommands
 				} else {
 					while(commands.Length > 60) {
 						int i = commands.LastIndexOf(' ', 60, 60);
-						sender.Message(Color.Teal + " " + commands.Substring(0, i));
-						commands = commands.Substring(i + 1);
+						sender.Message(Color.Teal + commands.Substring(0, i));
+						commands = commands.Substring(i);
 					}
-					sender.Message(Color.Teal + " " + commands);
+					sender.Message(Color.Teal + commands);
 				}
             } else {
                 if (args[0] == '/') args = args.Substring(1);
