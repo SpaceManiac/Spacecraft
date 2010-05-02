@@ -8,7 +8,7 @@ namespace spacecraft
 
     class NewPlayer
     {
-        public static Dictionary<String, RankEnum> PlayerRanks = new Dictionary<string, RankEnum>(); 
+        public static Dictionary<String, Rank> PlayerRanks = new Dictionary<String, Rank>(); 
         /// <summary>
         /// Translates a name into a given rank.
         /// i.e. PlayerRanks["Blocky"] = RankEnum.Admin;
@@ -18,7 +18,7 @@ namespace spacecraft
         private Connection conn;
 
 
-        public RankEnum rank;
+        public Rank currentRank;
         public Byte playerID;
         public string name { get; protected set; }
         public Position pos { get; protected set; }
@@ -26,8 +26,8 @@ namespace spacecraft
 
         public byte heading;
         public byte pitch;
-        public bool placing;
-        public byte placeType;
+/*        public bool placing;
+        public byte placeType; */
 
         public NewPlayer(TcpClient client, string username)
         {
@@ -45,9 +45,9 @@ namespace spacecraft
                 }
             }
 
-            rank = RankEnum.Guest;
+            currentRank = Rank.Guest;
             if (PlayerRanks.ContainsKey(name))
-                rank = PlayerRanks[name];
+                currentRank = PlayerRanks[name];
 
         }
 
@@ -76,6 +76,20 @@ namespace spacecraft
                 this.pitch = Pitch;
             }
             return changed;
+        }
+
+        public void Kick() 
+        { 
+            throw new NotImplementedException();  
+        }
+        public void Teleport(Position dest) 
+        { 
+            throw new NotImplementedException(); 
+        }
+
+        public void PrintMessage(string msg)
+        {
+            throw new NotImplementedException();
         }
 
     }

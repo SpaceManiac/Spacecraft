@@ -12,8 +12,10 @@ public class Robot : Player
 		time = 0;
     }
     
-    public void Update(Server serv)
+    public void Update()
     {
+        MinecraftServer serv = MinecraftServer.theServ;
+
 		time += (1.0 /30);
 		if(time < 1) {
 			x += 6;
@@ -25,7 +27,7 @@ public class Robot : Player
 			z -= 6;
 		} else {
 			time = 0;
-			Update(serv);
+			//Update(serv);
 		}
 		serv.SendAll(Connection.PacketPositionUpdate(this));
     }

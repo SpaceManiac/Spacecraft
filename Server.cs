@@ -8,7 +8,7 @@ using System.Threading;
 using System.Collections;
 using System.Timers;
 
-public class Server
+public class MinecraftServer
 {
     private ArrayList connections;
 	private ArrayList mobs;
@@ -28,10 +28,10 @@ public class Server
 	public string serverhash;
 	private bool justFlistBeated = false;
 
-    static public Server theServ;
+    static public MinecraftServer theServ;
     public static ManualResetEvent OnExit = new ManualResetEvent(false);
     
-    public Server()
+    public MinecraftServer()
     {
         if (theServ != null)
         { return; }
@@ -123,9 +123,9 @@ public class Server
 	
 	private void MobTimer(object x, ElapsedEventArgs y)
 	{
-		for(int i = 0; i < mobs.Count; ++i) {
+		/*for(int i = 0; i < mobs.Count; ++i) {
 			((Robot)(mobs[i])).Update(this);
-		}
+		}*/
 	}
     
     private void Heartbeat()
