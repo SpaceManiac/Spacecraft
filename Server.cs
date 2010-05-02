@@ -67,7 +67,7 @@ public class MinecraftServer
             }
             
             //int maxplayers = 16;
-            if(Spacecraft.Config["max-players"] != null) {
+            if(Settings.("max-players" != null) {
                 //maxplayers = Convert.ToInt32(Spacecraft.Config["max-players"]);
             }
             connections = new ArrayList();

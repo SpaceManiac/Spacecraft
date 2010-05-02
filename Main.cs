@@ -6,9 +6,7 @@ using System.Threading;
 using System.Web;
 
 class Spacecraft
-{
-    public static Hashtable Config;
-        
+{        
     public static void Main()
     {
         Log("Spacecraft is starting...");
