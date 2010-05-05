@@ -1,3 +1,0 @@
-Admin=SpaceManiac,Blocky
-Mod=AtkinsSJ,Kerma
-Builder=mortar,Blackduck606,Cliffy1000,Rumia,BunnyBot5000
