@@ -24,6 +24,14 @@ public class Config
 		
 	}
 	
+	public static string GetDefinedList() {
+		string r = "";
+		foreach(KeyValuePair<string, string> kvp in _Config) {
+			r += " " + kvp.Key;
+		}
+		return r;
+	}
+	
 	public static string Get(string key, string def) {
 		if(Contains(key))
             return (_Config[key]);

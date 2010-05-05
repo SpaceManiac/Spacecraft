@@ -27,6 +27,7 @@ public class ChatCommandHandling
 		Commands.Add("resend", new ChatCommands.ResendMap());
 		Commands.Add("rerank", new ChatCommands.ReloadRanks());
 		Commands.Add("clear", new ChatCommands.ClearChat());
+		Commands.Add("config", new ChatCommands.Configure());
     }
 
     /// <summary>
@@ -137,7 +138,8 @@ namespace ChatCommands
             } else if (args == "") {
                 sender.Message(Color.DarkRed + "No /me message specified");
             } else {
-                Connection.MsgAll(" * " + sender.player.name + " " + args);
+                Connection.MsgAll(" * " + sender.name + " " + args);
+				Spacecraft.Log("* " + sender.name + " " + args);
             }
         }
     }
@@ -163,6 +165,7 @@ namespace ChatCommands
                 } else {
                     Player _player = sender.player;
                     c.Send(Connection.PacketTeleportSelf(_player.x, _player.y, _player.z, _player.heading, _player.pitch));
+					Spacecraft.Log(sender.name + " brought " + args);
                 }
             }
         }
@@ -180,6 +183,7 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
+			Spacecraft.Log(sender.name + " shut down the server");
             MinecraftServer.theServ.SendAll(Connection.PacketKick("Server is shutting down!"));
             MinecraftServer.OnExit.Set();
 		}
@@ -201,6 +205,7 @@ namespace ChatCommands
 			MinecraftServer.theServ.map.yspawn = sender._player.y;
 			MinecraftServer.theServ.map.zspawn = sender._player.z;
 			sender.Message(Color.Teal + "Spawn point set");
+			Spacecraft.Log(sender.name + " set the spawn point");
 		}
 	}
 	
@@ -257,6 +262,7 @@ namespace ChatCommands
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
                     sender.Send(Connection.PacketTeleportSelf(p.x, p.y, p.z, p.heading, p.pitch));
+					Spacecraft.Log(sender.name + " telported to " + p.name);
                 }
             }
 		}
@@ -283,6 +289,7 @@ namespace ChatCommands
                     sender.Message(Color.DarkRed + "No such player " + pname);
                 } else {
                     c.Kick("You were kicked by " + sender.name);
+					Spacecraft.Log(sender.name + " kicked " + c.name);
                 }
             }
 		}
@@ -304,6 +311,7 @@ namespace ChatCommands
                 sender.Message(Color.DarkRed + "No message specified");
             } else {
                 Connection.MsgAll(Color.Yellow + args);
+				Spacecraft.Log("{" + sender.name + "} " + args);
             }
 		}
 	}
@@ -321,6 +329,7 @@ namespace ChatCommands
 		public override void Run(Connection sender, string cmd, string args)
 		{
             MinecraftServer.theServ.map.Dehydrate(MinecraftServer.theServ);
+			Spacecraft.Log(sender.name + " dehydrated the map");
 		}
 	}
 	
@@ -369,6 +378,7 @@ namespace ChatCommands
 		public override void Run(Connection sender, string cmd, string args)
 		{
 			Spacecraft.LoadRanks();
+			Spacecraft.Log(sender.name + " reloaded the ranks");
 			sender.Message(Color.Teal + "Ranks reloaded");
 		}
 	}
@@ -390,4 +400,42 @@ namespace ChatCommands
 			}
 		}
 	}	
+	
+	public class Configure : ChatCommandBase
+	{
+		public override Rank RankNeeded {
+			get { return Rank.Admin; }
+		}
+		
+ 		public override string HelpMsg {
+			get { return "/config: manages raw server options"; }
+		}
+		
+		public override void Run(Connection sender, string cmd, string args)
+		{
+			string[] argv = args.Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+			if(argv.Length == 0) {
+				string commands = "Options set:" + Config.GetDefinedList();
+				if(commands.Length <= 60) {
+                	sender.Message(Color.Teal + commands);
+				} else {
+					while(commands.Length > 60) {
+						int i = commands.LastIndexOf(' ', 60, 60);
+						sender.Message(Color.Teal + commands.Substring(0, i));
+						commands = commands.Substring(i);
+					}
+					sender.Message(Color.Teal + commands);
+				}
+			} else if(argv.Length == 1) {
+				string r = Config.Get(argv[0], null);
+				if(r == null) {
+					sender.Message(Color.Teal + "No option " + argv[0] + " defined");
+				} else {
+					sender.Message(Color.Teal + "Option " + argv[0] + " is " + r);
+				}
+			} else if(argv.Length == 2) {
+				// onos
+			}
+		}
+	}
 }

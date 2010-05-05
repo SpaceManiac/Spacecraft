@@ -22,11 +22,11 @@ public class Map
         physicsCount = 0;
         Spacecraft.Log("Generating map...");
         
-        xdim = 32;
-        ydim = 16;
-        zdim = 32;
+        xdim = 64;
+        ydim = 64;
+        zdim = 64;
         xspawn = (short)(16*xdim);  // center spawn
-        yspawn = (short)(16*ydim + 32);
+        yspawn = (short)(16*ydim + 48);
         zspawn = (short)(16*zdim);
         _data = new byte[xdim * ydim * zdim];
         for(short x = 0; x < xdim; ++x) {

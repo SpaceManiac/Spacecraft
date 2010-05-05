@@ -30,7 +30,6 @@ class Spacecraft
 		
         serv.Start();
 		
-        Thread.Sleep(100);
         Spacecraft.Log("Bye!");
 		Spacecraft.Log("");
         Environment.Exit(0);
@@ -69,21 +68,25 @@ class Spacecraft
             
         }
     }
+	
+	private static object logfile = new object();
     
     public static void Log(string text)
     {
-        /*if(!File.Exists("server.log")) {
+        if(!File.Exists("server.log")) {
             File.Create("server.log");
-        }*/
-        StreamWriter sw = new StreamWriter("server.log", true);
-		if(text == "") {
-			sw.WriteLine();
-			Console.WriteLine();
-		} else {
-	        sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
-	        Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+        }
+		lock(logfile) {
+	        StreamWriter sw = new StreamWriter("server.log", true);
+			if(text == "") {
+				sw.WriteLine();
+				Console.WriteLine();
+			} else {
+		        sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+		        Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
+			}
+		    sw.Close();
 		}
-	    sw.Close();
     }
 	
 	/*public static string UrlEncode( string input ) {

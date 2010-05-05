@@ -3,7 +3,7 @@
 
 # Name and connection information
 server-name = Spacecraft Alpha
-motd = Haldo there!
+motd = Haldo there! -hax
 port = 13000
 verify-names = false
 max-players = 32
