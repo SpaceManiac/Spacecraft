@@ -5,9 +5,14 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Text;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Soap;
 
+[Serializable()]
 public class Map
 {
+    
+    static short DefaultHeight=64, DefaultWidth=64, DefaultDepth = 64;
+
     public byte[] data { get; protected set; }
     public int Length { get { return xdim * ydim * zdim; } }
 	
@@ -15,7 +20,7 @@ public class Map
 	public short ydim { get; protected set; }
 	public short zdim { get; protected set; }
     public Position spawn { get; protected set; }
-    public byte headingSpawn { get; protected set; }
+    public byte spawnHeading { get; protected set; }
 	
 	public Dictionary<string, string> meta;
 	
@@ -24,9 +29,13 @@ public class Map
     
     public Map()
     {
+        SoapFormatter foo = new SoapFormatter();
         physicsCount = 0;
-        data = null;
+        data = new byte[]{0x02,0x03,0x04,0x05};
 		xdim = 0; ydim = 0; zdim = 0;
+        StreamWriter s = new StreamWriter("test.txt");
+        foo.Serialize(s.BaseStream, this);
+        s.Close();
     }
 	
 	public void SetSpawn(Position p)
@@ -39,10 +48,11 @@ public class Map
         physicsCount = 0;
         Spacecraft.Log("Generating map...");
         
-        xdim = 64;
-        ydim = 64;
-        zdim = 64;
+        xdim = DefaultWidth;
+        ydim = DefaultHeight;
+        zdim = DefaultDepth;
 		spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
+        // Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
         data = new byte[Length];
         for(short x = 0; x < xdim; ++x) {
             for(short z = 0; z < zdim; ++z) {
@@ -135,13 +145,13 @@ public class Map
             short z = reader.ReadInt16();
             short y = reader.ReadInt16();
 			spawn = new Position(x, y, z);
-            headingSpawn = reader.ReadByte();
+            spawnHeading = reader.ReadByte();
             /* pitchSpawn = */ reader.ReadByte();
             if( spawn.x > xdim * 32 || spawn.y > ydim * 32 || spawn.z > zdim * 32 ||
                 spawn.x < 0 || spawn.y < 0 || spawn.z < 0 ) {
                 Spacecraft.Log( "Map.ReadHeader: Spawn coordinates are outside the valid range! Using center of the map instead." );
                 spawn = new Position((short)(xdim / 2 * 32), (short)(ydim / 2 * 32), (short)(zdim / 2 * 32));
-				headingSpawn = 0;
+				spawnHeading = 0;
             }
 
         } catch( FormatException ex ) {
@@ -230,7 +240,7 @@ public class Map
         writer.Write( (ushort)spawn.x );
         writer.Write( (ushort)spawn.z );
         writer.Write( (ushort)spawn.y );
-        writer.Write( (byte)headingSpawn );
+        writer.Write( (byte)spawnHeading );
         writer.Write( (byte)0 );
         writer.Flush();
     }

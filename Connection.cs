@@ -292,8 +292,8 @@ public class Connection
             if(p == _player || p == null) continue;
             Send(PacketSpawnPlayer((Player)(players[i])));
         }
-        Send(PacketTeleportSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.headingSpawn, 0));
-        Send(PacketSpawnSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.headingSpawn, 0));
+        Send(PacketTeleportSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.spawnHeading, 0));
+        Send(PacketSpawnSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.spawnHeading, 0));
 		MsgAll(Color.Yellow + name + " has joined!");
         Message(Color.Yellow + "You're a " + Player.RankColor(_player.rank) + player.rank.ToString() + Color.Yellow + ". See /help for info");
     }
