@@ -28,6 +28,9 @@ public class ChatCommandHandling
 		Commands.Add("rerank", new ChatCommands.ReloadRanks());
 		Commands.Add("clear", new ChatCommands.ClearChat());
 		Commands.Add("config", new ChatCommands.Configure());
+		Commands.Add("go", new ChatCommands.LandmarkGoto());
+		Commands.Add("mark", new ChatCommands.LandmarkAdd());
+		Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
     }
 
     /// <summary>
@@ -429,6 +432,90 @@ namespace ChatCommands
 				}
 			} else if(argv.Length == 2) {
 				// TODO: possibly allow setting config inline
+			}
+		}
+	}
+	
+	public class LandmarkGoto : ChatCommandBase
+	{
+		public override Rank RankNeeded {
+			get { return Rank.Guest; }
+		}
+
+		public override string HelpMsg {
+			get { return "/go: teleports you to a landmark"; }
+		}
+		
+		public override void Run(Connection sender, string cmd, string args)
+		{
+			Map map = MinecraftServer.theServ.map;
+			if(args == "") {
+				string marks = "Landmarks:" + map.GetLandmarkList();
+				ChatCommandHandling.WrapMessage(sender, marks);
+			} else {
+				if(map.landmarks.ContainsKey(args)) {
+					Position p = map.landmarks[args].First;
+					byte heading = map.landmarks[args].Second;
+					sender.Send(Connection.PacketTeleportSelf(p.x, p.y, p.z, heading, 0));
+					sender.Message(Color.Teal + "Teleported to landmark " + args);
+				} else {
+					sender.Message(Color.DarkRed + "No such landmark " + args);
+				}
+			}
+		}
+	}
+	
+	public class LandmarkAdd : ChatCommandBase
+	{
+		public override Rank RankNeeded {
+			get { return Rank.Builder; }
+		}
+
+		public override string HelpMsg {
+			get { return "/mark: creates a landmark"; }
+		}
+		
+		public override void Run(Connection sender, string cmd, string args)
+		{
+			Map map = MinecraftServer.theServ.map;
+			if(args == "") {
+				string marks = "Landmarks:" + map.GetLandmarkList();
+				ChatCommandHandling.WrapMessage(sender, marks);
+			} else {
+				if(map.landmarks.ContainsKey(args)) {
+					sender.Message(Color.DarkRed + "Landmark " + args + " already exists");
+				} else {
+					Position p = new Position(sender._player.x, sender._player.y, sender._player.z);
+					byte heading = sender._player.heading;
+					map.landmarks.Add(args, new Pair<Position, byte>(p, heading));
+					sender.Message(Color.Teal + "Landmark " + args + " created");
+				}
+			}
+		}
+	}
+	
+	public class LandmarkRemove : ChatCommandBase
+	{
+		public override Rank RankNeeded {
+			get { return Rank.Mod; }
+		}
+
+		public override string HelpMsg {
+			get { return "/rmmark: removes a landmark"; }
+		}
+		
+		public override void Run(Connection sender, string cmd, string args)
+		{
+			Map map = MinecraftServer.theServ.map;
+			if(args == "") {
+				string marks = "Landmarks:" + map.GetLandmarkList();
+				ChatCommandHandling.WrapMessage(sender, marks);
+			} else {
+				if(map.landmarks.ContainsKey(args)) {
+					map.landmarks.Remove(args);
+				} else {
+					sender.Message(Color.DarkRed + "No such landmark " + args);
+				}
 			}
 		}
 	}

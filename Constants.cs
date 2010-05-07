@@ -158,7 +158,7 @@ public enum PacketType : byte
     Kick               = 0x0e, // server
 }
 
-public enum PacketLength
+public enum PacketLength : int
 {
     Ident               = 131, // client & server
     Ping                = 1, // server
