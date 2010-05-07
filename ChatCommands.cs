@@ -233,9 +233,9 @@ namespace ChatCommands
                 }
             } else {
                 string b = args;
-                if(Block.Names.Contains(b)) {
+                if(BlockInfo.NameExists(b)) {
                     sender._player.placing = true;
-                    sender._player.placeType = (byte)(Block.Names[b]);
+                    sender._player.placeType = BlockInfo.names[b];
                     sender.Message(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
                 } else {
                     sender.Message(Color.DarkRed + "Unknown block " + b);

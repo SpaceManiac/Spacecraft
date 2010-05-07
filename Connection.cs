@@ -304,7 +304,7 @@ public class Connection
         short y = Net2Host(BitConverter.ToInt16(packet, 3));
         short z = Net2Host(BitConverter.ToInt16(packet, 5));
         byte mode = packet[7];
-        byte type = packet[8];
+        Block type = (Block)(packet[8]);
         
         BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.Length));
         
@@ -385,9 +385,9 @@ public class Connection
 	}
     
     // ===================================================================
-    // static Packet* functions
+    // static BasePacket* functions
     
-    public static byte[] PacketSetBlock(short x, short y, short z, byte block)
+    public static byte[] PacketSetBlock(short x, short y, short z, Block block)
     {
         byte[] packet = new byte[PacketLen.ServerSetBlock];
         packet[0] = Packet.ServerSetBlock;
@@ -397,7 +397,7 @@ public class Connection
         packet[1] = bytex[0]; packet[2] = bytex[1];
         packet[3] = bytey[0]; packet[4] = bytey[1];
         packet[5] = bytez[0]; packet[6] = bytez[1];
-        packet[7] = block;
+        packet[7] = (byte) block;
         return packet;
     }
     

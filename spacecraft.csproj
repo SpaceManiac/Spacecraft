@@ -32,7 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -43,6 +42,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="NewConnection.cs" />
     <Compile Include="NewPlayer.cs" />
+    <Compile Include="Packet.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Player.cs" />
