@@ -26,7 +26,7 @@ namespace spacecraft
             {
                 int bytesRead = _client.GetStream().Read(buffer, 0, 1024);
             }
-            while (PacketLen.Lookup(buffer[0]) == 0);
+            while (false); //PacketLen.Lookup(buffer[0]) == 0);
 
 
 

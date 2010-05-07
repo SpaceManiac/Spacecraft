@@ -22,18 +22,30 @@ public class Map
     public byte spawnHeading { get; protected set; }
 	
 	public Dictionary<string, string> meta;
+	public Dictionary<string, Pair<Position, byte>> landmarks;
 	
     private uint physicsCount;
     private bool physicsSuspended = false;
     
     public Map()
     {
-   
         physicsCount = 0;
-        data = null;
+        data = new byte[]{0x02,0x03,0x04,0x05};
 		xdim = 0; ydim = 0; zdim = 0;
-        StreamWriter s = new StreamWriter("test.txt");
+        landmarks = new Dictionary<string, Pair<Position, byte>>();
+        //StreamWriter s = new StreamWriter("test.txt");
+        //foo.Serialize(s.BaseStream, this);
+        //s.Close();
     }
+	
+	public string GetLandmarkList()
+	{
+		string r = "";
+		foreach(KeyValuePair<string, Pair<Position, byte>> pair in landmarks) {
+			r += " " + pair.Key;
+		}
+		return r;
+	}
 	
 	public void SetSpawn(Position p, byte heading)
 	{
@@ -157,7 +169,6 @@ public class Map
             return false;
         }
         return true;
-
     }
 
     private void ReadMetadata( FileStream fs ) {
@@ -168,7 +179,23 @@ public class Map
             for( int i = 0; i < metaSize; i++ ) {
                 string key = ReadLengthPrefixedString( reader );
                 string value = ReadLengthPrefixedString( reader );
-                meta.Add( key, value );
+				if(key == "@landmark") {
+					int p = value.IndexOf("=");
+					string name = value.Substring(0, p);
+					int p2 = value.IndexOf(",", p + 1);
+					short x = Convert.ToInt16(value.Substring(p + 1, p2 - p));
+					int p3 = value.IndexOf(",", p2 + 1);
+					short z = Convert.ToInt16(value.Substring(p2 + 1, p3 - p2));
+					int p4 = value.IndexOf(",", p3 + 1);
+					short y = Convert.ToInt16(value.Substring(p3 + 1, p4 - p3));
+					int p5 = value.IndexOf(",", p4 + 1);
+					byte heading = Convert.ToByte(value.Substring(p5 + 1));
+					
+					Position pos = new Position(x, y, z);
+					landmarks.Add(name, new Pair<Position, byte>(pos, heading));
+				} else {
+					meta.Add( key, value );
+				}
 				Spacecraft.Log( "Map.ReadMetadata: {0} = {1} ", key, value);
             }
         } catch( FormatException ex ) {
@@ -245,6 +272,25 @@ public class Map
     void WriteMetadata( FileStream fs ) {
         BinaryWriter writer = new BinaryWriter( fs );
         writer.Write( (ushort)meta.Count );
+		foreach(KeyValuePair<string, Pair<Position, byte>> pair in landmarks) {
+			string key = pair.Key;
+			Position p = pair.Value.First;
+			byte heading = pair.Value.Second;
+			WriteLengthPrefixedString(writer, "@landmark");
+			
+			StringBuilder data = new StringBuilder();
+			data.Append(key);
+			data.Append("=");
+			data.Append(p.x);
+			data.Append(",");
+			data.Append(p.z);
+			data.Append(",");
+			data.Append(p.y);
+			data.Append(",");
+			data.Append(heading);
+			WriteLengthPrefixedString(writer, data.ToString());
+		}
+			            
         foreach( KeyValuePair<string, string> pair in meta ) {
             WriteLengthPrefixedString( writer, pair.Key );
             WriteLengthPrefixedString( writer, pair.Value );

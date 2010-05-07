@@ -67,13 +67,17 @@ public class Connection
         
         // check to see if we have a full packet
         while(bufsize > 0) {
-            int packsize = PacketLen.Lookup(buffer[0]);
+			PacketType ptype = (PacketType) buffer[0];
+			
+            int packsize = PacketLengthInfo.Lookup(ptype);
             if(packsize == 0) {
                 break;
             } else if(bufsize >= packsize) {
                 // extract packet
                 byte[] packet = new byte[packsize];
                 Array.Copy(buffer, packet, packsize);
+				
+				ptype = (PacketType) packet[0];
                 
                 // shift buffer
                 bufsize -= packsize;
@@ -81,13 +85,13 @@ public class Connection
                 Array.Copy(buffer, packsize, temp, 0, bufsize);
                 buffer = temp;
                 
-                if(packet[0] == Packet.Ident) {
+                if(ptype == PacketType.Ident) {
                     HandleJoin(packet);
-                } else if(packet[0] == Packet.PlayerSetBlock) {
+                } else if(ptype == PacketType.PlayerSetBlock) {
                     HandleBlock(packet);
-                } else if(packet[0] == Packet.PositionUpdate) {
+                } else if(ptype == PacketType.PositionUpdate) {
                     HandlePosition(packet);
-                } else if(packet[0] == Packet.Message) {
+                } else if(ptype == PacketType.Message) {
                     HandleMessage(packet);
                 }
             } else {
@@ -187,7 +191,7 @@ public class Connection
     
     private void SendMap()
     {
-        byte[] levelInit = new byte[] { 0x02 };
+        byte[] levelInit = new byte[] { (byte) PacketType.LevelInit };
         Send(levelInit);
         
         using(MemoryStream memstr = new MemoryStream()) {
@@ -199,7 +203,7 @@ public class Connection
 				int len = serv.map.Length;
                 for(int i = 0; i < len; i += 1024) {
                     byte[] packet = new byte[1028];
-                    packet[0] = 0x03;
+                    packet[0] = (byte) PacketType.LevelChunk;
                     
                     int remaining = len - i;
                     if(remaining > 1024) remaining = 1024;
@@ -219,8 +223,8 @@ public class Connection
         byte[] ydim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.ydim));
         byte[] zdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.zdim));
         
-        byte[] levelFin = new byte[PacketLen.LevelFinish];
-        levelFin[0] = Packet.LevelFinish;
+        byte[] levelFin = new byte[(int)PacketLength.LevelFinish];
+        levelFin[0] = (byte) PacketType.LevelFinish;
         levelFin[1] = xdim[0]; levelFin[2] = xdim[1];
         levelFin[3] = ydim[0]; levelFin[4] = ydim[1];
         levelFin[5] = zdim[0]; levelFin[6] = zdim[1];
@@ -389,8 +393,8 @@ public class Connection
     
     public static byte[] PacketSetBlock(short x, short y, short z, Block block)
     {
-        byte[] packet = new byte[PacketLen.ServerSetBlock];
-        packet[0] = Packet.ServerSetBlock;
+        byte[] packet = new byte[(int)(PacketLength.ServerSetBlock)];
+        packet[0] = (byte)PacketType.ServerSetBlock;
         byte[] bytex = BitConverter.GetBytes(Host2Net(x));
         byte[] bytey = BitConverter.GetBytes(Host2Net(y));
         byte[] bytez = BitConverter.GetBytes(Host2Net(z));
@@ -403,8 +407,8 @@ public class Connection
     
     public static byte[] PacketPositionUpdate(Player player)
     {
-        byte[] packet = new byte[PacketLen.PositionUpdate];
-        packet[0] = Packet.PositionUpdate;
+        byte[] packet = new byte[(int)PacketLength.PositionUpdate];
+        packet[0] = (byte)PacketType.PositionUpdate;
         byte[] bytex = BitConverter.GetBytes(Host2Net(player.x));
         byte[] bytey = BitConverter.GetBytes(Host2Net(player.y));
         byte[] bytez = BitConverter.GetBytes(Host2Net(player.z));
@@ -419,8 +423,8 @@ public class Connection
     
     public static byte[] PacketTeleportSelf(short x, short y, short z, byte heading, byte pitch)
     {
-        byte[] packet = new byte[PacketLen.PositionUpdate];
-        packet[0] = Packet.PositionUpdate;
+        byte[] packet = new byte[(int)PacketLength.PositionUpdate];
+        packet[0] = (byte)PacketType.PositionUpdate;
         byte[] bytex = BitConverter.GetBytes(Host2Net(x));
         byte[] bytey = BitConverter.GetBytes(Host2Net(y));
         byte[] bytez = BitConverter.GetBytes(Host2Net(z));
@@ -435,8 +439,8 @@ public class Connection
     
     public static byte[] PacketSpawnPlayer(Player player)
     {
-        byte[] packet = new byte[PacketLen.SpawnPlayer];
-        packet[0] = Packet.SpawnPlayer;
+        byte[] packet = new byte[(int)PacketLength.SpawnPlayer];
+        packet[0] = (byte)PacketType.SpawnPlayer;
         packet[1] = player.pid;
         InsertString(packet, 2, player.name);
         byte[] bytex = BitConverter.GetBytes(Host2Net(player.x));
@@ -452,8 +456,8 @@ public class Connection
     
     public static byte[] PacketSpawnSelf(short x, short y, short z, byte heading, byte pitch)
     {
-        byte[] packet = new byte[PacketLen.SpawnPlayer];
-        packet[0] = Packet.SpawnPlayer;
+        byte[] packet = new byte[(int)PacketLength.SpawnPlayer];
+        packet[0] = (byte)PacketType.SpawnPlayer;
         packet[1] = 255;
         InsertString(packet, 2, "MYNAME");
         byte[] bytex = BitConverter.GetBytes(Host2Net(x));
@@ -469,16 +473,16 @@ public class Connection
     
     public static byte[] PacketDespawnPlayer(Player player)
     {
-        byte[] packet = new byte[PacketLen.DespawnPlayer];
-        packet[0] = Packet.DespawnPlayer;
+        byte[] packet = new byte[(int)PacketLength.DespawnPlayer];
+        packet[0] = (byte)PacketType.DespawnPlayer;
         packet[1] = player.pid;
         return packet;
     }
     
     public static byte[] PacketMessage(string msg)
     {
-        byte[] packet = new byte[66];
-        packet[0] = 0x0d;
+        byte[] packet = new byte[(int)PacketLength.Message];
+        packet[0] = (byte)PacketType.Message;
         packet[1] = 0;
         InsertString(packet, 2, msg);
         return packet;

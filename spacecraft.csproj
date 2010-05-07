@@ -43,6 +43,7 @@
     <Compile Include="NewConnection.cs" />
     <Compile Include="NewPlayer.cs" />
     <Compile Include="Packet.cs" />
+    <Compile Include="Pair.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Player.cs" />

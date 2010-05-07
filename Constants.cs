@@ -1,165 +1,191 @@
-
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
-public enum Block2
+public enum Block : byte
 {
-    Air = 0x00,
-    Rock = 0x01,
-    Grass = 0x02,
+    Undefined = 255, // for error checking
+
+    Air = 0,
+    Rock = 1,
+    Grass = 2,
+    Dirt = 3,
+    Cobblestone = 4,
+    Wood = 5,
+    Sapling = 6,
+    Adminium = 7,
+    Water = 8,
+    StillWater = 9,
+    Lava = 10,
+    StillLava = 11,
+    Sand = 12,
+    Gravel = 13,
+    GoldOre = 14,
+    IronOre = 15,
+    CoalOre = 16,
+    Log = 17,
+    Leaves = 18,
+    Sponge = 19,
+    Glass = 20,
+
+    Red = 21,
+    Orange = 22,
+    Yellow = 23,
+    Lime = 24,
+    Green = 25,
+    Teal = 26,
+    Aqua = 27,
+    Cyan = 28,
+    Blue = 29,
+    Indigo = 30,
+    Violet = 31,
+    Magenta = 32,
+    Pink = 33,
+    Black = 34,
+    Gray = 35,
+    White = 36,
+
+    YellowFlower = 37,
+    RedFlower = 38,
+    RedMushroom = 39,
+    BrownMushroom = 40,
+    
+    Gold = 41,
+    Iron = 42,
+    DoubleStair = 43,
+    Stair = 44,
+    Brick = 45,
+    TNT = 46,
+    Books = 47,
+    MossyCobblestone = 48,
+    Obsidian = 49,
+    
+    // indev only
+    I_Torch            = 0x32,
+    I_Fire            = 0x33,
+    I_InfWater        = 0x34
 }
 
-public class Block
-{    
-    public const byte Air                 = 0x00;
-    public const byte Rock                 = 0x01;
-    public const byte Grass             = 0x02;
-    public const byte Dirt                 = 0x03;
-    public const byte Cobblestone        = 0x04;
-    public const byte Wood                 = 0x05;
-    public const byte Sapling            = 0x06;
-    public const byte Adminium            = 0x07;
-    public const byte Water             = 0x08;
-    public const byte StillWater         = 0x09;
-    public const byte Lava                 = 0x0A;
-    public const byte StillLava         = 0x0B;
-    public const byte Sand                 = 0x0C;
-    public const byte Gravel             = 0x0D;
-    public const byte GoldOre             = 0x0E;
-    public const byte IronOre             = 0x0F;
-    public const byte CoalOre            = 0x10;
-    public const byte TreeTrunk         = 0x11;
-    public const byte Leaves             = 0x12;
-    public const byte Sponge             = 0x13;
-    public const byte Glass             = 0x14;
-    public const byte RedCloth             = 0x15;
-    public const byte OrangeCloth         = 0x16;
-    public const byte YellowCloth         = 0x17;
-    public const byte LightGreenCloth     = 0x18;
-    public const byte GreenCloth         = 0x19;
-    public const byte AGreenCloth         = 0x1A;
-    public const byte CyanCloth         = 0x1B;
-    public const byte BlueCloth         = 0x1C;
-    public const byte PurpleCloth         = 0x1D;
-    public const byte IndigoCloth         = 0x1E;
-    public const byte VioletCloth         = 0x1F;
-    public const byte MagentaCloth         = 0x20;
-    public const byte PinkCloth         = 0x21;
-    public const byte BlackCloth         = 0x22;
-    public const byte GrayCloth         = 0x23;
-    public const byte WhiteCloth         = 0x24;
-    public const byte YellowFlower         = 0x25;
-    public const byte RedFlower         = 0x26;
-    public const byte BrownMushroom        = 0x27;
-    public const byte RedMushroom         = 0x28;
-    public const byte Gold                 = 0x29;
-    public const byte Iron                 = 0x2A;
-    public const byte DoubleStair         = 0x2B;
-    public const byte Stair             = 0x2C;
-    public const byte Brick             = 0x2D;
-    public const byte TNT                 = 0x2E;
-    public const byte Books             = 0x2F;
-    public const byte MossyCobble         = 0x30;
-    public const byte Obsidian             = 0x31;
-    
-    public static Hashtable Names;
+public static class BlockInfo
+{
+    public static Dictionary<string, Block> names;
 	
-	public static bool IsFluid(byte block) {
-		return (block == Water || block == StillWater || block == Lava || block == StillLava);
+	public static bool IsFluid(Block block) {
+		return (block == Block.Water || block == Block.StillWater
+		        || block == Block.Lava || block == Block.StillLava);
 	}
-	public static bool IsDecoration(byte block) {
-		return (block == YellowFlower || block == RedFlower || block == BrownMushroom || block == RedMushroom);
+	public static bool IsDecoration(Block block) {
+		return (block == Block.YellowFlower || block == Block.RedFlower ||
+		        block == Block.BrownMushroom || block == Block.RedMushroom ||
+		        block == Block.Sapling);
 	}
     
-	public static bool IsTransparent(byte block) {
-		return (IsDecoration(block) || block == Glass || block == Leaves || block == Air);
+	public static bool IsTransparent(Block block) {
+		return (IsDecoration(block) || block == Block.Glass || block == Block.Leaves || block == Block.Air);
 	}
-	public static bool IsOpaque(byte block) {
+	public static bool IsOpaque(Block block) {
 		return !IsTransparent(block);
 	}
 	
-	public static bool IsSolid(byte block) {
-        return (block != Air && !IsFluid(block) && !IsDecoration(block));
+	public static bool IsSolid(Block block) {
+        return (block != Block.Air && !IsFluid(block) && !IsDecoration(block));
     }
     
-    public static void MakeNames() {
-        Names = new Hashtable();
-        Names["2stair"] = DoubleStair;
-        Names["obsidian"] = Obsidian;
-        Names["adminium"] = Adminium;
-        Names["water"] = Water;
-        Names["lava"] = Lava;
-    }
-    
-    // indev only
-    public const byte I_Torch            = 0x32;
-    public const byte I_Fire            = 0x33;
-    public const byte I_InfWater        = 0x34;
-}
-
-public class Packet
-{
-   
-    public const byte Ident                = 0x00; // client & server
-    public const byte Ping                 = 0x01; // server
-    public const byte LevelInit         = 0x02; // server
-    public const byte LevelChunk         = 0x03; // server
-    public const byte LevelFinish         = 0x04; // server
-    public const byte PlayerSetBlock     = 0x05; // client
-    public const byte ServerSetBlock     = 0x06; // server
-    public const byte SpawnPlayer         = 0x07; // server
-    public const byte PositionUpdate     = 0x08; // client & server
-    public const byte U_PositionUpdate    = 0x09; // unused server
-    public const byte U_PositionUpdate2 = 0x0a; // unused server
-    public const byte U_OrientUpdate    = 0x0b; // unused server
-    public const byte DespawnPlayer        = 0x0c; // server
-    public const byte Message            = 0x0d; // client & server
-    public const byte Kick                = 0x0e; // server
-}
-
-
-
-public class PacketLen
-{
-    public const short Ident                = 131; // client & server
-    public const short Ping                 = 1; // server
-    public const short LevelInit         = 1; // server
-    public const short LevelChunk         = 1028; // server
-    public const short LevelFinish         = 7; // server
-    public const short PlayerSetBlock     = 9; // client
-    public const short ServerSetBlock     = 8; // server
-    public const short SpawnPlayer         = 74; // server
-    public const short PositionUpdate     = 10; // client & server
-    public const short U_PositionUpdate    = 10; // unused server
-    public const short U_PositionUpdate2 = 8; // unused server
-    public const short U_OrientUpdate    = 4; // unused server
-    public const short DespawnPlayer        = 2; // server
-    public const short Message            = 66; // client & server
-    public const short Kick                = 65; // server
-    
-    public static short Lookup(byte p) {
-        switch(p) {
-            case Packet.Ident: return Ident;
-            case Packet.Ping: return Ping;
-            case Packet.LevelInit: return LevelInit;
-            case Packet.LevelChunk: return LevelChunk;
-            case Packet.LevelFinish: return LevelFinish;
-            case Packet.PlayerSetBlock: return PlayerSetBlock;
-            case Packet.ServerSetBlock: return ServerSetBlock;
-            case Packet.SpawnPlayer: return SpawnPlayer;
-            case Packet.PositionUpdate: return PositionUpdate;
-            case Packet.U_PositionUpdate: return U_PositionUpdate;
-            case Packet.U_PositionUpdate2: return U_PositionUpdate2;
-            case Packet.U_OrientUpdate: return U_OrientUpdate;
-            case Packet.DespawnPlayer: return DespawnPlayer;
-            case Packet.Message: return Message;
-            case Packet.Kick: return Kick;
+    static BlockInfo() {
+        names = new Dictionary<string, Block>();
+		
+        foreach(string block in Enum.GetNames(typeof(Block))) {
+            names.Add(block.ToLower(), (Block) Enum.Parse(typeof(Block), block));
         }
-        return 0;
+		
+        names["none"] = Block.Air;
+        names["nothing"] = Block.Air;
+        names["empty"] = Block.Air;
+        names["soil"] = Block.Dirt;
+		names["stone"] = Block.Rock;
+        names["rocks"] = Block.Cobblestone;
+        names["plant"] = Block.Sapling;
+        names["admincrete"] = Block.Adminium;
+		names["admin"] = Block.Adminium;
+        names["ore"] = Block.IronOre;
+        names["coal"] = Block.CoalOre;
+        names["trunk"] = Block.Log;
+        names["treetrunk"] = Block.Log;
+        names["foliage"] = Block.Leaves;
+        names["grey"] = Block.Gray;
+        names["flower"] = Block.YellowFlower;
+        names["mushroom"] = Block.BrownMushroom;
+        names["steel"] = Block.Iron;
+        names["metal"] = Block.Iron;
+        names["silver"] = Block.Iron;
+        names["stairs"] = Block.DoubleStair;
+        names["bricks"] = Block.Brick;
+        names["dynamite"] = Block.TNT;
+        names["bookcase"] = Block.Books;
+        names["shelf"] = Block.Books;
+        names["shelves"] = Block.Books;
+        names["book"] = Block.Books;
+        names["moss"] = Block.MossyCobblestone;
+        names["mossy"] = Block.MossyCobblestone;
+        names["mossystone"] = Block.MossyCobblestone;
+        names["mossyrocks"] = Block.MossyCobblestone;
+        names["mossystones"] = Block.MossyCobblestone;
+        names["dark"] = Block.Obsidian;
+    }
+	
+	public static bool NameExists(string key)
+	{
+		return names.ContainsKey(key);
+	}
+}
+
+public enum PacketType : byte
+{
+    Ident              = 0x00, // client & server
+    Ping               = 0x01, // server
+    LevelInit          = 0x02, // server
+    LevelChunk         = 0x03, // server
+    LevelFinish        = 0x04, // server
+    PlayerSetBlock     = 0x05, // client
+    ServerSetBlock     = 0x06, // server
+    SpawnPlayer        = 0x07, // server
+    PositionUpdate     = 0x08, // client & server
+    U_PositionUpdate   = 0x09, // unused server
+    U_PositionUpdate2  = 0x0a, // unused server
+    U_OrientUpdate     = 0x0b, // unused server
+    DespawnPlayer      = 0x0c, // server
+    Message            = 0x0d, // client & server
+    Kick               = 0x0e, // server
+}
+
+public enum PacketLength : int
+{
+    Ident               = 131, // client & server
+    Ping                = 1, // server
+    LevelInit           = 1, // server
+    LevelChunk          = 1028, // server
+    LevelFinish         = 7, // server
+    PlayerSetBlock      = 9, // client
+    ServerSetBlock      = 8, // server
+    SpawnPlayer         = 74, // server
+    PositionUpdate      = 10, // client & server
+    U_PositionUpdate    = 10, // unused server
+    U_PositionUpdate2   = 8, // unused server
+    U_OrientUpdate      = 4, // unused server
+    DespawnPlayer       = 2, // server
+    Message             = 66, // client & server
+    Kick                = 65, // server
+}
+
+public static class PacketLengthInfo
+{
+    public static int Lookup(PacketType p) {
+        string name = Enum.GetName(typeof(PacketType), p);
+		return (int)Enum.Parse(typeof(PacketLength), name);
     }
 }
 
-public class Color
+public static class Color
 {
     public const string Black = "&0";
     public const string DarkBlue = "&1";

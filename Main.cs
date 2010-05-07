@@ -28,7 +28,7 @@ class Spacecraft
                 Config.Initialize();
             }
 
-            Block.MakeNames();
+          //  Block.MakeNames();
 
             LoadRanks();
 
