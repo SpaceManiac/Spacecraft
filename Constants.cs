@@ -102,6 +102,7 @@ public static class BlockInfo
         names["nothing"] = Block.Air;
         names["empty"] = Block.Air;
         names["soil"] = Block.Dirt;
+		names["stone"] = Block.Rock;
         names["rocks"] = Block.Cobblestone;
         names["plant"] = Block.Sapling;
         names["admincrete"] = Block.Adminium;
@@ -138,66 +139,53 @@ public static class BlockInfo
 	}
 }
 
-public class Packet
+public enum PacketType : byte
 {
-    public const byte Ident                = 0x00; // client & server
-    public const byte Ping                 = 0x01; // server
-    public const byte LevelInit         = 0x02; // server
-    public const byte LevelChunk         = 0x03; // server
-    public const byte LevelFinish         = 0x04; // server
-    public const byte PlayerSetBlock     = 0x05; // client
-    public const byte ServerSetBlock     = 0x06; // server
-    public const byte SpawnPlayer         = 0x07; // server
-    public const byte PositionUpdate     = 0x08; // client & server
-    public const byte U_PositionUpdate    = 0x09; // unused server
-    public const byte U_PositionUpdate2 = 0x0a; // unused server
-    public const byte U_OrientUpdate    = 0x0b; // unused server
-    public const byte DespawnPlayer        = 0x0c; // server
-    public const byte Message            = 0x0d; // client & server
-    public const byte Kick                = 0x0e; // server
+    Ident              = 0x00, // client & server
+    Ping               = 0x01, // server
+    LevelInit          = 0x02, // server
+    LevelChunk         = 0x03, // server
+    LevelFinish        = 0x04, // server
+    PlayerSetBlock     = 0x05, // client
+    ServerSetBlock     = 0x06, // server
+    SpawnPlayer        = 0x07, // server
+    PositionUpdate     = 0x08, // client & server
+    U_PositionUpdate   = 0x09, // unused server
+    U_PositionUpdate2  = 0x0a, // unused server
+    U_OrientUpdate     = 0x0b, // unused server
+    DespawnPlayer      = 0x0c, // server
+    Message            = 0x0d, // client & server
+    Kick               = 0x0e, // server
 }
 
-public class PacketLen
+public enum PacketLength
 {
-    public const short Ident                = 131; // client & server
-    public const short Ping                 = 1; // server
-    public const short LevelInit         = 1; // server
-    public const short LevelChunk         = 1028; // server
-    public const short LevelFinish         = 7; // server
-    public const short PlayerSetBlock     = 9; // client
-    public const short ServerSetBlock     = 8; // server
-    public const short SpawnPlayer         = 74; // server
-    public const short PositionUpdate     = 10; // client & server
-    public const short U_PositionUpdate    = 10; // unused server
-    public const short U_PositionUpdate2 = 8; // unused server
-    public const short U_OrientUpdate    = 4; // unused server
-    public const short DespawnPlayer        = 2; // server
-    public const short Message            = 66; // client & server
-    public const short Kick                = 65; // server
-    
-    public static short Lookup(byte p) {
-        switch(p) {
-            case Packet.Ident: return Ident;
-            case Packet.Ping: return Ping;
-            case Packet.LevelInit: return LevelInit;
-            case Packet.LevelChunk: return LevelChunk;
-            case Packet.LevelFinish: return LevelFinish;
-            case Packet.PlayerSetBlock: return PlayerSetBlock;
-            case Packet.ServerSetBlock: return ServerSetBlock;
-            case Packet.SpawnPlayer: return SpawnPlayer;
-            case Packet.PositionUpdate: return PositionUpdate;
-            case Packet.U_PositionUpdate: return U_PositionUpdate;
-            case Packet.U_PositionUpdate2: return U_PositionUpdate2;
-            case Packet.U_OrientUpdate: return U_OrientUpdate;
-            case Packet.DespawnPlayer: return DespawnPlayer;
-            case Packet.Message: return Message;
-            case Packet.Kick: return Kick;
-        }
-        return 0;
+    Ident               = 131, // client & server
+    Ping                = 1, // server
+    LevelInit           = 1, // server
+    LevelChunk          = 1028, // server
+    LevelFinish         = 7, // server
+    PlayerSetBlock      = 9, // client
+    ServerSetBlock      = 8, // server
+    SpawnPlayer         = 74, // server
+    PositionUpdate      = 10, // client & server
+    U_PositionUpdate    = 10, // unused server
+    U_PositionUpdate2   = 8, // unused server
+    U_OrientUpdate      = 4, // unused server
+    DespawnPlayer       = 2, // server
+    Message             = 66, // client & server
+    Kick                = 65, // server
+}
+
+public static class PacketLengthInfo
+{
+    public static int Lookup(PacketType p) {
+        string name = Enum.GetName(typeof(PacketType), p);
+		return (int)Enum.Parse(typeof(PacketLength), name);
     }
 }
 
-public class Color
+public static class Color
 {
     public const string Black = "&0";
     public const string DarkBlue = "&1";
