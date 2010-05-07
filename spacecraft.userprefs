@@ -1,24 +1,31 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Main.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Map.cs" ctype="Workbench">
     <Files>
-      <File FileName="AssemblyInfo.cs" Line="13" Column="31" />
-      <File FileName="Connection.cs" Line="251" Column="11" />
-      <File FileName="Player.cs" Line="71" Column="20" />
-      <File FileName="ChatCommands.cs" Line="103" Column="47" />
-      <File FileName="Server.cs" Line="227" Column="63" />
+      <File FileName="..\CBMake\bin\proj.xml" Line="19" Column="14" />
+      <File FileName="AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Connection.cs" Line="296" Column="56" />
+      <File FileName="Player.cs" Line="70" Column="39" />
+      <File FileName="ChatCommands.cs" Line="217" Column="28" />
+      <File FileName="Server.cs" Line="1" Column="1" />
       <File FileName="Main.cs" Line="97" Column="12" />
+      <File FileName="MapLoaderDat.cs" Line="7" Column="40" />
+      <File FileName="Map.cs" Line="26" Column="34" />
+      <File FileName="Position.cs" Line="13" Column="40" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
-            <Node name="Main.cs" selected="True" />
+            <Node name="Map.cs" selected="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
         <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State selected="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

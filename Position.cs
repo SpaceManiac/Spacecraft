@@ -1,56 +1,57 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace spacecraft
+/* struct Position
+ * contains a set of x, y, z world coordinates (not map coordinates)
+ */
+
+public struct Position
 {
-    struct Position
+    public short x { get; /* private */ set; }
+    public short y { get; /* private */ set; }
+    public short z { get; /* private */ set; }
+
+    public Position(short X, short Y, short Z)
     {
-        public Int16 x { get; private set; }
-        public Int16 y { get; private set; }
-        public Int16 z { get; private set; }
+        this = new Position(); // Using fields in the constructer is messy, so let .NET clear the messiness, then proceed.
+        x = X;
+        y = Y;
+        z = Z;
+    }
 
-        public Position(Int16 X, Int16 Y, Int16 Z)
-        {
-            this = new Position(); // Using fields in the constructer is messy, so let .NET clear the messiness, then proceed.
-            x = X;
-            y = Y;
-            z = Z;
-        }
-
-        public Position(byte x, byte y, byte z)
-        {
-            this = new Position((Int16)x, (Int16)y, (Int16)z);
-        }
+    public Position(byte x, byte y, byte z)
+    {
+        this = new Position((short)x, (short)y, (short)z);
+    }
 
 
-        static public bool operator ==(Position A, Position B)
-        {
-            return A.Equals(B);
-        }
-        static public bool operator !=(Position A, Position B)
-        {
-            return !A.Equals(B);
-        }
+    static public bool operator ==(Position A, Position B)
+    {
+        return A.Equals(B);
+    }
+    static public bool operator !=(Position A, Position B)
+    {
+        return !A.Equals(B);
+    }
 
-        public override bool Equals(object obj)
+    public override bool Equals(object obj)
+    {
+        bool equal = false;
+        if (obj is Position)
         {
-            bool equal = false;
-            if (obj is Position)
+            Position pos = (Position)obj;
+            if (this.x == pos.x &&
+                this.y == pos.y &&
+                this.z == pos.z)
             {
-                Position pos = (Position)obj;
-                if (this.x == pos.x &&
-                    this.y == pos.y &&
-                    this.z == pos.z)
-                {
-                    equal = true;
-                }
+                equal = true;
             }
-            return equal;
         }
-        public override int GetHashCode()
-        {
-            return x.GetHashCode() * y.GetHashCode() * z.GetHashCode();
-        }
+        return equal;
+    }
+    public override int GetHashCode()
+    {
+        return x.GetHashCode() * y.GetHashCode() * z.GetHashCode();
     }
 }

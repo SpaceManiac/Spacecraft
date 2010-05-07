@@ -9,7 +9,7 @@ class Spacecraft
 {
     public static void Main()
     {
-        Log("Spacecraft is starting...");
+        Log("{0} is starting...", "Spacecraft");
         if(!File.Exists("admins.txt")) {
             Log("Note: admins.txt does not exist, creating.");
             File.Create("admins.txt");
@@ -87,6 +87,11 @@ class Spacecraft
 			}
 		    sw.Close();
 		}
+    }
+	
+    public static void Log(string format, params object[] args)
+    {
+        Log(String.Format(format, args));
     }
 	
 	/*public static string UrlEncode( string input ) {

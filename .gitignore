@@ -1,3 +1,4 @@
 bin/Debug/admins.txt
 bin/Debug/server.log
 bin/Debug/externalurl.txt
+bin/Debug/*.fcm.*

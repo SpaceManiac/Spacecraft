@@ -201,9 +201,11 @@ namespace ChatCommands
 		
 		public override void Run(Connection sender, string cmd, string args)
 		{
-			MinecraftServer.theServ.map.xspawn = sender._player.x;
-			MinecraftServer.theServ.map.yspawn = sender._player.y;
-			MinecraftServer.theServ.map.zspawn = sender._player.z;
+			MinecraftServer.theServ.map.SetSpawn(new Position(
+	        	sender._player.x,
+	        	sender._player.y,
+	        	sender._player.z
+			));
 			sender.Message(Color.Teal + "Spawn point set");
 			Spacecraft.Log(sender.name + " set the spawn point");
 		}

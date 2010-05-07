@@ -51,11 +51,11 @@ public class MinecraftServer
     public void Start()
     {
         map = new Map();
-        if(File.Exists("level.dat")) {
-            map.Load("level.dat");
+        if(File.Exists("level.fcm")) {
+            map = Map.Load("level.fcm");
         } else {
-            map.Generate();
-            map.Save("level.dat");
+            //map.Generate();
+            //map.Save("level.dat");
         }
         
         try {
@@ -102,7 +102,7 @@ public class MinecraftServer
     {
         Heartbeat();
 		FlistBeat();
-        map.Save("level.dat");
+        map.Save("level.fcm");
         GC.Collect();
     }
     
@@ -283,11 +283,6 @@ public class MinecraftServer
 		SendAll(Connection.PacketSpawnPlayer(m));
 		Spacecraft.Log("Spawning mob " + name);
 	}
-    
-    public void LoadMap()
-    {
-        // ...
-    }
     
     public void Shutdown()
     {

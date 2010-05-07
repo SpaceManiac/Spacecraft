@@ -215,9 +215,9 @@ public class Connection
             }
         }
         
-        byte[] xdim = BitConverter.GetBytes(Host2Net(serv.map.xdim));
-        byte[] ydim = BitConverter.GetBytes(Host2Net(serv.map.ydim));
-        byte[] zdim = BitConverter.GetBytes(Host2Net(serv.map.zdim));
+        byte[] xdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.xdim));
+        byte[] ydim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.ydim));
+        byte[] zdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.zdim));
         
         byte[] levelFin = new byte[PacketLen.LevelFinish];
         levelFin[0] = Packet.LevelFinish;
@@ -292,8 +292,8 @@ public class Connection
             if(p == _player || p == null) continue;
             Send(PacketSpawnPlayer((Player)(players[i])));
         }
-        Send(PacketTeleportSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
-        Send(PacketSpawnSelf(serv.map.xspawn, serv.map.yspawn, serv.map.zspawn, serv.map.headingspawn, serv.map.pitchspawn));
+        Send(PacketTeleportSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.headingSpawn, 0));
+        Send(PacketSpawnSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.headingSpawn, 0));
 		MsgAll(Color.Yellow + name + " has joined!");
         Message(Color.Yellow + "You're a " + Player.RankColor(_player.rank) + player.rank.ToString() + Color.Yellow + ". See /help for info");
     }
