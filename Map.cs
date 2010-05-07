@@ -289,12 +289,12 @@ public class Map
         for(short x = 0; x < xdim; ++x) {
             for(short y = 0; y < ydim; ++y) {
                  for(short z = 0; z < zdim; ++z) {
-                    byte tile = GetTile(x, y, z);
+                    Block tile = GetTile(x, y, z);
                     if(physicsCount % 10 == 0) {
                         // grass
                         bool lit = true;
                         for(short y2 = (short)(y + 1); y2 < ydim; ++y2) {
-                            if(Block.IsOpaque(GetTile(x, y2, z))) {
+                            if(BlockInfo.IsOpaque(GetTile(x, y2, z))) {
                                 lit = false;
                                 break;
                             }
@@ -309,8 +309,8 @@ public class Map
                     // water & lava
                     if(tile == Block.Water || tile == Block.Lava) {
                         if(tile != Block.Lava || physicsCount % 2 == 0) {
-							byte under = GetTile(x, (short)(y - 1), z);
-							if (!Block.IsFluid(under) && under != Block.Air) {
+							Block under = GetTile(x, (short)(y - 1), z);
+							if (!BlockInfo.IsFluid(under) && under != Block.Air) {
 	                            if (GetTile((short)(x + 1), y, z) == Block.Air) {
 	                                FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
 	                            }
@@ -371,7 +371,7 @@ public class Map
         physicsSuspended = false;
     }
     
-    public void SetSend(MinecraftServer srv, short x, short y, short z, byte tile)
+    public void SetSend(MinecraftServer srv, short x, short y, short z, Block tile)
     {
         if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
         SetTile(x, y, z, tile);
@@ -383,15 +383,15 @@ public class Map
         return ((y * zdim + z) * xdim + x);
     }
     
-    public void SetTile(short x, short y, short z, byte tile)
+    public void SetTile(short x, short y, short z, Block tile)
     {
         if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-        data[BlockIndex(x, y, z)] = tile;
+        data[BlockIndex(x, y, z)] = (byte)tile;
     }
     
-    public byte GetTile(short x, short y, short z)
+    public Block GetTile(short x, short y, short z)
     {
         if(x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return Block.Adminium;
-        return data[BlockIndex(x, y, z)];
+        return (Block)data[BlockIndex(x, y, z)];
     }
 }

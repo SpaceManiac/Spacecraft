@@ -21,9 +21,6 @@ class Spacecraft
         } else {
 			Config.Initialize();
         }
-        
-        Block.MakeNames();
-
         LoadRanks();
 
         MinecraftServer serv = new MinecraftServer();

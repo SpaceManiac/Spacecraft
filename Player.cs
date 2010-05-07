@@ -19,7 +19,7 @@ public class Player
     public byte heading;
     public byte pitch;
     public bool placing;
-    public byte placeType;
+    public Block placeType;
     
     public Player(string username)
     {
