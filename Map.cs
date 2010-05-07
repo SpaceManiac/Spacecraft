@@ -8,6 +8,8 @@ using System.Net;
 
 public class Map
 {
+	public const int levelFormatID = 2;
+		
     public byte[] data { get; protected set; }
     public int Length { get { return xdim * ydim * zdim; } }
 	
@@ -29,9 +31,10 @@ public class Map
 		xdim = 0; ydim = 0; zdim = 0;
     }
 	
-	public void SetSpawn(Position p)
+	public void SetSpawn(Position p, byte heading)
 	{
 		spawn = p;
+		headingSpawn = heading;
 	}
     
     public void Generate()
@@ -105,11 +108,10 @@ public class Map
 	private bool ReadHeader(FileStream fs) {
         BinaryReader reader = new BinaryReader( fs );
         try {
-			reader.ReadInt32();
-            /*if(reader.ReadUInt32() != Config.LevelFormatID) {
-                world.log.Log( "Map.ReadHeader: Incorrect level format id (expected: {0}).", LogType.Error, Config.LevelFormatID );
+            if(reader.ReadUInt32() != levelFormatID) {
+                world.log.Log( "Map.ReadHeader: Incorrect level format id (expected: {0}).", Config.LevelFormatID );
                 return false;
-            }*/
+            }
 	
 			// odd order is intentional: fCraft uses x,y,height to mean x,z,y
 			
@@ -212,11 +214,9 @@ public class Map
         if( File.Exists( fileName ) ) {
             File.Delete( fileName );
         }
-        File.Move( tempFileName, fileName );
-        if( File.Exists( tempFileName ) ) {
-            File.Delete( tempFileName );
-        }
-        Spacecraft.Log( "Saved map succesfully to {0}", fileName );
+        // TODO: this fails for no reason 
+		File.Move( tempFileName, fileName );
+		Spacecraft.Log( "Saved map succesfully to {0}", fileName );
         return true;
     }
 
@@ -335,8 +335,10 @@ public class Map
         }
         
         foreach(PositionBlock task in FluidList) {
-            SetSend(srv, task.x, task.y, task.z, task.tile);
-        }
+			if(!SpongeList.Contains(new PositionBlock(task.x, task.y, task.z, Block.Air))) {
+            	SetSend(srv, task.x, task.y, task.z, task.tile);
+           	}
+		}
         foreach(PositionBlock task in SpongeList) {
             if (GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava || GetTile(task.x, task.y, task.z) == Block.StillWater)
             {
