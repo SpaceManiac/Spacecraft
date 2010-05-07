@@ -49,6 +49,16 @@ public class ChatCommandHandling
             sender.Message(Color.DarkRed + "Unknown command " + cmd);
 		}
     }
+	
+	static public void WrapMessage(Connection sendto, string message)
+	{
+		while(message.Length > 60) {
+			int i = message.LastIndexOf(' ', 60, 60);
+			sendto.Message(Color.Teal + message.Substring(0, i));
+			message = message.Substring(i);
+		}
+		sendto.Message(Color.Teal + message);
+	}
 
     static public string GetHelp(string cmd)
 	{
@@ -97,16 +107,7 @@ namespace ChatCommands
             if (args == "") {
                 sender.Message(Color.Teal + "You are a " + Player.RankColor(sender.player.rank) + sender.player.rank.ToString());
                 string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender._player.rank);
-				if(commands.Length <= 60) {
-                	sender.Message(Color.Teal + commands);
-				} else {
-					while(commands.Length > 60) {
-						int i = commands.LastIndexOf(' ', 60, 60);
-						sender.Message(Color.Teal + commands.Substring(0, i));
-						commands = commands.Substring(i);
-					}
-					sender.Message(Color.Teal + commands);
-				}
+				ChatCommandHandling.WrapMessage(sender, commands);
             } else {
                 if (args[0] == '/') args = args.Substring(1);
                 string help = ChatCommandHandling.GetHelp(args);
@@ -417,17 +418,8 @@ namespace ChatCommands
 		{
 			string[] argv = args.Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
 			if(argv.Length == 0) {
-				string commands = "Options set:" + Config.GetDefinedList();
-				if(commands.Length <= 60) {
-                	sender.Message(Color.Teal + commands);
-				} else {
-					while(commands.Length > 60) {
-						int i = commands.LastIndexOf(' ', 60, 60);
-						sender.Message(Color.Teal + commands.Substring(0, i));
-						commands = commands.Substring(i);
-					}
-					sender.Message(Color.Teal + commands);
-				}
+				string list = "Options set:" + Config.GetDefinedList();
+				ChatCommandHandling.WrapMessage(sender, list);
 			} else if(argv.Length == 1) {
 				string r = Config.Get(argv[0], null);
 				if(r == null) {
@@ -436,7 +428,7 @@ namespace ChatCommands
 					sender.Message(Color.Teal + "Option " + argv[0] + " is " + r);
 				}
 			} else if(argv.Length == 2) {
-				// onos
+				// TODO: possibly allow setting config inline
 			}
 		}
 	}
