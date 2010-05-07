@@ -10,7 +10,7 @@ using System.Runtime.Serialization.Formatters.Soap;
 [Serializable()]
 public class Map
 {
-	public const int levelFormatID = 2;
+	public const uint levelFormatID = 0xFC000002;
     private static short DefaultHeight=64, DefaultWidth=64, DefaultDepth = 64;
 	
     public byte[] data { get; protected set; }
@@ -116,9 +116,10 @@ public class Map
 	private bool ReadHeader(FileStream fs) {
         BinaryReader reader = new BinaryReader( fs );
         try {
-            if(reader.ReadUInt32() != levelFormatID) {
-                Spacecraft.Log( "Map.ReadHeader: Incorrect level format id (expected: {0}).", levelFormatID );
-                return false;
+        	uint format = reader.ReadUInt32();
+			if(format != levelFormatID) {
+                Spacecraft.Log( "Map.ReadHeader: Incorrect level format id (expected {0}, got {1}).", levelFormatID, format );
+                //return false;
             }
 	
 			// odd order is intentional: fCraft uses x,y,height to mean x,z,y
