@@ -5,7 +5,7 @@ using System.Text;
 /* struct Position
  * contains a set of x, y, z world coordinates (not map coordinates)
  */
-
+[Serializable()]
 public struct Position
 {
     public short x { get; /* private */ set; }

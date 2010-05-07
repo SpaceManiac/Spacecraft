@@ -205,7 +205,7 @@ namespace ChatCommands
 	        	sender._player.x,
 	        	sender._player.y,
 	        	sender._player.z
-			));
+			), sender._player.heading);
 			sender.Message(Color.Teal + "Spawn point set");
 			Spacecraft.Log(sender.name + " set the spawn point");
 		}
