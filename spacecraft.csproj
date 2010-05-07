@@ -41,6 +41,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="NewConnection.cs" />
     <Compile Include="NewPlayer.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Server.cs" />

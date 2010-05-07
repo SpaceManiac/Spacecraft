@@ -15,8 +15,7 @@ namespace spacecraft
         /// </summary>
         public static Dictionary<Byte, NewPlayer> idTable =  new Dictionary<Byte,NewPlayer>();
 
-        private Connection conn;
-
+        private NewConnection conn;
 
         public Rank currentRank;
         public Byte playerID;
@@ -29,11 +28,11 @@ namespace spacecraft
 /*        public bool placing;
         public byte placeType; */
 
-        public NewPlayer(TcpClient client, string username)
+        public NewPlayer(TcpClient client)
         {
-            name = username;
+            name = null;
             pos = new Position(128, 128, 128);
-            conn = new Connection(client );
+            conn = new NewConnection(client );
 
             for (Byte i = 0; i < Byte.MaxValue; i++)
             {
@@ -86,10 +85,9 @@ namespace spacecraft
         { 
             throw new NotImplementedException(); 
         }
-
         public void PrintMessage(string msg)
         {
-            throw new NotImplementedException();
+            conn.DisplayMessage(msg);
         }
 
     }

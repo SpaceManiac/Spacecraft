@@ -98,6 +98,7 @@ public class Block
 
 public class Packet
 {
+   
     public const byte Ident                = 0x00; // client & server
     public const byte Ping                 = 0x01; // server
     public const byte LevelInit         = 0x02; // server
@@ -114,6 +115,8 @@ public class Packet
     public const byte Message            = 0x0d; // client & server
     public const byte Kick                = 0x0e; // server
 }
+
+
 
 public class PacketLen
 {
