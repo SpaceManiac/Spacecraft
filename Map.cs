@@ -29,13 +29,11 @@ public class Map
     
     public Map()
     {
-        SoapFormatter foo = new SoapFormatter();
+   
         physicsCount = 0;
-        data = new byte[]{0x02,0x03,0x04,0x05};
+        data = null;
 		xdim = 0; ydim = 0; zdim = 0;
         StreamWriter s = new StreamWriter("test.txt");
-        foo.Serialize(s.BaseStream, this);
-        s.Close();
     }
 	
 	public void SetSpawn(Position p, byte heading)

@@ -9,30 +9,45 @@ class Spacecraft
 {
     public static void Main()
     {
-        Log("{0} is starting...", "Spacecraft");
-        if(!File.Exists("admins.txt")) {
-            Log("Note: admins.txt does not exist, creating.");
-            File.Create("admins.txt");
-        }
-        
-        if(!File.Exists("properties.txt")) {
-            Log("Error: could not find properties.txt!");
-            return;
-        } else {
-			Config.Initialize();
-        }
-        
-        Block.MakeNames();
+        try
+        {
+            Log("{0} is starting...", "Spacecraft");
+            if (!File.Exists("admins.txt"))
+            {
+                Log("Note: admins.txt does not exist, creating.");
+                File.Create("admins.txt");
+            }
 
-        LoadRanks();
+            if (!File.Exists("properties.txt"))
+            {
+                Log("Error: could not find properties.txt!");
+                return;
+            }
+            else
+            {
+                Config.Initialize();
+            }
 
-        MinecraftServer serv = new MinecraftServer();
-		
-        serv.Start();
-		
-        Spacecraft.Log("Bye!");
-		Spacecraft.Log("");
-        Environment.Exit(0);
+            Block.MakeNames();
+
+            LoadRanks();
+
+            MinecraftServer serv = new MinecraftServer();
+
+            serv.Start();
+
+            Spacecraft.Log("Bye!");
+            Spacecraft.Log("");
+            Environment.Exit(0);
+        }
+        catch (Exception e) // Something went wrong and wasn't caught.
+        {
+            Console.WriteLine("===FATAL ERROR===");
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.Source);
+            Console.WriteLine();
+            Console.Write(e.StackTrace);
+        }
     }
 
     public static void LoadRanks()
