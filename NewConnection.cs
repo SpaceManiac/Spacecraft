@@ -57,6 +57,10 @@ namespace spacecraft
 
         }
 
+        public void SendKick(string reason)
+        {
+
+        }
 
     }
 }
