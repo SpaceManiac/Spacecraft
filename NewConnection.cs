@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -11,7 +11,7 @@ namespace spacecraft
         event AuthenticationHandler Authenticated;
 
         string _username;
-        byte[] _verificationHash = new byte[1024];
+        byte[] _verificationHash = new byte[64];
         TcpClient _client;
      
         public NewConnection(TcpClient c) {
@@ -27,7 +27,7 @@ namespace spacecraft
             {
                 try
                 {
-                    int bytesRead = _client.GetStream().Read(buffer, buffsize, 1024);
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, buffer.Length - buffsize);
                     buffsize += bytesRead;
                 }
                 catch (Exception e)

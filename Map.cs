@@ -24,7 +24,7 @@ namespace spacecraft
         public byte spawnHeading { get; protected set; }
 
         public Dictionary<string, string> meta = new Dictionary<string, string>();
-        public Dictionary<string, Pair<Position, byte>> landmarks;
+        public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
         private uint physicsCount;
         private bool physicsSuspended = false;
@@ -34,7 +34,6 @@ namespace spacecraft
             physicsCount = 0;
             data = new byte[] { 0x02, 0x03, 0x04, 0x05 };
             xdim = 0; ydim = 0; zdim = 0;
-            landmarks = new Dictionary<string, Pair<Position, byte>>();
             //StreamWriter s = new StreamWriter("test.txt");
             //foo.Serialize(s.BaseStream, this);
             //s.Close();
