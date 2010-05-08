@@ -55,7 +55,7 @@ public class MinecraftServer
             map = Map.Load("level.fcm");
         } else {
             //map.Generate();
-            //map.Save("level.dat");
+            //map.Save("level.fcm");
         }
         
         try {
@@ -287,7 +287,7 @@ public class MinecraftServer
     public void Shutdown()
     {
         Spacecraft.Log("Spacecraft is shutting down...");
-        map.Save("level.dat");
+        map.Save("level.fcm");
     }
     
     public void SendAll(byte[] data)

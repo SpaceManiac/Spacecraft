@@ -33,6 +33,7 @@ public class Map
         data = new byte[]{0x02,0x03,0x04,0x05};
 		xdim = 0; ydim = 0; zdim = 0;
         landmarks = new Dictionary<string, Pair<Position, byte>>();
+		meta = new Dictionary<string, string>();
         //StreamWriter s = new StreamWriter("test.txt");
         //foo.Serialize(s.BaseStream, this);
         //s.Close();
