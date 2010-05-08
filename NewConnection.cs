@@ -18,19 +18,28 @@ namespace spacecraft
             _client = c;
         }
 
-        private byte[] ReceivePacket()
+        private Packet ReceivePacket()
         {
-            byte[] buffer = new byte[1024]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
+            byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
             int buffsize = 0;
+
             do
             {
-                int bytesRead = _client.GetStream().Read(buffer, 0, 1024);
+                try
+                {
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, 1024);
+                    buffsize += bytesRead;
+                }
+                catch (Exception e)
+                {
+                    Spacecraft.LogError("Something went wrong while we were reading a packet!");
+                }
             }
-            while (false); //PacketLen.Lookup(buffer[0]) == 0);
+            while (false && buffsize < 1300);
+            
+            
 
-
-
-            return new byte[] { };
+            return null;
         }
 
 

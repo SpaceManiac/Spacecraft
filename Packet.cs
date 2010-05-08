@@ -3,66 +3,104 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Reflection;
 
 namespace spacecraft
 {
-    [Serializable]
-    public abstract class BasePacket
+    public abstract partial class Packet  // Continued in Constants.cs, which defines enums.
     {
         abstract public byte PacketID { get; }
-        public static implicit operator byte[](BasePacket pack)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream s = new MemoryStream();
-            formatter.Serialize(s, pack);
-            return s.ToArray();
-        }
+
+        abstract public byte[] ToByteArray();
+        public static implicit operator byte[](Packet P) { return P.ToByteArray(); }
     }
 
     /// <summary>
     /// A packet that informs the server of a player's arrival.
     /// </summary>
-    public class PlayerIDPacket : BasePacket
+    public class PlayerIDPacket :  Packet
     {
-        override public byte PacketID { get { return 0x0; }  }
-        byte Version;
-        byte[] Username;
-        byte[] Key;
-        byte Unknown; // Unused.
+        override public byte PacketID { get { return 0x0; } }
+        public byte Version;
+        public byte[] Username;
+        public byte[] Key;
+        public byte Unknown; // Unused.
+
+        override public byte[] ToByteArray()
+        {
+            byte[] buff = new byte[1 + 1 + 1024 + 1024 + 1];
+
+            buff[0] = PacketID;
+            buff[1] = Version;
+            Username.CopyTo(buff, 2);
+            Key.CopyTo(buff, 2 + Username.Length);
+            buff[2 + Username.Length + Key.Length] = Unknown;
+            return buff;
+        }
     }
 
     /// <summary>
     /// Informing the server of a player making a change to a block.
     /// </summary>
-    public class BlockUpdatePacket : BasePacket
+    public class BlockUpdatePacket : Packet
     {
         override public byte PacketID { get { return 0x05; } }
-        short X;
-        short Y;
-        short Z;
-        byte Mode;
-        byte Type;
+        public short X;
+        public short Y;
+        public short Z;
+        public byte Mode;
+        public byte Type;
+
+        override public byte[] ToByteArray()
+        {
+            byte[] buff = new byte[1 + 2 + 2 + 2 + 1 + 1];
+
+            buff[0] = PacketID;
+            buff[1] = (byte) (X >> 8);
+            buff[2] = (byte)(X % 65536);
+
+            buff[3] = (byte)(Y >> 8);
+            buff[4] = (byte)(Y % 65536);
+
+            buff[5] = (byte)(Z >> 8);
+            buff[6] = (byte)(Z % 65536);
+
+            buff[7] = Mode;
+            buff[8] = Type;
+
+            return buff;
+        }
     }
 
     /// <summary>
     /// Informs the server of the player's position and orientation.
     /// </summary>
-    public class PositionUpdatePacket : BasePacket
+    public class PositionUpdatePacket : Packet
     {
-        override public byte PacketID { get { return 0x08; } }
-        byte PlayerID;
-        short X;
-        short Y;
-        short Z;
-        byte Heading;
-        byte Pitch;
+        override  public byte PacketID { get { return 0x08; } }
+        public byte PlayerID;
+        public short X;
+        public short Y;
+        public short Z;
+        public byte Heading;
+        public byte Pitch;
+
+        override public byte[] ToByteArray()
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    public class MessagePacket : BasePacket
+    public class MessagePacket : Packet
     {
         override public byte PacketID { get { return 0x0d; } }
         public byte Unused;
         public byte[] Message;
+
+        override public byte[] ToByteArray()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
