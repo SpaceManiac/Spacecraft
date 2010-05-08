@@ -49,10 +49,11 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Robot.cs" />
     <Compile Include="Map\Map.cs" />
-    <Compile Include="Map\MapLoaderDat.cs" />
     <Compile Include="Map\PositionBlock.cs" />
     <Compile Include="MinecraftServer.cs" />
     <Compile Include="Spacecraft.cs" />
+    <Compile Include="Map\DatLoading.cs" />
+    <Compile Include="Map\MapIO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
