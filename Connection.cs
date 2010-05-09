@@ -50,16 +50,10 @@ namespace spacecraft
             {
                 bytesRead = client.GetStream().EndRead(ar);
             }
-            catch (IOException)
+            catch (Exception e)
             {
                 _Disconnect();
-                Spacecraft.Log("IOException in Connection object.");
-                return;
-            }
-            catch (InvalidOperationException)
-            {
-                _Disconnect();
-                Spacecraft.Log("IOException in Connection object.");
+                Spacecraft.LogError("Exception in Connection: {0}", e.Message);
                 return;
             }
             if (bytesRead == 0)
@@ -125,15 +119,11 @@ namespace spacecraft
             {
                 client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
             }
-            catch (IOException)
+            catch (Exception e)
             {
                 _Disconnect();
-                return;
-            }
-            catch (InvalidOperationException)
-            {
-                _Disconnect();
-                return;
+                Spacecraft.LogError("Exception in Connection: {0}", e.Message);
+				return;
             }
         }
 
@@ -227,29 +217,28 @@ namespace spacecraft
 
             using (MemoryStream memstr = new MemoryStream())
             {
-                using (GZipStream compress = new GZipStream(memstr, CompressionMode.Compress))
+                serv.map.GetCompressedCopy(memstr, true);
+                memstr.Seek(0, SeekOrigin.Begin);
+
+				// TODO: figure out how to make this work with memstr.Length -
+				// I tried it but it didn't work
+				
+                int len = serv.map.Length;
+                for (int i = 0; i < len; i += 1024)
                 {
-                    compress.Write(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.Length)), 0, sizeof(int));
-                    compress.Write(serv.map.data, 0, serv.map.Length);
-                    memstr.Seek(0, SeekOrigin.Begin);
+                    byte[] packet = new byte[1028];
+                    packet[0] = (byte)Packet.PacketType.LevelChunk;
 
-                    int len = serv.map.Length;
-                    for (int i = 0; i < len; i += 1024)
-                    {
-                        byte[] packet = new byte[1028];
-                        packet[0] = (byte)Packet.PacketType.LevelChunk;
+                    int remaining = len - i;
+                    if (remaining > 1024) remaining = 1024;
+                    byte[] lenb = BitConverter.GetBytes(Host2Net((short)remaining));
 
-                        int remaining = len - i;
-                        if (remaining > 1024) remaining = 1024;
-                        byte[] lenb = BitConverter.GetBytes(Host2Net((short)remaining));
+                    packet[1] = lenb[0];
+                    packet[2] = lenb[1];
+                    memstr.Read(packet, 3, remaining);
 
-                        packet[1] = lenb[0];
-                        packet[2] = lenb[1];
-                        memstr.Read(packet, 3, remaining);
-
-                        packet[1027] = (byte)(100.0 * i / len);
-                        Send(packet);
-                    }
+                    packet[1027] = (byte)(100.0 * i / len);
+                    Send(packet);
                 }
             }
 
@@ -259,9 +248,9 @@ namespace spacecraft
 
             byte[] levelFin = new byte[(int)Packet.PacketLength.LevelFinish];
             levelFin[0] = (byte)Packet.PacketType.LevelFinish;
-            levelFin[1] = xdim[0]; levelFin[2] = xdim[1];
-            levelFin[3] = ydim[0]; levelFin[4] = ydim[1];
-            levelFin[5] = zdim[0]; levelFin[6] = zdim[1];
+            Array.Copy(xdim, 0, levelFin, 1, 2);
+            Array.Copy(ydim, 0, levelFin, 3, 2);
+            Array.Copy(zdim, 0, levelFin, 5, 2);
             Send(levelFin);
         }
 

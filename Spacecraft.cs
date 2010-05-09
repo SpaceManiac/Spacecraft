@@ -110,6 +110,10 @@ namespace spacecraft
                 sw.Close();
             }
         }
+        public static void Log(string format, params object[] args)
+        {
+            Log(String.Format(format, args));
+        }
 
         private static object errorfile = new object();
 
@@ -126,12 +130,9 @@ namespace spacecraft
                 Log("ERROR! Check error.log for details!");
             }
         }
-
-
-        public static void Log(string format, params object[] args)
-        {
-            Log(String.Format(format, args));
-        }
-
+		public static void LogError(string format, params object[] args)
+		{
+			LogError(String.Format(format, args));
+		}
     }
 }

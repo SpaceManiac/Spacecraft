@@ -13,8 +13,8 @@ heartbeat = true
 public = false
 
 # List.fragmer.net heartbeat information
-flist-heartbeat = false
-flist-public = false
+flist-heartbeat = true
+flist-public = true
 
 # max-connections = 3
 # admin-slot = false

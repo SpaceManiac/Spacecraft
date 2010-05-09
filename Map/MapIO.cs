@@ -4,12 +4,14 @@ using System.IO.Compression;
 using System.Text;
 using System.Collections.Generic;
 
+// Thanks to fragmer of fCraft for letting us use his map format and map loading code!
+// http://fcraft.net/
+
 namespace spacecraft
 {
 	public partial class Map
 	{
 		// continued in Map.cs
-		
 		
         // ==== Loading ====
 

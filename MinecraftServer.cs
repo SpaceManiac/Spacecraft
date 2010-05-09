@@ -206,7 +206,7 @@ namespace spacecraft
 
         private void FlistBeat()
         {
-            if (true)//!Config.GetBool("flist-heartbeat", true))
+            if (!Config.GetBool("flist-heartbeat", true))
             {
                 return;
             }

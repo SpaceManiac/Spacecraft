@@ -7,8 +7,8 @@ namespace spacecraft
 {
     class NewConnection
     {
-        delegate void AuthenticationHandler(bool sucess);
-        event AuthenticationHandler Authenticated;
+        public delegate void AuthenticationHandler(bool sucess);
+        public event AuthenticationHandler Authenticated;
 
         string _username;
         byte[] _verificationHash = new byte[64];
@@ -32,7 +32,7 @@ namespace spacecraft
                 }
                 catch (Exception e)
                 {
-                    Spacecraft.LogError("Something went wrong while we were reading a packet!");
+                    Spacecraft.LogError("Something went wrong while we were reading a packet! {0}", e.Message);
                 }
             }
             while (false && buffsize < 1300);
@@ -46,7 +46,8 @@ namespace spacecraft
         private void Authenticate()
         {
             bool authorized = false;
-            throw new NotImplementedException();
+			
+			
 
             if (Authenticated != null)
                 Authenticated(authorized);

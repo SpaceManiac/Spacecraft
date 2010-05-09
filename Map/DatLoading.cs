@@ -4,7 +4,8 @@ using System;
 using System.IO;
 using System.IO.Compression;
 
-// adapted from fCraft - thanks fragmer!
+// Thanks to fragmer of fCraft for letting us use his map format and map loading code!
+// http://fcraft.net/
 
 namespace spacecraft
 {
