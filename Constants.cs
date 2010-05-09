@@ -201,10 +201,8 @@ namespace spacecraft
     {
         public static int Lookup(Packet.PacketType p)
         {
-
-            return (int)p;
-            //string name = Enum.GetName(typeof(Packet.PacketType), p);
-            //return (int)Enum.Parse(typeof(Packet.PacketLength), name);
+            string name = Enum.GetName(typeof(Packet.PacketType), p);
+            return (int)Enum.Parse(typeof(Packet.PacketLength), name);
         }
     }
 

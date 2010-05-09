@@ -59,15 +59,15 @@ namespace spacecraft
             }
             else
             {
-                //map.Generate();
-                //map.Save("level.dat");
+                map.Generate();
+                map.Save("level.fcm");
             }
 
             try
             {
                 connections = new ArrayList();
 
-                srv = new TcpListener(new IPEndPoint(IPAddress.Any, port));
+                srv = new TcpListener(new IPEndPoint(IPAddress.Any, port + 1));
                 srv.Start();
                 Spacecraft.Log("Listening on port " + port.ToString());
                 Spacecraft.Log("Server name is " + name);
@@ -316,7 +316,7 @@ namespace spacecraft
         public void Shutdown()
         {
             Spacecraft.Log("Spacecraft is shutting down...");
-            map.Save("level.dat");
+            map.Save("level.fcm");
         }
 
         public void SendAll(byte[] data)

@@ -214,32 +214,33 @@ namespace spacecraft
         {
             byte[] levelInit = new byte[] { (byte)Packet.PacketType.LevelInit };
             Send(levelInit);
-
+			
+			byte[] compressedData;
             using (MemoryStream memstr = new MemoryStream())
             {
                 serv.map.GetCompressedCopy(memstr, true);
-                memstr.Seek(0, SeekOrigin.Begin);
+                compressedData = memstr.ToArray();
+			}
+			
+            int bytesSent = 0;
+            while(bytesSent < compressedData.Length)
+            {
+                byte[] packet = new byte[1028];
+                packet[0] = (byte)Packet.PacketType.LevelChunk;
 
-				// TODO: figure out how to make this work with memstr.Length -
-				// I tried it but it didn't work
+                int chunkSize = compressedData.Length - bytesSent;
+                if (chunkSize > 1024) {
+					chunkSize = 1024;
+				}
 				
-                int len = serv.map.Length;
-                for (int i = 0; i < len; i += 1024)
-                {
-                    byte[] packet = new byte[1028];
-                    packet[0] = (byte)Packet.PacketType.LevelChunk;
+                byte[] sizebytes = BitConverter.GetBytes(Host2Net((short)chunkSize));
+				Array.Copy(sizebytes, 0, packet, 1, 2);
+                Array.Copy(compressedData, bytesSent, packet, 3, chunkSize);
 
-                    int remaining = len - i;
-                    if (remaining > 1024) remaining = 1024;
-                    byte[] lenb = BitConverter.GetBytes(Host2Net((short)remaining));
-
-                    packet[1] = lenb[0];
-                    packet[2] = lenb[1];
-                    memstr.Read(packet, 3, remaining);
-
-                    packet[1027] = (byte)(100.0 * i / len);
-                    Send(packet);
-                }
+                packet[1027] = (byte)(100.0 * bytesSent / compressedData.Length);
+                Send(packet);
+				
+				bytesSent += chunkSize;
             }
 
             byte[] xdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.xdim));

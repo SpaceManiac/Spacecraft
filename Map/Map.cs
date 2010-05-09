@@ -111,8 +111,8 @@ namespace spacecraft
             // run twice per second
             physicsCount++;
 
-            ArrayList FluidList = new ArrayList();
-            ArrayList SpongeList = new ArrayList();
+            List<PhysicsTask> FluidList = new List<PhysicsTask>();
+            List<PhysicsTask> SpongeList = new List<PhysicsTask>();
 
             for (short x = 0; x < xdim; ++x)
             {
@@ -152,24 +152,24 @@ namespace spacecraft
                                 {
                                     if (GetTile((short)(x + 1), y, z) == Block.Air)
                                     {
-                                        FluidList.Add(new PositionBlock((short)(x + 1), y, z, tile));
+                                        FluidList.Add(new PhysicsTask((short)(x + 1), y, z, tile));
                                     }
                                     if (GetTile((short)(x - 1), y, z) == Block.Air)
                                     {
-                                        FluidList.Add(new PositionBlock((short)(x - 1), y, z, tile));
+                                        FluidList.Add(new PhysicsTask((short)(x - 1), y, z, tile));
                                     }
                                     if (GetTile(x, y, (short)(z + 1)) == Block.Air)
                                     {
-                                        FluidList.Add(new PositionBlock(x, y, (short)(z + 1), tile));
+                                        FluidList.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
                                     }
                                     if (GetTile(x, y, (short)(z - 1)) == Block.Air)
                                     {
-                                        FluidList.Add(new PositionBlock(x, y, (short)(z - 1), tile));
+                                        FluidList.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
                                     }
                                 }
                                 if (GetTile(x, (short)(y - 1), z) == Block.Air)
                                 {
-                                    FluidList.Add(new PositionBlock(x, (short)(y - 1), z, tile));
+                                    FluidList.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
                                 }
                             }
                         }
@@ -182,7 +182,7 @@ namespace spacecraft
                                 {
                                     for (short diffZ = -2; diffZ <= 2; diffZ++)
                                     {
-                                        SpongeList.Add(new PositionBlock((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
+                                        SpongeList.Add(new PhysicsTask((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
                                     }
                                 }
                             }
@@ -191,14 +191,14 @@ namespace spacecraft
                 }
             }
 
-            foreach (PositionBlock task in FluidList)
+            foreach (PhysicsTask task in FluidList)
             {
-                if (!SpongeList.Contains(new PositionBlock(task.x, task.y, task.z, Block.Air)))
+                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air)))
                 {
                     SetSend(srv, task.x, task.y, task.z, task.tile);
                 }
             }
-            foreach (PositionBlock task in SpongeList)
+            foreach (PhysicsTask task in SpongeList)
             {
                 if (GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava || GetTile(task.x, task.y, task.z) == Block.StillWater)
                 {
