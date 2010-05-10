@@ -11,15 +11,15 @@ namespace spacecraft
         static ChatCommandHandling()
         {
             Commands = new Dictionary<String, ChatCommands.ChatCommandBase>();
-
-            Commands.Add("help", new ChatCommands.Help());
+			
             Commands.Add("me", new ChatCommands.ThirdPerson());
+            Commands.Add("help", new ChatCommands.Help());
+            Commands.Add("teleport", new ChatCommands.Teleport());
+            Commands.Add("tp", new ChatCommands.Teleport());
             Commands.Add("bring", new ChatCommands.Bring());
             Commands.Add("exit", new ChatCommands.Exit());
             Commands.Add("setspawn", new ChatCommands.SetSpawn());
             Commands.Add("place", new ChatCommands.Place());
-            Commands.Add("teleport", new ChatCommands.Teleport());
-            Commands.Add("tp", new ChatCommands.Teleport());
             Commands.Add("kick", new ChatCommands.Kick());
             Commands.Add("k", new ChatCommands.Kick());
             Commands.Add("broadcast", new ChatCommands.Broadcast());
@@ -29,10 +29,11 @@ namespace spacecraft
             Commands.Add("resend", new ChatCommands.ResendMap());
             Commands.Add("rerank", new ChatCommands.ReloadRanks());
             Commands.Add("clear", new ChatCommands.ClearChat());
-            Commands.Add("config", new ChatCommands.Configure());
             Commands.Add("go", new ChatCommands.LandmarkGoto());
             Commands.Add("mark", new ChatCommands.LandmarkAdd());
             Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
+            Commands.Add("config", new ChatCommands.Configure());
+			Commands.Add("whois", new ChatCommands.WhoIs());
         }
 
         /// <summary>
@@ -542,10 +543,11 @@ namespace spacecraft
 
             public override void Run(Connection sender, string cmd, string args)
             {
+				args = args.Trim().ToLower();
                 Map map = MinecraftServer.theServ.map;
                 if (args == "")
                 {
-                    string marks = "Landmarks:" + map.GetLandmarkList();
+                    string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
                     ChatCommandHandling.WrapMessage(sender, marks);
                 }
                 else
@@ -579,10 +581,11 @@ namespace spacecraft
 
             public override void Run(Connection sender, string cmd, string args)
             {
+				args = args.Trim().ToLower();
                 Map map = MinecraftServer.theServ.map;
                 if (args == "")
                 {
-                    string marks = "Landmarks:" + map.GetLandmarkList();
+                    string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
                     ChatCommandHandling.WrapMessage(sender, marks);
                 }
                 else
@@ -596,7 +599,7 @@ namespace spacecraft
                         Position p = new Position(sender._player.x, sender._player.y, sender._player.z);
                         byte heading = sender._player.heading;
                         map.landmarks.Add(args, new Pair<Position, byte>(p, heading));
-                        sender.Message(Color.Teal + "Landmark " + args + " created");
+                        Connection.MsgAll(Color.Yellow + "Landmark " + args + " created");
                     }
                 }
             }
@@ -616,10 +619,11 @@ namespace spacecraft
 
             public override void Run(Connection sender, string cmd, string args)
             {
+				args = args.Trim().ToLower();
                 Map map = MinecraftServer.theServ.map;
                 if (args == "")
                 {
-                    string marks = "Landmarks:" + map.GetLandmarkList();
+                    string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
                     ChatCommandHandling.WrapMessage(sender, marks);
                 }
                 else
@@ -627,12 +631,41 @@ namespace spacecraft
                     if (map.landmarks.ContainsKey(args))
                     {
                         map.landmarks.Remove(args);
+						Connection.MsgAll(Color.Yellow + "Landmark " + args + " removed");
                     }
                     else
                     {
                         sender.Message(Color.DarkRed + "No such landmark " + args);
                     }
                 }
+            }
+        }
+		
+		public class WhoIs : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Builder; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "/whois: get information on a user"; }
+            }
+
+            public override void Run(Connection sender, string cmd, string args)
+            {
+				args = args.Trim();
+                Player p = MinecraftServer.theServ.GetPlayer(args);
+				Rank r = Player.LookupRank(args);
+				if(p == null) {
+					sender.Message(Color.Teal + args + " is offline");
+					sender.Message(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
+				} else {
+					sender.Message(Color.Teal + args + " is online");
+					sender.Message(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.Message(Color.Teal + args + " is at: " + p.x + "," + p.y + "," + p.z);
+				}
             }
         }
     }

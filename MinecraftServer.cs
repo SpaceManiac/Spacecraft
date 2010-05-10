@@ -67,7 +67,7 @@ namespace spacecraft
             {
                 connections = new ArrayList();
 
-                srv = new TcpListener(new IPEndPoint(IPAddress.Any, port + 1));
+                srv = new TcpListener(new IPEndPoint(IPAddress.Any, port));
                 srv.Start();
                 Spacecraft.Log("Listening on port " + port.ToString());
                 Spacecraft.Log("Server name is " + name);

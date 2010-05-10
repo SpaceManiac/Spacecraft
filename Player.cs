@@ -39,22 +39,27 @@ namespace spacecraft
                     break;
                 }
             }
-
-            rank = Rank.Guest;
-            foreach (Rank key in RankedPlayers.Keys)
-            {
-                if (RankedPlayers[key].Contains(username))
-                {
-                    rank = key;
-                    break;
-                }
-            }
+			
+			rank = LookupRank(username);
         }
 
         ~Player()
         {
             ids.Remove(pid);
         }
+		
+		public static Rank LookupRank(string username) {
+            foreach (Rank key in RankedPlayers.Keys)
+            {
+                foreach (string name in RankedPlayers[key])
+				{
+                    if(name.ToLower() == username.ToLower()) {
+						return key;
+					}
+                }
+            }
+			return Rank.Guest;
+		}
 
         public bool PositionUpdate(Int16 X, Int16 Y, Int16 Z, byte Heading, byte Pitch)
         {

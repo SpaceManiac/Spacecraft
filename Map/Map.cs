@@ -41,14 +41,14 @@ namespace spacecraft
             //s.Close();
         }
 
-        public string GetLandmarkList()
+        public string[] GetLandmarkList()
         {
-            string r = "";
+            List<string> l = new List<string>();
             foreach (KeyValuePair<string, Pair<Position, byte>> pair in landmarks)
             {
-                r += " " + pair.Key;
+                l.Add(pair.Key);
             }
-            return r;
+            return l.ToArray();
         }
 
         public void SetSpawn(Position p, byte heading)
