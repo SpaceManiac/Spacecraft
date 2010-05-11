@@ -20,7 +20,6 @@ namespace spacecraft
         private System.Timers.Timer mobtimer;
         private TcpListener srv;
 
-        public static Random rnd;
         public int salt;
         public Map map;
         public int port;
@@ -39,8 +38,7 @@ namespace spacecraft
             theServ = this;
 
             mobs = new ArrayList();
-            rnd = new Random();
-            salt = rnd.Next(100000, 999999);
+            salt = Spacecraft.random.Next(100000, 999999);
             srv = null;
             firstbeat = true;
 

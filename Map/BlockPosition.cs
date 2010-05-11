@@ -20,7 +20,7 @@ public struct BlockPosition
         z = Z;
     }
 
-    public BlockPosition(byte x, byte y, byte z)
+    public BlockPosition(int x, int y, int z)
     {
         this = new BlockPosition((short)x, (short)y, (short)z);
     }
@@ -34,21 +34,25 @@ public struct BlockPosition
     {
         return !A.Equals(B);
     }
+	
+	public override string ToString()
+	{
+		return "(" + x.ToString() + "," + y.ToString() + "," + z.ToString() + ")";
+	}
 
     public override bool Equals(object obj)
     {
-        bool equal = false;
-        if (obj is Position)
+        if (obj is BlockPosition)
         {
             BlockPosition pos = (BlockPosition)obj;
             if (this.x == pos.x &&
                 this.y == pos.y &&
                 this.z == pos.z)
             {
-                equal = true;
+                return true;
             }
         }
-        return equal;
+        return false;
     }
     public override int GetHashCode()
     {

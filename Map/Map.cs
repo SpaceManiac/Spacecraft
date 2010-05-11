@@ -133,11 +133,11 @@ namespace spacecraft
                                     break;
                                 }
                             }
-                            if (tile == Block.Dirt && lit && MinecraftServer.rnd.NextDouble() < 0.2)
+                            if (tile == Block.Dirt && lit && Spacecraft.random.NextDouble() < 0.2)
                             {
                                 SetSend(srv, x, y, z, Block.Grass);
                             }
-                            if (tile == Block.Grass && !lit && MinecraftServer.rnd.NextDouble() < 0.7)
+                            if (tile == Block.Grass && !lit && Spacecraft.random.NextDouble() < 0.7)
                             {
                                 SetSend(srv, x, y, z, Block.Dirt);
                             }
@@ -237,6 +237,11 @@ namespace spacecraft
         {
             return ((y * zdim + z) * xdim + x);
         }
+		
+		public static int BlockIndex2(short x, short y, short z, short xdim, short zdim)
+		{
+			return ((y * zdim + z) * xdim + x);
+		}
 
         public void SetTile(short x, short y, short z, Block tile)
         {

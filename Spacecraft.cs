@@ -9,6 +9,8 @@ namespace spacecraft
 {
     class Spacecraft
     {
+		public static Random random;
+		
         public static void Main()
         {
             try
@@ -29,8 +31,8 @@ namespace spacecraft
                 {
                     Config.Initialize();
                 }
-
-                //  Block.MakeNames();
+				
+				random = new Random();
 
                 LoadRanks();
 

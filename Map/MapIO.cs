@@ -198,7 +198,7 @@ namespace spacecraft
 
         public bool Save(string fileName)
         {
-            string tempFileName = fileName + "." + (new Random().Next().ToString());
+            string tempFileName = fileName + "." + (Spacecraft.random.Next().ToString());
 
             using (FileStream fs = File.Create(tempFileName))
             {
@@ -247,7 +247,7 @@ namespace spacecraft
         void WriteMetadata(FileStream fs)
         {
             BinaryWriter writer = new BinaryWriter(fs);
-            writer.Write((ushort)meta.Count);
+            writer.Write((ushort)(meta.Count + landmarks.Count));
             foreach (KeyValuePair<string, Pair<Position, byte>> pair in landmarks)
             {
                 string key = pair.Key;
