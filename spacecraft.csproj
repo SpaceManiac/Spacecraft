@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -39,8 +39,8 @@
     <Compile Include="ChatCommands.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="NewConnection.cs" />
-    <Compile Include="NewPlayer.cs" />
+    <Compile Include="Overhaul Code\NewConnection.cs" />
+    <Compile Include="Overhaul Code\NewPlayer.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="Pair.cs" />
     <Compile Include="Position.cs" />

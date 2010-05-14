@@ -6,13 +6,14 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
 using System.Timers;
 
 namespace spacecraft
 {
     public class MinecraftServer
     {
-        private ArrayList connections;
+        private List<Connection> connections;
         private ArrayList mobs;
         private bool firstbeat;
         private System.Timers.Timer beattimer;
@@ -27,7 +28,6 @@ namespace spacecraft
         public string name;
         public string motd;
         public string serverhash;
-        private bool justFlistBeated = false;
 
         static public MinecraftServer theServ;
         public static ManualResetEvent OnExit = new ManualResetEvent(false);
@@ -63,7 +63,7 @@ namespace spacecraft
 
             try
             {
-                connections = new ArrayList();
+                connections = new List<Connection>();
 
                 srv = new TcpListener(new IPEndPoint(IPAddress.Any, port));
                 srv.Start();

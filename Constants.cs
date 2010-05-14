@@ -189,10 +189,8 @@ namespace spacecraft
             Kick = 65, // server
         }
 
-        public PacketType PacketFromLength(int length)
+        static public PacketType PacketFromLength(int length)
         {
-
-
             return PacketType.UNKNOWN;
         }
     }
