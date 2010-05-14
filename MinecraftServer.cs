@@ -105,7 +105,6 @@ namespace spacecraft
         private void BeatTimer(object x, ElapsedEventArgs y)
         {
             Heartbeat();
-            FlistBeat();
             map.Save("level.fcm");
             GC.Collect();
         }
@@ -200,91 +199,6 @@ namespace spacecraft
                     firstbeat = false;
                 }
             }
-        }
-
-        private void FlistBeat()
-        {
-            if (!Config.GetBool("flist-heartbeat", true))
-            {
-                return;
-            }
-
-            if (justFlistBeated)
-            {
-                justFlistBeated = false;
-                return;
-            }
-            justFlistBeated = true;
-
-            StringBuilder builder = new StringBuilder();
-            builder.Append("name=");
-            builder.Append(name);
-
-            builder.Append("&motd=");
-            builder.Append(motd);
-
-            builder.Append("&hash=");
-            builder.Append(serverhash);
-
-            builder.Append("&max=");
-            builder.Append(maxplayers);
-
-            builder.Append("&users=");
-            builder.Append(connections.Count);
-
-            builder.Append("&public=");
-
-            if (Config.GetBool("flist-public", false))
-            {
-                builder.Append("true");
-            }
-            else
-            {
-                builder.Append("false");
-            }
-
-            builder.Append("&server=spacecraft");
-
-            builder.Append("&port=");
-            builder.Append(port);
-
-            builder.Append("&players=");
-            string sep = "";
-            foreach (Player p in GetAllPlayers(false))
-            {
-                builder.Append(sep);
-                builder.Append(p.name);
-                sep = ",";
-            }
-
-            builder.Append("&data=spacecraft");
-
-            string postcontent = builder.ToString();
-            byte[] post = Encoding.ASCII.GetBytes(postcontent);
-
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://list.fragmer.net/announce.php");
-            req.ContentType = "application/x-www-form-urlencoded";
-            req.Method = "POST";
-            req.ContentLength = post.Length;
-            Stream o = req.GetRequestStream();
-            o.Write(post, 0, post.Length);
-            o.Close();
-
-            WebResponse resp;
-            try
-            {
-                resp = req.GetResponse();
-            }
-            catch { resp = null; }
-            if (resp == null)
-            {
-                Spacecraft.Log("Error: unable to heartbeat with flist!");
-                return;
-            }
-
-            // maybe this can be safely removed?
-            StreamReader sr = new StreamReader(resp.GetResponseStream());
-            string data = sr.ReadToEnd().Trim();
         }
 
         public void AcceptClient(IAsyncResult ar)
