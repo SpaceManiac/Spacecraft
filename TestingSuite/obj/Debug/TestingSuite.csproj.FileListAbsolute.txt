@@ -1,7 +1,0 @@
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\obj\Debug\ResolveAssemblyReference.cache
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\bin\Debug\TestingSuite.exe
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\bin\Debug\TestingSuite.pdb
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\bin\Debug\spacecraft.exe
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\bin\Debug\spacecraft.pdb
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\obj\Debug\TestingSuite.exe
-C:\Documents and Settings\Ewan\Desktop\Spacecraft\TestingSuite\obj\Debug\TestingSuite.pdb
