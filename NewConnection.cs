@@ -14,11 +14,13 @@ namespace spacecraft
         byte[] _verificationHash = new byte[64];
         TcpClient _client;
      
-        public NewConnection(TcpClient c) {
+        public NewConnection(TcpClient c) 
+        {
             _client = c;
+			
         }
 
-        private Packet ReceivePacket()
+        private ClientPacket ReceivePacket()
         {
             byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
             int buffsize = 0;
@@ -32,12 +34,10 @@ namespace spacecraft
                 }
                 catch (Exception e)
                 {
-                    Spacecraft.LogError("Something went wrong while we were reading a packet! {0}", e.Message);
+                    Spacecraft.LogError("Something went wrong while we were reading a packet!\n" +  e.Message);
                 }
             }
             while (false && buffsize < 1300);
-            
-            
 
             return null;
         }

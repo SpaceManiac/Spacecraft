@@ -127,6 +127,7 @@ namespace spacecraft
                 sw.Write("==== ");
                 sw.Write(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
                 sw.Write(" ====");
+				sw.WriteLine();
                 sw.WriteLine(text);
                 sw.Close();
                 Log("ERROR! Check error.log for details!");

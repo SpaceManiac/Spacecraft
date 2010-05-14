@@ -14,11 +14,24 @@ namespace spacecraft
         abstract public byte[] ToByteArray();
         public static implicit operator byte[](Packet P) { return P.ToByteArray(); }
     }
+	
+    /// <summary>
+    /// Packets that are being sent by the client, received by the server.
+    /// </summary>
+	public abstract class ClientPacket : Packet
+    {   
+    }
+    /// <summary>
+    /// Packets that are being sent by the server.
+    /// </summary>
+    public abstract class ServerPacket : Packet 
+    {
+    }
 
     /// <summary>
     /// A packet that informs the server of a player's arrival.
     /// </summary>
-    public class PlayerIDPacket :  Packet
+    public class PlayerIDPacket : ClientPacket
     {
         override public byte PacketID { get { return 0x0; } }
         public byte Version;
@@ -42,7 +55,7 @@ namespace spacecraft
     /// <summary>
     /// Informing the server of a player making a change to a block.
     /// </summary>
-    public class BlockUpdatePacket : Packet
+    public class BlockUpdatePacket : ClientPacket
     {
         override public byte PacketID { get { return 0x05; } }
         public short X;
@@ -75,7 +88,7 @@ namespace spacecraft
     /// <summary>
     /// Informs the server of the player's position and orientation.
     /// </summary>
-    public class PositionUpdatePacket : Packet
+    public class PositionUpdatePacket : ClientPacket
     {
         override  public byte PacketID { get { return 0x08; } }
         public byte PlayerID;
@@ -91,7 +104,7 @@ namespace spacecraft
         }
     }
 
-    public class MessagePacket : Packet
+    public class MessagePacket : ClientPacket
     {
         override public byte PacketID { get { return 0x0d; } }
         public byte Unused;
