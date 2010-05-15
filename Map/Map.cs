@@ -237,7 +237,12 @@ namespace spacecraft
         {
             return ((y * zdim + z) * xdim + x);
         }
-		
+
+        public int BlockIndex2(short x, short y, short z)
+        {
+            return ((y * zdim + z) * xdim + x);
+        }
+
 		public static int BlockIndex2(short x, short y, short z, short xdim, short zdim)
 		{
 			return ((y * zdim + z) * xdim + x);

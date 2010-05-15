@@ -99,5 +99,23 @@ namespace spacecraft
 		{
 			return (EscherMode)(1 + (int)(Spacecraft.random.NextDouble() * 5));
 		}
+		
+		public static EscherMode Invert(EscherMode mode)
+		{
+			switch(mode) {
+			case EscherMode.XPlus:
+				return EscherMode.XMinus;
+			case EscherMode.XMinus:
+				return EscherMode.XPlus;
+			case EscherMode.YMinus:
+				return EscherMode.YPlus;
+			case EscherMode.ZPlus:
+				return EscherMode.ZMinus;
+			case EscherMode.ZMinus:
+				return EscherMode.ZPlus;
+			case EscherMode.None:
+				return EscherMode.YMinus;
+			}
+		}
 	}
 }
