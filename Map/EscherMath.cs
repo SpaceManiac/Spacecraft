@@ -4,9 +4,9 @@ namespace spacecraft
 {
 	public enum EscherMode {
 		None,
+        YPlus = None, // Unsual ordering because changing this value resets the value it's counting from for the others.
 		XPlus,
 		XMinus,
-		YPlus,
 		YMinus,
 		ZPlus,
 		ZMinus
@@ -57,7 +57,6 @@ namespace spacecraft
 				return new BlockPosition(y, z, x);
 			case EscherMode.ZMinus:
 				return new BlockPosition(x, zmax - z, y);
-			case EscherMode.YPlus:
 			case EscherMode.None:
 			default:
 				return pos;
@@ -90,7 +89,6 @@ namespace spacecraft
 				return new BlockPosition(z, x, y);
 			case EscherMode.ZMinus:
 				return new BlockPosition(x, z, zmax - y);
-			case EscherMode.YPlus:
 			case EscherMode.None:
 			default:
 				return pos;

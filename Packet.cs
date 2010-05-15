@@ -115,6 +115,4 @@ namespace spacecraft
             throw new NotImplementedException();
         }
     }
-
-
 }
