@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace spacecraft
 {
     class NewConnection
     {
-        static int PROTOCOL_VERSION = 0x07;
+        static byte PROTOCOL_VERSION = 0x07;
+
+        public delegate void PlayerSpawnHandler(string username);
+        public event PlayerSpawnHandler PlayerSpawn;
 
         public delegate void AuthenticationHandler(bool sucess);
         public event AuthenticationHandler Authenticated;
@@ -21,11 +25,6 @@ namespace spacecraft
 
         public delegate void DisconnectHandler();
         public event DisconnectHandler Disconnect;
-
-
-
-        string _username;
-        byte[] _verificationHash = new byte[64];
 
         bool Connected = true;
 
@@ -48,10 +47,10 @@ namespace spacecraft
                     HandleMessage((MessagePacket) IncomingPacket);
                     break;
                 case (byte) Packet.PacketType.PlayerSetBlock:
-                    HandleBlockSet(IncomingPacket);
+                    HandleBlockSet((BlockUpdatePacket)IncomingPacket);
                     break;
                 case (byte) Packet.PacketType.PositionUpdate:
-                    HandlePositionUpdate(IncomingPacket);
+                    HandlePositionUpdate((PositionUpdatePacket)IncomingPacket);
                     break;
                 case (byte) Packet.PacketType.SpawnPlayer:
                     HandlePlayerSpawn((PlayerIDPacket)IncomingPacket);
@@ -62,29 +61,52 @@ namespace spacecraft
             }
         }
 
+        private void HandlePositionUpdate(PositionUpdatePacket positionUpdatePacket)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void HandleBlockSet(BlockUpdatePacket blockUpdatePacket)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void HandleMessage(MessagePacket messagePacket)
+        {
+            throw new NotImplementedException();
+        }
+
         private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
         {
             if (IncomingPacket.Version != PROTOCOL_VERSION)
             {
                 SendKick("Wrong protocol version.");
             }
+            bool success = IsHashCorrect(IncomingPacket.Username.ToString().Trim(), IncomingPacket.Key.ToString().Trim());
+
+            if (Authenticated != null)
+                Authenticated(success);
+
+
+            if (PlayerSpawn != null)
+            {
+                PlayerSpawn(IncomingPacket.Username.ToString().Trim());
+            }
+
+            // Send response packet.
+            PlayerInPacket outPacket = new PlayerInPacket();
+            
+            string motd = MinecraftServer.theServ.motd.PadRight(64, (char)20);
+            outPacket.MOTD = Encoding.ASCII.GetBytes(motd);
+            string name = MinecraftServer.theServ.name.PadRight(64, (char)20);
+            outPacket.Name = Encoding.ASCII.GetBytes(name);
+            outPacket.Version = PROTOCOL_VERSION;
+
+
+            SendPacket(outPacket);
         }
 
-        private void HandlePositionUpdate(ClientPacket IncomingPacket)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void HandleBlockSet(ClientPacket IncomingPacket)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void HandleMessage(MessagePacket IncomingPacket)
-        {
-            throw new NotImplementedException();
-        }
-
+      
 
 
         private ClientPacket ReceivePacket()
@@ -110,10 +132,33 @@ namespace spacecraft
         }
 
 
+        private void SendPacket(ServerPacket packet)
+        {
+            try
+            {
+                byte[] bytes = packet;
+                _client.GetStream().Write(bytes, 0, bytes.Length);
+            }
+            catch (IOException e)
+            {
+                Quit();
+            }
+            catch (InvalidOperationException)
+            {
+                Quit();
+            }
+        }
+
+        private void Quit()
+        {
+            if (Disconnect != null)
+                Disconnect();
+        }
+
+
         private void Authenticate()
         {
             bool authorized = false;
-			
 			
 
             if (Authenticated != null)
@@ -126,11 +171,7 @@ namespace spacecraft
 
             string salt = MinecraftServer.theServ.salt.ToString();
             string combined = salt + name;
-            Byte[] combinedBytes = new Byte[combined.Length];
-            for (int i = 0; i < combined.Length; i++)
-            {
-                combinedBytes[i] = (Byte) combined[i];
-            }
+            Byte[] combinedBytes = Encoding.ASCII.GetBytes(combined);
             string properHash = provider.ComputeHash(combinedBytes).ToString();
 
 

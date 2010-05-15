@@ -116,5 +116,28 @@ namespace spacecraft
         }
     }
 
+    /* ================================================================================================================================
+     * ================================================================================================================================
+     * ================================================================================================================================ 
+     * 
+     */
+
+    /// <summary>
+    /// Confirms to the client that the player has been connected.
+    /// </summary>
+    public class PlayerInPacket : ServerPacket
+    {
+        public override byte PacketID { get { return 0x00; } }
+        public byte Version;
+        public byte[] Name;
+        public byte[] MOTD;
+        public byte Type;
+
+        public override byte[] ToByteArray()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
 }
