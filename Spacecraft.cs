@@ -21,17 +21,7 @@ namespace spacecraft
                     Log("Note: admins.txt does not exist, creating.");
                     File.Create("admins.txt");
                 }
-
-                if (!File.Exists("properties.txt"))
-                {
-                    Log("Error: could not find properties.txt!");
-                    return;
-                }
-                else
-                {
-                    Config.Initialize();
-                }
-				
+               
 				random = new Random();
 
                 LoadRanks();
@@ -51,6 +41,7 @@ namespace spacecraft
                 Console.WriteLine(e.Source);
                 Console.WriteLine();
                 Console.Write(e.StackTrace);
+                Console.Read();
             }
         }
 
