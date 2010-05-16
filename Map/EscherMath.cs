@@ -114,7 +114,10 @@ namespace spacecraft
 			case EscherMode.ZMinus:
 				return EscherMode.ZPlus;
 			case EscherMode.None:
+            default:
 				return EscherMode.YMinus;
+            
+
 			}
 		}
 	}

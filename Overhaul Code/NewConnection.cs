@@ -27,6 +27,8 @@ namespace spacecraft
         public event DisconnectHandler Disconnect;
 
         bool Connected = true;
+        Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
+
 
         TcpClient _client;
 
@@ -34,7 +36,13 @@ namespace spacecraft
         {
             _client = c;
             while (Connected)
+            {
+                while (SendQueue.Count > 0)
+                {
+                    SendPacket(SendQueue.Dequeue());
+                }
                 HandlePacket();
+            }
         }
 
         void HandlePacket()
@@ -73,7 +81,8 @@ namespace spacecraft
 
         private void HandleMessage(MessagePacket messagePacket)
         {
-            throw new NotImplementedException();
+            if (ReceivedMessage != null)
+                ReceivedMessage(messagePacket.Message.ToString().Trim());
         }
 
         private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
@@ -139,7 +148,7 @@ namespace spacecraft
                 byte[] bytes = packet;
                 _client.GetStream().Write(bytes, 0, bytes.Length);
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 Quit();
             }

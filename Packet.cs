@@ -9,6 +9,11 @@ namespace spacecraft
 {
     public abstract partial class Packet  // Continued in Constants.cs, which defines enums.
     {
+        protected const int BYTE_LENGTH = 1;
+        protected const int SHORT_LENGTH = 2;
+        protected const int STRING_LENGTH = NetworkString.Size;
+        protected const int ARRAY_LENGTH = NetworkByteArray.Size;
+
         abstract public byte PacketID { get; }
 
         abstract public byte[] ToByteArray();
@@ -35,20 +40,19 @@ namespace spacecraft
     {
         override public byte PacketID { get { return 0x0; } }
         public byte Version;
-        public byte[] Username;
-        public byte[] Key;
+        public NetworkString Username;
+        public NetworkString Key;
         public byte Unknown; // Unused.
 
         override public byte[] ToByteArray()
         {
-            byte[] buff = new byte[1 + 1 + 1024 + 1024 + 1];
-
-            buff[0] = PacketID;
-            buff[1] = Version;
-            Username.CopyTo(buff, 2);
-            Key.CopyTo(buff, 2 + Username.Length);
-            buff[2 + Username.Length + Key.Length] = Unknown;
-            return buff;
+            Builder<Byte> builder = new Builder<byte>();
+            builder.Append(PacketID);
+            builder.Append(Version);
+            builder.Append(Username);
+            builder.Append(Key);
+            builder.Append(Unknown);
+            return builder.ToArray();
         }
     }
 
@@ -58,30 +62,22 @@ namespace spacecraft
     public class BlockUpdatePacket : ClientPacket
     {
         override public byte PacketID { get { return 0x05; } }
-        public short X;
-        public short Y;
-        public short Z;
+        public NetworkShort X;
+        public NetworkShort Y;
+        public NetworkShort Z;
         public byte Mode;
         public byte Type;
 
         override public byte[] ToByteArray()
         {
-            byte[] buff = new byte[1 + 2 + 2 + 2 + 1 + 1];
-
-            buff[0] = PacketID;
-            buff[1] = (byte)(X >> 8);
-            buff[2] = (byte)(X % 65536);
-
-            buff[3] = (byte)(Y >> 8);
-            buff[4] = (byte)(Y % 65536);
-
-            buff[5] = (byte)(Z >> 8);
-            buff[6] = (byte)(Z % 65536);
-
-            buff[7] = Mode;
-            buff[8] = Type;
-
-            return buff;
+            Builder<Byte> b = new Builder<byte>();
+            b.Append(PacketID);
+            b.Append(X);
+            b.Append(Y);
+            b.Append(Z);
+            b.Append(Mode);
+            b.Append(Type);
+            return b.ToArray();
         }
     }
 
@@ -92,15 +88,23 @@ namespace spacecraft
     {
         override public byte PacketID { get { return 0x08; } }
         public byte PlayerID;
-        public short X;
-        public short Y;
-        public short Z;
+        public NetworkShort X;
+        public NetworkShort Y;
+        public NetworkShort Z;
         public byte Heading;
         public byte Pitch;
 
         override public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            Builder<Byte> builder = new Builder<byte>();
+            builder.Append(PacketID);
+            builder.Append(PlayerID);
+            builder.Append(X);
+            builder.Append(Y);
+            builder.Append(Z);
+            builder.Append(Heading);
+            builder.Append(Pitch);
+            return builder.ToArray();
         }
     }
 
@@ -108,18 +112,21 @@ namespace spacecraft
     {
         override public byte PacketID { get { return 0x0d; } }
         public byte Unused;
-        public byte[] Message;
+        public NetworkString Message;
 
         override public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            Builder<Byte> b = new Builder<byte>();
+            b.Append(PacketID);
+            b.Append(Unused);
+            b.Append(Message);
+            return b.ToArray();
         }
     }
 
     /* ================================================================================================================================
      * ================================================================================================================================
      * ================================================================================================================================ 
-     * 
      */
 
     /// <summary>
@@ -129,13 +136,19 @@ namespace spacecraft
     {
         public override byte PacketID { get { return 0x00; } }
         public byte Version;
-        public byte[] Name;
-        public byte[] MOTD;
+        public NetworkString Name;
+        public NetworkString MOTD;
         public byte Type;
 
         public override byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            Builder<byte> b = new Builder<byte>();
+            b.Append(PacketID);
+            b.Append(Version);
+            b.Append(Name);
+            b.Append(MOTD);
+            b.Append(Type);
+            return b.ToArray();
         }
     }
 

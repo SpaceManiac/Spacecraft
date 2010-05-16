@@ -36,10 +36,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builder.cs" />
     <Compile Include="ChatCommands.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Map\EscherTransformer.cs" />
+    <Compile Include="NetworkTypes.cs" />
     <Compile Include="Overhaul Code\NewConnection.cs" />
     <Compile Include="Overhaul Code\NewPlayer.cs" />
     <Compile Include="Packet.cs" />
