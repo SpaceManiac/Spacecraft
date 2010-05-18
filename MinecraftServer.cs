@@ -11,7 +11,7 @@ using System.Timers;
 
 namespace spacecraft
 {
-    public class MinecraftServer
+    public partial class MinecraftServer
     {
         private List<Connection> connections;
         private ArrayList mobs;

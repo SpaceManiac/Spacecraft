@@ -43,6 +43,7 @@
     <Compile Include="NetworkTypes.cs" />
     <Compile Include="Overhaul Code\NewConnection.cs" />
     <Compile Include="Overhaul Code\NewPlayer.cs" />
+    <Compile Include="Overhaul Code\NewServer.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="Pair.cs" />
     <Compile Include="Position.cs" />

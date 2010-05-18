@@ -14,6 +14,9 @@ namespace spacecraft
         public delegate void PlayerSpawnHandler(string username);
         public event PlayerSpawnHandler PlayerSpawn;
 
+        public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
+        public event PlayerMoveHandler PlayerMove;
+
         public delegate void AuthenticationHandler(bool sucess);
         public event AuthenticationHandler Authenticated;
 
@@ -34,6 +37,9 @@ namespace spacecraft
 
         public NewConnection(TcpClient c)
         {
+
+            SendQueue = new Queue<ServerPacket>();
+
             _client = c;
             while (Connected)
             {
@@ -41,18 +47,18 @@ namespace spacecraft
                 {
                     SendPacket(SendQueue.Dequeue());
                 }
-                HandlePacket();
+                HandleIncomingPacket();
             }
         }
 
-        void HandlePacket()
+        void HandleIncomingPacket()
         {
             ClientPacket IncomingPacket = ReceivePacket();
 
             switch (IncomingPacket.PacketID)
             {
                 case (byte)Packet.PacketType.Message:
-                    HandleMessage((MessagePacket)IncomingPacket);
+                    HandleMessage((ClientMessagePacket)IncomingPacket);
                     break;
                 case (byte)Packet.PacketType.PlayerSetBlock:
                     HandleBlockSet((BlockUpdatePacket)IncomingPacket);
@@ -71,7 +77,15 @@ namespace spacecraft
 
         private void HandlePositionUpdate(PositionUpdatePacket positionUpdatePacket)
         {
-            throw new NotImplementedException();
+
+            Position pos = new Position(positionUpdatePacket.X, positionUpdatePacket.Y, positionUpdatePacket.Z);
+
+            byte heading = positionUpdatePacket.Heading;
+            byte pitch = positionUpdatePacket.Pitch;
+
+            if (PlayerMove != null)
+                PlayerMove(pos, heading, pitch);
+
         }
 
         private void HandleBlockSet(BlockUpdatePacket blockUpdatePacket)
@@ -79,10 +93,10 @@ namespace spacecraft
             throw new NotImplementedException();
         }
 
-        private void HandleMessage(MessagePacket messagePacket)
+        private void HandleMessage(ClientMessagePacket messagePacket)
         {
             if (ReceivedMessage != null)
-                ReceivedMessage(messagePacket.Message.ToString().Trim());
+                ReceivedMessage(messagePacket.Message.ToString());
         }
 
         private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
@@ -96,6 +110,9 @@ namespace spacecraft
             if (Authenticated != null)
                 Authenticated(success);
 
+            if (ReceivedUsername != null)
+                ReceivedUsername(IncomingPacket.Username.ToString());
+
 
             if (PlayerSpawn != null)
             {
@@ -105,10 +122,9 @@ namespace spacecraft
             // Send response packet.
             PlayerInPacket outPacket = new PlayerInPacket();
 
-            string motd = MinecraftServer.theServ.motd.PadRight(64, (char)20);
-            outPacket.MOTD = Encoding.ASCII.GetBytes(motd);
-            string name = MinecraftServer.theServ.name.PadRight(64, (char)20);
-            outPacket.Name = Encoding.ASCII.GetBytes(name);
+            outPacket.MOTD = MinecraftServer.theServ.motd;
+            string name = MinecraftServer.theServ.name;
+            outPacket.Name = name;
             outPacket.Version = PROTOCOL_VERSION;
 
 
@@ -135,7 +151,11 @@ namespace spacecraft
                     Spacecraft.LogError("Something went wrong while we were reading a packet!\n" + e.Message);
                 }
             }
-            while (false && buffsize < 1300);
+            while ((Packet.PacketFromLength(buffsize) == Packet.PacketType.UNKNOWN) && buffsize < buffer.Length - 100);
+
+            ClientPacket P = ClientPacket.FromByteArray(buffer);
+            
+
 
             return null;
         }
@@ -160,18 +180,10 @@ namespace spacecraft
 
         private void Quit()
         {
+            _client.Close();
+
             if (Disconnect != null)
                 Disconnect();
-        }
-
-
-        private void Authenticate()
-        {
-            bool authorized = false;
-
-
-            if (Authenticated != null)
-                Authenticated(authorized);
         }
 
         private bool IsHashCorrect(string name, string hash)
@@ -191,15 +203,25 @@ namespace spacecraft
 
         public void DisplayMessage(string msg)
         {
-
+            ServerMessagePacket P = new ServerMessagePacket();
+            P.Message = msg;
+            SendQueue.Enqueue(P);
         }
 
         public void SendKick(string reason)
         {
+            DisconnectPacket P = new DisconnectPacket();
+            P.Reason = reason;
+            SendQueue.Enqueue(P);
 
             if (Disconnect != null)
                 Disconnect();
         }
 
+
+        internal void SendPositionUpdate(Position dest)
+        {
+            
+        }
     }
 }

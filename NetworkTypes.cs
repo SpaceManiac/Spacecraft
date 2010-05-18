@@ -6,13 +6,30 @@ namespace spacecraft
 {
     /* Types used by the Packet class to guareentee properties about the data being sent. */
 
-    public struct NetworkString
+    public abstract class NetworkByteContainer
     {
-        byte[] _contents;
-        const byte FILLER_CHAR = 0x20;
-        public const int Size = 64;
+        protected byte[] _contents;
+        protected static byte FILLER_CHAR;
+        protected static int Size;
 
-        public static implicit operator byte[](NetworkString s)
+        public override string ToString()
+        {
+            int end = Size;
+            for (int i = _contents.Length; i > 0; i--) // Starts at the end, counts backwards.
+            {
+                if (_contents[i] != FILLER_CHAR)
+                { // Find last non-filler character, and record it.
+                    end = i;
+                    break; 
+                }
+            }
+
+            string output = Encoding.ASCII.GetString(_contents);
+            // If FILLER_CHAR is anything other than null, it'll appear in the parsed string, so we need to take it out.
+            return output.Substring(0, end); 
+        }
+
+        public static implicit operator byte[](NetworkByteContainer s)
         {
             byte[] b = new byte[Size];
             for (int i = 0; i < b.Length; i++)
@@ -21,36 +38,42 @@ namespace spacecraft
             }
             s._contents.CopyTo(b, 0);
             return b;
-        }
-        public NetworkString(byte[] bar)
-        {
-            _contents = new byte[Size];
-            for (int i = 0; i < _contents.Length; i++)
-            {
-                _contents[i] = FILLER_CHAR;
-            }
-            bar.CopyTo(_contents, 0);
         }
     }
 
-    public struct NetworkByteArray
+    public class NetworkString : NetworkByteContainer
     {
-        byte[] _contents;
-        const byte FILLER_CHAR =  0x00;
-        public const int Size = 1024;
+        new const byte FILLER_CHAR = 0x20;
+        new public const int Size = 64; 
 
-        public static implicit operator byte[](NetworkByteArray s)
+        public NetworkString(byte[] raw)
         {
-            byte[] b = new byte[Size];
-            for (int i = 0; i < b.Length; i++)
+            _contents = new byte[Size];
+            for (int i = 0; i < _contents.Length; i++)
             {
-                b[i] = FILLER_CHAR;
+                _contents[i] = FILLER_CHAR;
             }
-            s._contents.CopyTo(b, 0);
-            return b;
+            raw.CopyTo(_contents, 0);
         }
+
+        public static implicit operator NetworkString(string s)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(s);
+            return new NetworkString(bytes);
+        }
+    }
+
+    public class NetworkByteArray : NetworkByteContainer
+    {
+        new public const int  Size = 1024;
+        new public const  byte FILLER_CHAR = 0x00;
+
         public NetworkByteArray(byte[] bar)
         {
+            if (bar.Length > Size)
+            {
+                throw new ArgumentException();
+            }
             _contents = new byte[Size];
             for (int i = 0; i < _contents.Length; i++)
             {
@@ -58,6 +81,13 @@ namespace spacecraft
             }
             bar.CopyTo(_contents, 0);
         }
+
+        public static implicit operator NetworkByteArray(string s)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(s);
+            return new NetworkByteArray(bytes);
+        }
+
     }
 
     public struct NetworkShort

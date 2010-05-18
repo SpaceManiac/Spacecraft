@@ -7,8 +7,15 @@ namespace spacecraft
 {
     class NewPlayer
     {
+
         public static Dictionary<String, Rank> PlayerRanks = new Dictionary<String, Rank>();
         public static Dictionary<Byte, NewPlayer> idTable = new Dictionary<Byte, NewPlayer>();
+
+        public delegate void PlayerSpawnHandler(string username);
+        public event PlayerSpawnHandler PlayerSpawn;
+
+        public delegate void PlayerMoveHandler(Position dest);
+        public event PlayerMoveHandler PlayerMove;
 
         private NewConnection conn;
 
@@ -16,17 +23,18 @@ namespace spacecraft
         public byte playerID;
         public string name { get; protected set; }
         public Position pos { get; protected set; }
-
         public byte heading;
         public byte pitch;
-        /*        public bool placing;
-            public byte placeType; */
 
         public NewPlayer(TcpClient client)
         {
             name = null;
             pos = new Position(128, 128, 128);
             conn = new NewConnection(client);
+
+            conn.PlayerMove += new NewConnection.PlayerMoveHandler(conn_PlayerMove);
+            conn.PlayerSpawn += new NewConnection.PlayerSpawnHandler(conn_PlayerSpawn);
+
 
             for (byte i = 0; i < byte.MaxValue; ++i)
             {
@@ -48,51 +56,53 @@ namespace spacecraft
             }
         }
 
+       
+
         ~NewPlayer()
         {
             idTable.Remove(playerID);
         }
 
-        public bool PositionUpdate(Int16 X, Int16 Y, Int16 Z, byte Heading, byte Pitch)
-        {
-            bool changed = false;
-            Position newPos = new Position(X, Y, Z);
-            if (newPos != pos)
-            {
-                changed = true;
-                pos = newPos;
-            }
-            if (Heading != heading)
-            {
-                changed = true;
-                heading = Heading;
-            }
-            if (Pitch != pitch)
-            {
-                changed = true;
-                pitch = Pitch;
-            }
-            return changed;
-        }
-
         public void Kick()
         {
-            Kick("");
+            Kick(null);
         }
 
         public void Kick(string reason)
         {
             conn.SendKick(reason);
         }
+
         public void Teleport(Position dest)
         {
-            throw new NotImplementedException();
+            pos = dest;
+
+            conn.SendPositionUpdate(dest);
         }
+
         public void PrintMessage(string msg)
         {
             conn.DisplayMessage(msg);
         }
 
+        /* ================================================================================
+         * Event handlers
+         * ================================================================================
+         */
+
+        void conn_PlayerSpawn(string username)
+        {
+            this.name = name;
+        }
+
+        void conn_PlayerMove(Position dest, byte heading, byte pitch)
+        {
+            pos = dest;
+            this.heading = heading;
+            this.pitch = pitch;
+        }
+
+        
     }
 
 }
