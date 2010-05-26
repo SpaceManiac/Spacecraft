@@ -20,8 +20,7 @@ namespace spacecraft
             Spacecraft.Log("Loading " + filename + "...");
             if (!File.Exists(filename))
             {
-                Spacecraft.Log("Map does not exist: " + filename);
-                return null;
+                throw new FileLoadException("Map does not exist.");
             }
 
             switch (Path.GetExtension(filename).ToLowerInvariant())
@@ -31,7 +30,7 @@ namespace spacecraft
                 //case ".dat":
                 //  return DatLoading.Load(filename);
                 default:
-                    throw new Exception("Unknown map file format.");
+                    throw new FileLoadException("Unknown map file format.");
             }
 		}
         

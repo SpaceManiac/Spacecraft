@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace spacecraft
 {
@@ -16,9 +17,6 @@ namespace spacecraft
 
         public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
         public event PlayerMoveHandler PlayerMove;
-
-        public delegate void AuthenticationHandler(bool sucess);
-        public event AuthenticationHandler Authenticated;
 
         public delegate void UsernameHandler(string username);
         public event UsernameHandler ReceivedUsername;
@@ -37,10 +35,16 @@ namespace spacecraft
 
         public NewConnection(TcpClient c)
         {
-
             SendQueue = new Queue<ServerPacket>();
 
             _client = c;
+
+            Thread T = new Thread(Start);
+            T.Start();
+        }
+
+        void Start()
+        {
             while (Connected)
             {
                 while (SendQueue.Count > 0)
@@ -49,6 +53,7 @@ namespace spacecraft
                 }
                 HandleIncomingPacket();
             }
+
         }
 
         void HandleIncomingPacket()
@@ -105,10 +110,7 @@ namespace spacecraft
             {
                 SendKick("Wrong protocol version.");
             }
-            bool success = IsHashCorrect(IncomingPacket.Username.ToString().Trim(), IncomingPacket.Key.ToString().Trim());
-
-            if (Authenticated != null)
-                Authenticated(success);
+            bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
 
             if (ReceivedUsername != null)
                 ReceivedUsername(IncomingPacket.Username.ToString());
@@ -155,9 +157,7 @@ namespace spacecraft
 
             ClientPacket P = ClientPacket.FromByteArray(buffer);
             
-
-
-            return null;
+            return P;
         }
 
 
@@ -181,7 +181,7 @@ namespace spacecraft
         private void Quit()
         {
             _client.Close();
-
+            Connected = false;
             if (Disconnect != null)
                 Disconnect();
         }

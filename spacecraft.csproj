@@ -32,7 +32,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +46,7 @@
     <Compile Include="Overhaul Code\NewConnection.cs" />
     <Compile Include="Overhaul Code\NewPlayer.cs" />
     <Compile Include="Overhaul Code\NewServer.cs" />
-    <Compile Include="Packet.cs" />
+    <Compile Include="ClientPackets.cs" />
     <Compile Include="Pair.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Player.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="Robot.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="MinecraftServer.cs" />
+    <Compile Include="ServerPackets.cs" />
     <Compile Include="Spacecraft.cs" />
     <Compile Include="Map\DatLoading.cs" />
     <Compile Include="Map\MapIO.cs" />

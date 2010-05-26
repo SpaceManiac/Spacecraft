@@ -191,7 +191,60 @@ namespace spacecraft
 
         static public PacketType PacketFromLength(int length)
         {
-            return PacketType.UNKNOWN;
+            PacketType val;
+
+            switch (length)
+            {
+                case 0x00:
+                    val =  PacketType.Ident;
+                    break;
+                case 0x01:
+                    val =  PacketType.Ping;
+                    break;
+                case 0x02:
+                    val =  PacketType.LevelInit;
+                    break;
+                case 0x03:
+                    val =  PacketType.LevelChunk;
+                    break;
+                case 0x04:
+                    val =  PacketType.LevelFinish;
+                    break;
+                case 0x05:
+                    val =  PacketType.PlayerSetBlock;
+                    break;
+                case 0x06:
+                    val =  PacketType.ServerSetBlock;
+                    break;
+                case 0x07:
+                    val =  PacketType.SpawnPlayer;
+                    break;
+                case 0x08:
+                    val =  PacketType.PositionUpdate;
+                    break;
+                case 0x09:
+                    val =  PacketType.U_PositionUpdate;
+                    break;
+                case 0x0A:
+                    val =  PacketType.U_PositionUpdate2;
+                    break;
+                case 0x0B:
+                    val =  PacketType.U_OrientUpdate;
+                    break;
+                case 0x0C:
+                    val =  PacketType.DespawnPlayer;
+                    break;
+                case 0x0D:
+                    val =  PacketType.Message;
+                    break;
+                case 0x0E:
+                    val =  PacketType.Kick;
+                    break;
+                default:
+                    val =  PacketType.UNKNOWN;
+                    break;
+            }
+            return val;
         }
     }
 

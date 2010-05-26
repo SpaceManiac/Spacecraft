@@ -26,7 +26,8 @@ namespace spacecraft
 
                 LoadRanks();
 
-                MinecraftServer serv = new MinecraftServer();
+                //MinecraftServer serv = new MinecraftServer();
+                NewServer serv = new NewServer();
 
                 serv.Start();
 
