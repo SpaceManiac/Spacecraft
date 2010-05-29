@@ -12,7 +12,7 @@ namespace spacecraft
     {
         static byte PROTOCOL_VERSION = 0x07;
 
-        public delegate void PlayerSpawnHandler(string username);
+        public delegate void PlayerSpawnHandler();
         public event PlayerSpawnHandler PlayerSpawn;
 
         public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
@@ -49,7 +49,7 @@ namespace spacecraft
             {
                 while (SendQueue.Count > 0)
                 {
-                    SendPacket(SendQueue.Dequeue());
+                    TransmitPacket(SendQueue.Dequeue());
                 }
                 HandleIncomingPacket();
             }
@@ -62,6 +62,10 @@ namespace spacecraft
 
             switch (IncomingPacket.PacketID)
             {
+                case (byte)Packet.PacketType.Ident:
+                    HandlePlayerSpawn((PlayerIDPacket)IncomingPacket);
+                    break;
+
                 case (byte)Packet.PacketType.Message:
                     HandleMessage((ClientMessagePacket)IncomingPacket);
                     break;
@@ -114,26 +118,65 @@ namespace spacecraft
 
             if (ReceivedUsername != null)
                 ReceivedUsername(IncomingPacket.Username.ToString());
+            
 
+            // Send response packet.
+            ServerIdentPacket Ident = new ServerIdentPacket();
+
+            Ident.MOTD = NewServer.theServ.motd;
+            Ident.Name = NewServer.theServ.name;
+            Ident.Version = PROTOCOL_VERSION;
+
+            TransmitPacket(Ident);
+
+            SendMap();
 
             if (PlayerSpawn != null)
             {
-                PlayerSpawn(IncomingPacket.Username.ToString().Trim());
+                PlayerSpawn();
             }
-
-            // Send response packet.
-            PlayerInPacket outPacket = new PlayerInPacket();
-
-            outPacket.MOTD = MinecraftServer.theServ.motd;
-            string name = MinecraftServer.theServ.name;
-            outPacket.Name = name;
-            outPacket.Version = PROTOCOL_VERSION;
-
-
-            SendPacket(outPacket);
         }
 
+        private void SendMap()
+        {
+            Map M = NewServer.theServ.map;
+            SendPacket(new LevelInitPacket());
 
+            byte[] compressedData; 
+            using (MemoryStream memstr = new MemoryStream())
+            {
+                M.GetCompressedCopy(memstr, true);
+                compressedData = memstr.ToArray();
+            }
+
+            int bytesSent = 0;
+            while (compressedData.Length > bytesSent) //  While we still have data to transmit.
+            {
+                LevelChunkPacket P = new LevelChunkPacket(); // New packet.
+
+
+                byte[] Chunk = new byte[NetworkByteArray.Size];
+                        
+
+                int remaining = compressedData.Length - bytesSent;
+                remaining = Math.Min(remaining, NetworkByteArray.Size);
+
+                Array.Copy(compressedData, bytesSent, Chunk, 0, remaining);
+                bytesSent += remaining;
+ 
+                P.ChunkData = new NetworkByteArray(Chunk);
+                P.ChunkLength = (short) (Math.Min(NetworkByteArray.Size, compressedData.Length - bytesSent));
+                P.PercentComplete = (byte)(100 * (bytesSent / compressedData.Length));
+
+                SendPacket(P);
+            }
+
+            LevelEndPacket End = new LevelEndPacket();
+            End.X = M.xdim;
+            End.Y = M.ydim;
+            End.Z = M.zdim;
+            SendPacket(End);
+        }
 
 
         private ClientPacket ReceivePacket()
@@ -161,7 +204,7 @@ namespace spacecraft
         }
 
 
-        private void SendPacket(ServerPacket packet)
+        private void TransmitPacket(ServerPacket packet)
         {
             try
             {
@@ -178,6 +221,11 @@ namespace spacecraft
             }
         }
 
+        private void SendPacket(ServerPacket P)
+        {
+            SendQueue.Enqueue(P);
+        }
+
         private void Quit()
         {
             _client.Close();
@@ -190,7 +238,7 @@ namespace spacecraft
         {
             MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();
 
-            string salt = MinecraftServer.theServ.salt.ToString();
+            string salt = NewServer.theServ.salt.ToString(); //MinecraftServer.theServ.salt.ToString();
             string combined = salt + name;
             Byte[] combinedBytes = Encoding.ASCII.GetBytes(combined);
             string properHash = provider.ComputeHash(combinedBytes).ToString();
@@ -205,23 +253,44 @@ namespace spacecraft
         {
             ServerMessagePacket P = new ServerMessagePacket();
             P.Message = msg;
-            SendQueue.Enqueue(P);
+            SendPacket(P);
         }
 
         public void SendKick(string reason)
         {
             DisconnectPacket P = new DisconnectPacket();
             P.Reason = reason;
-            SendQueue.Enqueue(P);
+            SendPacket(P);
 
             if (Disconnect != null)
                 Disconnect();
         }
 
 
-        internal void SendPositionUpdate(Position dest)
+        public void SendPlayerMovement(NewPlayer player, Position dest, bool self)
         {
-            
+            PlayerMovePacket packet = new PlayerMovePacket();
+            packet.PlayerID = player.playerID;
+            if (self)
+                packet.PlayerID = 255;
+            packet.X = player.pos.x;
+            packet.Y = player.pos.y;
+            packet.Z = player.pos.z;
+
+            SendPacket(packet);
+        }
+
+        public void HandlePlayerSpawn(NewPlayer Player)
+        {
+            PlayerSpawnPacket packet = new PlayerSpawnPacket();
+            packet.PlayerID = Player.playerID;
+            packet.Name = Player.name;
+            packet.X = Player.pos.x;
+            packet.Y = Player.pos.y;
+            packet.Z = Player.pos.z;
+            packet.Heading = Player.heading;
+            packet.Pitch = Player.pitch;
+            SendPacket(packet);
         }
     }
 }

@@ -192,58 +192,54 @@ namespace spacecraft
         static public PacketType PacketFromLength(int length)
         {
             PacketType val;
+            // TODO: Make this better.
 
             switch (length)
             {
-                case 0x00:
-                    val =  PacketType.Ident;
+                case 131:
+                    val= PacketType.Ident;
                     break;
-                case 0x01:
-                    val =  PacketType.Ping;
+                case 1:
+                    val = PacketType.Ping;
+                    // LevelInit is /also/ one byte long, but there should be no reason we need to identify it by it's length.
                     break;
-                case 0x02:
-                    val =  PacketType.LevelInit;
+                case 1028:
+                    val = PacketType.LevelChunk;
                     break;
-                case 0x03:
-                    val =  PacketType.LevelChunk;
+                case 7:
+                    val = PacketType.LevelFinish;
                     break;
-                case 0x04:
-                    val =  PacketType.LevelFinish;
+                case 9:
+                    val = PacketType.PlayerSetBlock;
                     break;
-                case 0x05:
-                    val =  PacketType.PlayerSetBlock;
+                case 8:
+                    val = PacketType.ServerSetBlock;
                     break;
-                case 0x06:
-                    val =  PacketType.ServerSetBlock;
+                // Ditto PacketType.U_PositionUpdate2;
+                case 74:
+                    val = PacketType.SpawnPlayer;
                     break;
-                case 0x07:
-                    val =  PacketType.SpawnPlayer;
+                case 10:
+                    val = PacketType.PositionUpdate;
                     break;
-                case 0x08:
-                    val =  PacketType.PositionUpdate;
+                    // Ditto U_PositionUpdate;
+                case 4:
+                    val = PacketType.U_OrientUpdate;
                     break;
-                case 0x09:
-                    val =  PacketType.U_PositionUpdate;
+                case 2:
+                    val = PacketType.DespawnPlayer;
                     break;
-                case 0x0A:
-                    val =  PacketType.U_PositionUpdate2;
+                case 66:
+                    val = PacketType.Message;
                     break;
-                case 0x0B:
-                    val =  PacketType.U_OrientUpdate;
-                    break;
-                case 0x0C:
-                    val =  PacketType.DespawnPlayer;
-                    break;
-                case 0x0D:
-                    val =  PacketType.Message;
-                    break;
-                case 0x0E:
-                    val =  PacketType.Kick;
+                case 65:
+                    val = PacketType.Kick;
                     break;
                 default:
-                    val =  PacketType.UNKNOWN;
-                    break;
+                     val = PacketType.UNKNOWN;
+                     break;
             }
+
             return val;
         }
     }

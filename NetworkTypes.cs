@@ -12,18 +12,20 @@ namespace spacecraft
         protected static byte FILLER_CHAR;
         protected static int Size;
 
+        public int thisSize;
+        public byte thisFill;
+
         public override string ToString()
         {
             int end = Size;
-            for (int i = _contents.Length; i > 0; i--) // Starts at the end, counts backwards.
+            for (int i = _contents.Length-1; i > 0; i--) // Starts at the end, counts backwards.
             {
-                if (_contents[i] != FILLER_CHAR)
+                if (_contents[i] != this.thisFill)
                 { // Find last non-filler character, and record it.
                     end = i;
                     break; 
                 }
             }
-
             string output = Encoding.ASCII.GetString(_contents);
             // If FILLER_CHAR is anything other than null, it'll appear in the parsed string, so we need to take it out.
             return output.Substring(0, end); 
@@ -31,10 +33,10 @@ namespace spacecraft
 
         public static implicit operator byte[](NetworkByteContainer s)
         {
-            byte[] b = new byte[Size];
+            byte[] b = new byte[s.thisSize];
             for (int i = 0; i < b.Length; i++)
             {
-                b[i] = FILLER_CHAR;
+                b[i] = s.thisFill;
             }
             s._contents.CopyTo(b, 0);
             return b;
@@ -43,11 +45,16 @@ namespace spacecraft
 
     public class NetworkString : NetworkByteContainer
     {
-        new const byte FILLER_CHAR = 0x20;
-        new public const int Size = 64; 
+        new public const byte FILLER_CHAR = 0x20;
+        new public const int Size = 64;
 
+       
         public NetworkString(byte[] raw)
         {
+            thisSize = Size;
+            thisFill = FILLER_CHAR;
+
+
             _contents = new byte[Size];
             for (int i = 0; i < _contents.Length; i++)
             {
@@ -66,10 +73,14 @@ namespace spacecraft
     public class NetworkByteArray : NetworkByteContainer
     {
         new public const int  Size = 1024;
-        new public const  byte FILLER_CHAR = 0x00;
+        new public const byte FILLER_CHAR = 0x00;
+
+
 
         public NetworkByteArray(byte[] bar)
         {
+            thisSize = Size;
+            thisFill = FILLER_CHAR;
             if (bar.Length > Size)
             {
                 throw new ArgumentException();

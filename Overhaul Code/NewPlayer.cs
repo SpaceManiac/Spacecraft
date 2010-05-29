@@ -11,17 +11,35 @@ namespace spacecraft
 
         public static Dictionary<String, Rank> PlayerRanks = new Dictionary<String, Rank>();
 
-        public delegate void PlayerSpawnHandler(NewPlayer sender, string username);
+        public delegate void PlayerSpawnHandler(NewPlayer sender);
+        /// <summary>
+        /// Triggered when the player first connects.
+        /// </summary>
         public event PlayerSpawnHandler Spawn;
 
         public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
+        /// <summary>
+        /// Triggred when the player moves.
+        /// </summary>
         public event PlayerMoveHandler Move;
+
+        public delegate void PlayerBlockChangeHandler(Position pos, Block BlockType);
+        /// <summary>
+        /// Triggred when the player moves.
+        /// </summary>
+        public event PlayerBlockChangeHandler BlockChange;
 
         public delegate void PlayerMsgHandler(string msg);
         /// <summary>
         /// Triggered when this client sends a message to the server.
         /// </summary>
         public event PlayerMsgHandler Message;
+
+        public delegate void PlayerDisconnect();
+        /// <summary>
+        /// Triggered when this client sends a message to the server.
+        /// </summary>
+        public event PlayerDisconnect Disconnect;
 
         private NewConnection conn;
 
@@ -32,18 +50,22 @@ namespace spacecraft
         public byte heading;
         public byte pitch;
 
-        public NewPlayer(TcpClient client)
+        public NewPlayer(TcpClient client, byte ID)
         {
-            pos = new Position(128, 128, 128);
+            pos = NewServer.theServ.map.spawn;
             conn = new NewConnection(client);
 
+            playerID = ID;
 
             conn.PlayerMove += new NewConnection.PlayerMoveHandler(conn_PlayerMove);
             conn.PlayerSpawn += new NewConnection.PlayerSpawnHandler(conn_PlayerSpawn);
+            conn.ReceivedUsername += new NewConnection.UsernameHandler(conn_ReceivedUsername);
             conn.ReceivedMessage += new NewConnection.MessageHandler(conn_ReceivedMessage);
-
+            conn.Disconnect += new NewConnection.DisconnectHandler(conn_Disconnect);
          
         }
+
+       
 
       
 
@@ -68,11 +90,6 @@ namespace spacecraft
         /// Called by the server to inform the player they've been moved.
         /// </summary>
         /// <param name="dest">Where they moved to</param>
-        public void Teleport(Position dest)
-        {
-            pos = dest;
-            conn.SendPositionUpdate(dest);
-        }
 
         /// <summary>
         /// Used to show messages to the player in the chat box, for chat messages, and the like.
@@ -83,15 +100,33 @@ namespace spacecraft
             conn.DisplayMessage(msg);
         }
 
+        public void PlayerJoins(NewPlayer Player)
+        {
+            conn.HandlePlayerSpawn(Player);
+        }
+
+        public void PlayerMoves(NewPlayer Player, Position dest)
+        {
+            byte ID = Player.playerID;
+            if (Player == this)
+            {
+                ID = 255;
+                pos = dest;
+            }
+
+            conn.SendPlayerMovement(Player, dest, Player == this);
+        }
+
+
         /* ================================================================================
          * Event handlers
          * ================================================================================
          */
 
-        void conn_PlayerSpawn(string username)
+        void conn_ReceivedUsername(string username)
         {
-            this.name = name;
-            
+            this.name = username;
+
             if (PlayerRanks.ContainsKey(name))
             {
                 currentRank = PlayerRanks[name];
@@ -100,9 +135,14 @@ namespace spacecraft
             {
                 currentRank = Rank.Guest;
             }
+        }
 
+
+        void conn_PlayerSpawn()
+        {
+           
             if (Spawn != null)
-                Spawn(this, username);
+                Spawn(this);
         }
 
         void conn_PlayerMove(Position dest, byte heading, byte pitch)
@@ -120,7 +160,14 @@ namespace spacecraft
             if (Message != null)
                 Message(msg);
         }
-        
+
+        void conn_Disconnect()
+        {
+            if (Disconnect != null)
+                Disconnect();
+        }
+
+
     }
 
 }
