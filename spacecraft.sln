@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C# Express 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spacecraft", "spacecraft.csproj", "{73A96857-C776-4B30-BE56-EE9A16C3E0FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingSuite", "TestingSuite\TestingSuite.csproj", "{B42FB67F-9D61-4B8A-B87A-397FCC0F4285}"
