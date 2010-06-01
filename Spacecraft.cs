@@ -48,35 +48,22 @@ namespace spacecraft
 
         public static void LoadRanks()
         {
-            Player.RankedPlayers.Clear();
+            NewPlayer.PlayerRanks.Clear();
             StreamReader Reader = new StreamReader("admins.txt");
             string[] Lines = Reader.ReadToEnd().Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             Reader.Close();
 
-            foreach (var line in Lines)
-            {
-                string[] parts;
-                string rank;
-                parts = line.Split('=');
+            foreach (string line in Lines) {
+                string[] parts = line.Split('=');
 
-                rank = parts[0].Substring(0, 1).ToUpper() + parts[0].Substring(1, parts[0].Length - 1);
-
-                Rank assignedRank = (Rank)Enum.Parse(typeof(Rank), rank);
-
-                if (!Player.RankedPlayers.ContainsKey(assignedRank) || Player.RankedPlayers[assignedRank] == null)
-                {
-                    Player.RankedPlayers[assignedRank] = new List<string>();
-                }
+                string rankStr = parts[0].Trim();
+                rankStr = rankStr.Substring(0, 1).ToUpper() + rankStr.Substring(1, parts[0].Length - 1);
+                Rank rank = (Rank) Enum.Parse(typeof(Rank), rankStr);
 
                 string[] people = parts[1].Split(',');
-
-                for (int i = 0; i < people.Length; i++)
-                {
-                    string name = people[i];
-                    Player.RankedPlayers[assignedRank].Add(name);
+                foreach(string name in people) {
+                    NewPlayer.PlayerRanks[name.Trim()] = rank;
                 }
-
-
             }
         }
 
