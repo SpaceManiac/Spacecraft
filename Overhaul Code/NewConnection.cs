@@ -196,7 +196,7 @@ namespace spacecraft
             {
                 try
                 {
-                    int bytesRead = _client.GetStream().Read(buffer, buffsize, 256);
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, buffer.Length - buffsize);
 					if(bytesRead == 0) {
 						Quit();
 						return null;
