@@ -42,12 +42,15 @@ namespace spacecraft
 
         private NewConnection conn;
 
-        public Rank currentRank;
+        public Rank rank;
         public byte playerID;
         public string name { get; protected set; }
         public Position pos { get; protected set; }
-        public byte heading;
-        public byte pitch;
+        public byte heading { get; protected set; }
+        public byte pitch { get; protected set; }
+        
+        public bool placing;
+        public Block placeType;
 
         public NewPlayer(TcpClient client, byte ID)
         {
@@ -133,13 +136,10 @@ namespace spacecraft
         {
             this.name = username;
 
-            if (PlayerRanks.ContainsKey(name))
-            {
-                currentRank = PlayerRanks[name];
-            }
-            else
-            {
-                currentRank = Rank.Guest;
+            if (PlayerRanks.ContainsKey(name)) {
+                rank = PlayerRanks[name];
+            } else {
+                rank = Rank.Guest;
             }
         }
 
@@ -176,8 +176,45 @@ namespace spacecraft
 
         void conn_ReceivedMessage(string msg)
         {
-            if (Message != null)
-                Message(name + ": " + msg);
+            if (msg[0] == '@') {
+                // private messages
+                int i = msg.IndexOf(' ');
+                string username = msg.Substring(1);
+                string message = "";
+                if (i > 0) {
+                    username = msg.Substring(1, i - 1);
+                    if (i != msg.Length - 1) {
+                        message = msg.Substring(i + 1);
+                    }
+                }
+                if (message != "") {
+                    NewPlayer P = NewServer.theServ.GetPlayer(username);
+                    if (P == null) {
+                        PrintMessage(Color.DarkRed + "No such user " + username);
+                    } else {
+                        PrintMessage(Color.Purple + ">" + username + "> " + message);
+                        P.PrintMessage(Color.Purple + "[" + this.name + "] " + message);
+                    }
+                }
+            } else if (msg[0] == '/') {
+            	// command; process before sending onwards
+            	
+                int i = msg.IndexOf(' ');
+                string cmd = msg.Substring(1);
+                string args = "";
+                if (i > 0) {
+                    cmd = msg.Substring(1, i - 1);
+                    if (i != msg.Length - 1) {
+                        args = msg.Substring(i + 1);
+                    }
+                }
+                
+                ChatCommandHandling.Execute(this, cmd, args);
+            }
+            else
+            {
+            	if (Message != null) Message(name + ": " + msg);
+            }
         }
 
         void conn_Disconnect()

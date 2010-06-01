@@ -39,38 +39,33 @@ namespace spacecraft
         /// <summary>
         /// Lookup the command cmd, and execute it using args as the arguments. sender is used to post error messages back to the user.
         /// </summary>
-        /// <param name="sender">The Connection attempting to execute the command.</param>
+        /// <param name="sender">The NewPlayer attempting to execute the command.</param>
         /// <param name="cmd">Command to execute, e.g. "me"</param>
         /// <param name="args">Argument passed to command, e.g. "uses /me sucessfully"</param>
         /// 
-        static public void Execute(Connection sender, string cmd, string args)
+        static public void Execute(NewPlayer sender, string cmd, string args)
         {
             if (Commands.ContainsKey(cmd))
             {
-                if (sender.player.rank >= Commands[cmd].RankNeeded)
-                {
+                if (sender.rank >= Commands[cmd].RankNeeded) {
                     Commands[cmd].Run(sender, cmd, args);
+                } else {
+                    sender.PrintMessage(Color.DarkRed + "You don't have permission to do that.");
                 }
-                else
-                {
-                    sender.Message(Color.DarkRed + "You don't have permission to do that.");
-                }
-            }
-            else
-            {
-                sender.Message(Color.DarkRed + "Unknown command " + cmd);
+            } else {
+                sender.PrintMessage(Color.DarkRed + "Unknown command " + cmd);
             }
         }
 
-        static public void WrapMessage(Connection sendto, string message)
+        static public void WrapMessage(NewPlayer sendto, string message)
         {
             while (message.Length > 60)
             {
                 int i = message.LastIndexOf(' ', 60, 60);
-                sendto.Message(Color.Teal + message.Substring(0, i));
+                sendto.PrintMessage(Color.Teal + message.Substring(0, i));
                 message = message.Substring(i);
             }
-            sendto.Message(Color.Teal + message);
+            sendto.PrintMessage(Color.Teal + message);
         }
 
         static public string GetHelp(string cmd)
@@ -105,7 +100,7 @@ namespace spacecraft
         {
             public abstract Rank RankNeeded { get; }
             public abstract string HelpMsg { get; }
-            public abstract void Run(Connection sender, string cmd, string arg);
+            public abstract void Run(NewPlayer sender, string cmd, string arg);
         }
 
         public class Help : ChatCommandBase
@@ -120,12 +115,12 @@ namespace spacecraft
                 get { return "/help: displays help information"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.Message(Color.Teal + "You are a " + Player.RankColor(sender.player.rank) + sender.player.rank.ToString());
-                    string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender._player.rank);
+                    sender.PrintMessage(Color.Teal + "You are a " + Player.RankColor(sender.rank) + sender.rank.ToString());
+                    string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender.rank);
                     ChatCommandHandling.WrapMessage(sender, commands);
                 }
                 else
@@ -134,11 +129,11 @@ namespace spacecraft
                     string help = ChatCommandHandling.GetHelp(args);
                     if (help == "")
                     {
-                        sender.Message(Color.DarkRed + "No help text on /" + args);
+                        sender.PrintMessage(Color.DarkRed + "No help text on /" + args);
                     }
                     else
                     {
-                        sender.Message(Color.Teal + help);
+                        sender.PrintMessage(Color.Teal + help);
                     }
                 }
             }
@@ -156,21 +151,21 @@ namespace spacecraft
                 get { return "/me: third-person roleplay-like actions"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 /* /me /me Easter egg. */
                 if (args == "/me")
                 {
-                    sender.Message(Color.Teal + "Red alert, /me /me found, PMing all players!");
-                    sender.Message(Color.Teal + "Easter egg get!");
+                    sender.PrintMessage(Color.Teal + "Red alert, /me /me found, PMing all players!");
+                    sender.PrintMessage(Color.Teal + "Easter egg get!");
                 }
                 else if (args == "")
                 {
-                    sender.Message(Color.DarkRed + "No /me message specified");
+                    sender.PrintMessage(Color.DarkRed + "No /me message specified");
                 }
                 else
                 {
-                    Connection.MsgAll(" * " + sender.name + " " + args);
+                    NewServer.theServ.MessageAll(" * " + sender.name + " " + args);
                     Spacecraft.Log("* " + sender.name + " " + args);
                 }
             }
@@ -188,23 +183,19 @@ namespace spacecraft
                 get { return "/bring: teleports a player to you (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.Message(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.DarkRed + "No player specified");
                 }
                 else
                 {
-                    Connection c = MinecraftServer.theServ.GetConnection(args);
-                    if (c == null)
-                    {
-                        sender.Message(Color.DarkRed + "No such player " + args);
-                    }
-                    else
-                    {
-                        Player _player = sender.player;
-                        c.Send(Connection.PacketTeleportSelf(_player.x, _player.y, _player.z, _player.heading, _player.pitch));
+                    NewPlayer p = NewServer.theServ.GetPlayer(args);
+                    if (p == null) {
+                        sender.PrintMessage(Color.DarkRed + "No such player " + args);
+                    } else {
+                        NewServer.theServ.MovePlayer(p, sender.pos, sender.heading, sender.pitch);
                         Spacecraft.Log(sender.name + " brought " + args);
                     }
                 }
@@ -223,11 +214,11 @@ namespace spacecraft
                 get { return "/exit: shuts down the server (admin)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 Spacecraft.Log(sender.name + " shut down the server");
-                MinecraftServer.theServ.SendAll(Connection.PacketKick("Server is shutting down!"));
-                MinecraftServer.OnExit.Set();
+                //NewServer.theServ.SendAll(NewPlayer.PacketKick("Server is shutting down!"));
+                NewServer.OnExit.Set();
             }
         }
 
@@ -243,14 +234,10 @@ namespace spacecraft
                 get { return "/setspawn: sets the global spawn point (admin)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
-                MinecraftServer.theServ.map.SetSpawn(new Position(
-                    sender._player.x,
-                    sender._player.y,
-                    sender._player.z
-                ), sender._player.heading);
-                sender.Message(Color.Teal + "Spawn point set");
+                NewServer.theServ.map.SetSpawn(sender.pos, sender.heading);
+                sender.PrintMessage(Color.Teal + "Spawn point set");
                 Spacecraft.Log(sender.name + " set the spawn point");
             }
         }
@@ -267,18 +254,18 @@ namespace spacecraft
                 get { return "/place: place special blocks (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    if (sender._player.placing)
+                    if (sender.placing)
                     {
-                        sender._player.placing = false;
-                        sender.Message(Color.Teal + "No longer placing");
+                        sender.placing = false;
+                        sender.PrintMessage(Color.Teal + "No longer placing");
                     }
                     else
                     {
-                        sender.Message(Color.DarkRed + "No block specified");
+                        sender.PrintMessage(Color.DarkRed + "No block specified");
                     }
                 }
                 else
@@ -286,13 +273,13 @@ namespace spacecraft
                     string b = args;
                     if (BlockInfo.NameExists(b))
                     {
-                        sender._player.placing = true;
-                        sender._player.placeType = BlockInfo.names[b];
-                        sender.Message(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
+                        sender.placing = true;
+                        sender.placeType = BlockInfo.names[b];
+                        sender.PrintMessage(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
                     }
                     else
                     {
-                        sender.Message(Color.DarkRed + "Unknown block " + b);
+                        sender.PrintMessage(Color.DarkRed + "Unknown block " + b);
                     }
                 }
             }
@@ -310,23 +297,23 @@ namespace spacecraft
                 get { return "/teleport, /tp: teleport to a player (builder+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.Message(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.DarkRed + "No player specified");
                 }
                 else
                 {
                     string pname = args;
-                    Player p = MinecraftServer.theServ.GetPlayer(pname);
+                    NewPlayer p = NewServer.theServ.GetPlayer(pname);
                     if (p == null)
                     {
-                        sender.Message(Color.DarkRed + "No such player " + pname);
+                        sender.PrintMessage(Color.DarkRed + "No such player " + pname);
                     }
                     else
                     {
-                        sender.Send(Connection.PacketTeleportSelf(p.x, p.y, p.z, p.heading, p.pitch));
+                        NewServer.theServ.MovePlayer(sender, p.pos, p.heading, p.pitch);
                         Spacecraft.Log(sender.name + " telported to " + p.name);
                     }
                 }
@@ -345,19 +332,19 @@ namespace spacecraft
                 get { return "/kick, /k: kick a player (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.Message(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.DarkRed + "No player specified");
                 }
                 else
                 {
                     string pname = args;
-                    Connection c = MinecraftServer.theServ.GetConnection(pname);
+                    NewPlayer c = NewServer.theServ.GetPlayer(pname);
                     if (c == null)
                     {
-                        sender.Message(Color.DarkRed + "No such player " + pname);
+                        sender.PrintMessage(Color.DarkRed + "No such player " + pname);
                     }
                     else
                     {
@@ -380,16 +367,16 @@ namespace spacecraft
                 get { return "/broadcast, /say: broadcast a message in yellow text (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.Message(Color.DarkRed + "No message specified");
+                    sender.PrintMessage(Color.DarkRed + "No message specified");
                 }
                 else
                 {
-                    Connection.MsgAll(Color.Yellow + args);
                     Spacecraft.Log("{" + sender.name + "} " + args);
+                    NewServer.theServ.MessageAll(Color.Yellow + args);
                 }
             }
         }
@@ -406,9 +393,9 @@ namespace spacecraft
                 get { return "/dehydrate: remove all liquids in case of flood (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
-                MinecraftServer.theServ.map.Dehydrate(MinecraftServer.theServ);
+                //NewServer.theServ.map.Dehydrate(NewServer.theServ);
                 Spacecraft.Log(sender.name + " dehydrated the map");
             }
         }
@@ -425,9 +412,9 @@ namespace spacecraft
                 get { return "/mob: spawn an AI mob (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
-                MinecraftServer.theServ.SpawnMob(sender._player, args);
+                //NewServer.theServ.SpawnMob(sender._player, args);
             }
         }
 
@@ -443,9 +430,9 @@ namespace spacecraft
                 get { return "/resend: resend the map for testing purposes (brokenish)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
-                sender.ResendMap();
+                //sender.ResendMap();
             }
         }
 
@@ -461,11 +448,11 @@ namespace spacecraft
                 get { return "/rerank: reload ranks from the rank (mod+)"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 Spacecraft.LoadRanks();
                 Spacecraft.Log(sender.name + " reloaded the ranks");
-                sender.Message(Color.Teal + "Ranks reloaded");
+                sender.PrintMessage(Color.Teal + "Ranks reloaded");
             }
         }
 
@@ -481,11 +468,11 @@ namespace spacecraft
                 get { return "/clear: clears the chat log"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 for (int ww = 0; ww < 20; ++ww)
                 {
-                    sender.Message("");
+                    sender.PrintMessage("");
                 }
             }
         }
@@ -502,7 +489,7 @@ namespace spacecraft
                 get { return "/config: manages raw server options"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
                 string[] argv = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (argv.Length == 0)
@@ -515,11 +502,11 @@ namespace spacecraft
                     string r = Config.Get(argv[0], null);
                     if (r == null)
                     {
-                        sender.Message(Color.Teal + "No option " + argv[0] + " defined");
+                        sender.PrintMessage(Color.Teal + "No option " + argv[0] + " defined");
                     }
                     else
                     {
-                        sender.Message(Color.Teal + "Option " + argv[0] + " is " + r);
+                        sender.PrintMessage(Color.Teal + "Option " + argv[0] + " is " + r);
                     }
                 }
                 else if (argv.Length == 2)
@@ -541,10 +528,10 @@ namespace spacecraft
                 get { return "/go: teleports you to a landmark"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = MinecraftServer.theServ.map;
+                Map map = NewServer.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -556,12 +543,12 @@ namespace spacecraft
                     {
                         Position p = map.landmarks[args].First;
                         byte heading = map.landmarks[args].Second;
-                        sender.Send(Connection.PacketTeleportSelf(p.x, p.y, p.z, heading, 0));
-                        sender.Message(Color.Teal + "Teleported to landmark " + args);
+                        NewServer.theServ.MovePlayer(sender, p, heading, 0);
+                        sender.PrintMessage(Color.Teal + "Teleported to landmark " + args);
                     }
                     else
                     {
-                        sender.Message(Color.DarkRed + "No such landmark " + args);
+                        sender.PrintMessage(Color.DarkRed + "No such landmark " + args);
                     }
                 }
             }
@@ -579,10 +566,10 @@ namespace spacecraft
                 get { return "/mark: creates a landmark"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = MinecraftServer.theServ.map;
+                Map map = NewServer.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -592,14 +579,13 @@ namespace spacecraft
                 {
                     if (map.landmarks.ContainsKey(args))
                     {
-                        sender.Message(Color.DarkRed + "Landmark " + args + " already exists");
+                        sender.PrintMessage(Color.DarkRed + "Landmark " + args + " already exists");
                     }
                     else
                     {
-                        Position p = new Position(sender._player.x, sender._player.y, sender._player.z);
-                        byte heading = sender._player.heading;
-                        map.landmarks.Add(args, new Pair<Position, byte>(p, heading));
-                        Connection.MsgAll(Color.Yellow + "Landmark " + args + " created");
+                        byte heading = sender.heading;
+                        map.landmarks.Add(args, new Pair<Position, byte>(sender.pos, heading));
+                        NewServer.theServ.MessageAll(Color.Yellow + sender.name + " created landmark " + args);
                     }
                 }
             }
@@ -617,10 +603,10 @@ namespace spacecraft
                 get { return "/rmmark: removes a landmark"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = MinecraftServer.theServ.map;
+                Map map = NewServer.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -631,11 +617,11 @@ namespace spacecraft
                     if (map.landmarks.ContainsKey(args))
                     {
                         map.landmarks.Remove(args);
-						Connection.MsgAll(Color.Yellow + "Landmark " + args + " removed");
+						NewServer.theServ.MessageAll(Color.Yellow + sender.name + " removed landmark " + args);
                     }
                     else
                     {
-                        sender.Message(Color.DarkRed + "No such landmark " + args);
+                        sender.PrintMessage(Color.DarkRed + "No such landmark " + args);
                     }
                 }
             }
@@ -653,18 +639,18 @@ namespace spacecraft
                 get { return "/whois: get information on a user"; }
             }
 
-            public override void Run(Connection sender, string cmd, string args)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
 				args = args.Trim();
-                Player p = MinecraftServer.theServ.GetPlayer(args);
+                NewPlayer p = NewServer.theServ.GetPlayer(args);
 				Rank r = Player.LookupRank(args);
 				if(p == null) {
-					sender.Message(Color.Teal + args + " is offline");
-					sender.Message(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.Teal + args + " is offline");
+					sender.PrintMessage(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
 				} else {
-					sender.Message(Color.Teal + args + " is online");
-					sender.Message(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
-					sender.Message(Color.Teal + args + " is at: " + p.x + "," + p.y + "," + p.z);
+					sender.PrintMessage(Color.Teal + args + " is online");
+					sender.PrintMessage(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.Teal + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
 				}
             }
         }

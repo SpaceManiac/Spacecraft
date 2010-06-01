@@ -270,8 +270,6 @@ namespace spacecraft
             return (hash == properHash);
         }
 
-
-
         public void DisplayMessage(string msg)
         {
             ServerMessagePacket P = new ServerMessagePacket();

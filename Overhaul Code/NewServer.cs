@@ -114,6 +114,17 @@ namespace spacecraft
             //map.Physics(this);
             // TODO: Get map physics to work with NewServer.
         }
+        
+        public NewPlayer GetPlayer(string name)
+        {
+        	// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
+        	foreach(NewPlayer P in Players) {
+        		if(P.name == name) {
+        			return P;
+        		}
+        	}
+        	return null;
+        }
 
         private void Heartbeat()
         {
@@ -256,7 +267,7 @@ namespace spacecraft
             MessageAll(Color.Yellow + sender.name + " has joined!");
         }
         
-        void MessageAll(string message)
+        public void MessageAll(string message)
         {
         	foreach (NewPlayer P in Players) {
         		P.PrintMessage(message);
@@ -264,7 +275,7 @@ namespace spacecraft
         	Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
         }
 
-        void MovePlayer(NewPlayer player, Position dest, byte heading, byte pitch) {
+        public void MovePlayer(NewPlayer player, Position dest, byte heading, byte pitch) {
             foreach (NewPlayer P in Players)
             {
                 P.PlayerMoves(player, dest, heading, pitch);

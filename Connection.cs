@@ -425,7 +425,7 @@ namespace spacecraft
                         args = msg.Substring(i + 1);
                     }
                 }
-                ChatCommandHandling.Execute(this, cmd, args);
+                //ChatCommandHandling.Execute(this, cmd, args);
             }
             else
             {
