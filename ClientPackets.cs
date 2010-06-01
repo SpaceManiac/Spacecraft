@@ -48,7 +48,7 @@ namespace spacecraft
                 default:
                     throw new ArgumentException("Byte array does not match any known packet");
             }
-
+			 
             return OutValue;
         }
     }
