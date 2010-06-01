@@ -236,7 +236,9 @@ namespace spacecraft
 
         void newPlayer_Message(string msg)
         {
-            throw new NotImplementedException();
+            foreach(NewPlayer P in Players) {
+				P.PrintMessage(msg);
+			}
         }
 
         void newPlayer_Spawn(NewPlayer sender)

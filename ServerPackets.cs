@@ -1,4 +1,4 @@
-﻿
+
 namespace spacecraft
 {
     /// <summary>
@@ -165,7 +165,7 @@ namespace spacecraft
     /// </summary>
     public class ServerMessagePacket : ServerPacket
     {
-        public override byte PacketID { get { return 0x0e; } }
+        public override byte PacketID { get { return 0x0d; } }
         public byte PlayerID;
         public NetworkString Message;
 

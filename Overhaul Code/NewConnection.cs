@@ -209,10 +209,10 @@ namespace spacecraft
 					Quit();
 					return null;
                 }
-				catch (Exception e)
-				{
-					Spacecraft.LogError("Something went wrong while we were reading a packet!\n" + e.Message);
-				}
+	            catch (InvalidOperationException)
+	            {
+	                Quit();
+	            }
             }
             while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
 

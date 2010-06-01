@@ -196,7 +196,10 @@ namespace spacecraft
 
         public ClientMessagePacket(byte[] input)
         {
-            throw new NotImplementedException();
+            Unused = input[1];
+			byte[] namebytes = new byte[NetworkString.Size];
+			Array.Copy(input, 2, namebytes, 0, NetworkString.Size);
+			Message = new NetworkString(namebytes);
         }
 
         override public byte[] ToByteArray()

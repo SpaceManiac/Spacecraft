@@ -165,7 +165,7 @@ namespace spacecraft
         void conn_ReceivedMessage(string msg)
         {
             if (Message != null)
-                Message(msg);
+                Message(name + ": " + msg);
         }
 
         void conn_Disconnect()
