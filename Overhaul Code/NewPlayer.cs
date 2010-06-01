@@ -35,11 +35,11 @@ namespace spacecraft
         /// </summary>
         public event PlayerMsgHandler Message;
 
-        public delegate void PlayerDisconnect();
+        public delegate void PlayerDisconnectHandler(NewPlayer sender);
         /// <summary>
         /// Triggered when this client sends a message to the server.
         /// </summary>
-        public event PlayerDisconnect Disconnect;
+        public event PlayerDisconnectHandler Disconnect;
 
         private NewConnection conn;
 
@@ -59,6 +59,7 @@ namespace spacecraft
 
             conn.PlayerMove += new NewConnection.PlayerMoveHandler(conn_PlayerMove);
             conn.PlayerSpawn += new NewConnection.PlayerSpawnHandler(conn_PlayerSpawn);
+            conn.BlockSet += new NewConnection.BlockSetHandler(conn_BlockSet);
             conn.ReceivedUsername += new NewConnection.UsernameHandler(conn_ReceivedUsername);
             conn.ReceivedMessage += new NewConnection.MessageHandler(conn_ReceivedMessage);
             conn.Disconnect += new NewConnection.DisconnectHandler(conn_Disconnect);
@@ -110,6 +111,13 @@ namespace spacecraft
             }
 
             conn.SendPlayerMovement(Player, dest, heading, pitch, Player == this);
+        }
+
+        public void PlayerDisconnects(NewPlayer P) { PlayerDisconnects(P.playerID); }
+
+        public void PlayerDisconnects(byte ID)
+        {
+            conn.SendPlayerDisconnect(ID);
         }
 
 		public void BlockSet(BlockPosition pos, Block type)
@@ -171,7 +179,7 @@ namespace spacecraft
         void conn_Disconnect()
         {
             if (Disconnect != null)
-                Disconnect();
+                Disconnect(this);
         }
     }
 }

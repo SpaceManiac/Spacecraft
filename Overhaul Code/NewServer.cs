@@ -208,21 +208,29 @@ namespace spacecraft
             newPlayer.Message += new NewPlayer.PlayerMsgHandler(newPlayer_Message);
             newPlayer.Move += new NewPlayer.PlayerMoveHandler(newPlayer_Move);
             newPlayer.BlockChange += new NewPlayer.PlayerBlockChangeHandler(newPlayer_BlockChange);
-            newPlayer.Disconnect += new NewPlayer.PlayerDisconnect(newPlayer_Disconnect);
+            newPlayer.Disconnect += new NewPlayer.PlayerDisconnectHandler(newPlayer_Disconnect);
 
             Players.Add(newPlayer);
 			
 			Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
         }
 
-        void newPlayer_Disconnect()
+        void newPlayer_Disconnect(NewPlayer Player)
         {
-            throw new NotImplementedException();
+            byte ID = Player.playerID;
+            Players.Remove(Player);
+            foreach (NewPlayer P in Players)
+            {
+                P.PlayerDisconnects(ID);
+            }
         }
 
         void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
         {
-            throw new NotImplementedException();
+            foreach (NewPlayer P in Players)
+            {
+                P.BlockSet(pos, BlockType);
+            }
         }
 
         void newPlayer_Move(NewPlayer sender, Position dest, byte heading, byte pitch)

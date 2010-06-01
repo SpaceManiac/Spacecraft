@@ -245,6 +245,10 @@ namespace spacecraft
             }
         }
 
+        /// <summary>
+        /// Queue a packet for sending.
+        /// </summary>
+        /// <param name="P">The packet to queue.</param>
         private void SendPacket(ServerPacket P)
         {
             SendQueue.Enqueue(P);
@@ -305,6 +309,13 @@ namespace spacecraft
             SendPacket(packet);
         }
 
+        internal void SendPlayerDisconnect(byte ID)
+        {
+            DespawnPacket packet = new DespawnPacket();
+            packet.PlayerID = ID;
+            SendPacket(packet);
+        }
+
         public void HandlePlayerSpawn(NewPlayer Player, bool self)
         {
             PlayerSpawnPacket packet = new PlayerSpawnPacket();
@@ -319,5 +330,7 @@ namespace spacecraft
             packet.Pitch = Player.pitch;
             SendPacket(packet);
         }
+
+        
     }
 }
