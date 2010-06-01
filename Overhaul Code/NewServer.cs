@@ -218,7 +218,7 @@ namespace spacecraft
             throw new NotImplementedException();
         }
 
-        void newPlayer_BlockChange(Position pos, Block BlockType)
+        void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
         {
             throw new NotImplementedException();
         }

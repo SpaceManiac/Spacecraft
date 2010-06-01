@@ -23,9 +23,9 @@ namespace spacecraft
         /// </summary>
         public event PlayerMoveHandler Move;
 
-        public delegate void PlayerBlockChangeHandler(Position pos, Block BlockType);
+        public delegate void PlayerBlockChangeHandler(BlockPosition pos, Block type);
         /// <summary>
-        /// Triggred when the player moves.
+        /// Triggred when the player changes a block.
         /// </summary>
         public event PlayerBlockChangeHandler BlockChange;
 
@@ -112,9 +112,14 @@ namespace spacecraft
             conn.SendPlayerMovement(Player, dest, heading, pitch, Player == this);
         }
 
-
-        /* ================================================================================
-         * Event handlers
+		public void BlockSet(BlockPosition pos, Block type)
+		{
+			// ...
+			
+		}
+		
+		/* ================================================================================
+		 * Event handlers
          * ================================================================================
          */
 
@@ -149,6 +154,13 @@ namespace spacecraft
             // Echo event on to other listeners, e.g. the server.
             Move(this, dest, heading, pitch);
         }
+		
+		void conn_BlockSet(short X, short Y, short Z, byte Mode, byte Type)
+		{
+			// Type + 1 is temporary.
+			if(BlockChange != null)
+				BlockChange(new BlockPosition(X, Y, Z), (Block)(Type + 1));
+		}
 
         void conn_ReceivedMessage(string msg)
         {

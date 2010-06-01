@@ -12,14 +12,17 @@ namespace spacecraft
     {
         static byte PROTOCOL_VERSION = 0x07;
 
+        public delegate void UsernameHandler(string username);
+        public event UsernameHandler ReceivedUsername;
+
         public delegate void PlayerSpawnHandler();
         public event PlayerSpawnHandler PlayerSpawn;
 
         public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
         public event PlayerMoveHandler PlayerMove;
-
-        public delegate void UsernameHandler(string username);
-        public event UsernameHandler ReceivedUsername;
+		
+		public delegate void BlockSetHandler(short X, short Y, short Z, byte Mode, byte Type);
+		public event BlockSetHandler BlockSet;
 
         public delegate void MessageHandler(string msg);
         public event MessageHandler ReceivedMessage;
@@ -71,7 +74,7 @@ namespace spacecraft
             {
                 case (byte)Packet.PacketType.Ident:
 					Spacecraft.Log("We haz Ident");
-                    HandlePlayerSpawn((PlayerIDPacket)IncomingPacket);
+                    HandlePlayerIdent((PlayerIDPacket)IncomingPacket);
                     break;
 
                 case (byte)Packet.PacketType.Message:
@@ -106,7 +109,9 @@ namespace spacecraft
 
         private void HandleBlockSet(BlockUpdatePacket blockUpdatePacket)
         {
-            throw new NotImplementedException();
+            if (BlockSet != null)
+				BlockSet(blockUpdatePacket.X, blockUpdatePacket.Y, blockUpdatePacket.Z,
+				         blockUpdatePacket.Mode, blockUpdatePacket.Type);
         }
 
         private void HandleMessage(ClientMessagePacket messagePacket)
@@ -115,7 +120,7 @@ namespace spacecraft
                 ReceivedMessage(messagePacket.Message.ToString());
         }
 
-        private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
+        private void HandlePlayerIdent(PlayerIDPacket IncomingPacket)
         {
             if (IncomingPacket.Version != PROTOCOL_VERSION) {
 				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
@@ -261,7 +266,6 @@ namespace spacecraft
             string combined = salt + name;
             Byte[] combinedBytes = Encoding.ASCII.GetBytes(combined);
             string properHash = provider.ComputeHash(combinedBytes).ToString();
-
 
             return (hash == properHash);
         }
