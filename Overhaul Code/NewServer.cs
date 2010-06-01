@@ -223,9 +223,13 @@ namespace spacecraft
             throw new NotImplementedException();
         }
 
-        void newPlayer_Move(Position dest, byte heading, byte pitch)
+        void newPlayer_Move(NewPlayer sender, Position dest, byte heading, byte pitch)
         {
-            throw new NotImplementedException();
+			foreach(NewPlayer P in Players) {
+				if(P != sender) {
+					P.PlayerMoves(sender, dest, heading, pitch);
+				}
+			}
         }
 
         void newPlayer_Message(string msg)
@@ -240,14 +244,13 @@ namespace spacecraft
                 P.PlayerJoins(sender);
             }
 
-            MovePlayer(sender, map.spawn);
+            MovePlayer(sender, map.spawn, map.spawnHeading, 0);
         }
 
-        void MovePlayer(NewPlayer player, Position dest)
-        {
+        void MovePlayer(NewPlayer player, Position dest, byte heading, byte pitch) {
             foreach (NewPlayer P in Players)
             {
-                P.PlayerMoves(player, dest);
+                P.PlayerMoves(player, dest, heading, pitch);
             }
         }
 

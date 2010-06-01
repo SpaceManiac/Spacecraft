@@ -17,7 +17,7 @@ namespace spacecraft
         /// </summary>
         public event PlayerSpawnHandler Spawn;
 
-        public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
+        public delegate void PlayerMoveHandler(NewPlayer player, Position dest, byte heading, byte pitch);
         /// <summary>
         /// Triggred when the player moves.
         /// </summary>
@@ -97,10 +97,10 @@ namespace spacecraft
 
         public void PlayerJoins(NewPlayer Player)
         {
-            conn.HandlePlayerSpawn(Player);
+            conn.HandlePlayerSpawn(Player, Player == this);
         }
 
-        public void PlayerMoves(NewPlayer Player, Position dest)
+        public void PlayerMoves(NewPlayer Player, Position dest, byte heading, byte pitch)
         {
             byte ID = Player.playerID;
             if (Player == this)
@@ -109,7 +109,7 @@ namespace spacecraft
                 pos = dest;
             }
 
-            conn.SendPlayerMovement(Player, dest, Player == this);
+            conn.SendPlayerMovement(Player, dest, heading, pitch, Player == this);
         }
 
 
@@ -147,7 +147,7 @@ namespace spacecraft
             this.pitch = pitch;
 
             // Echo event on to other listeners, e.g. the server.
-            Move(dest, heading, pitch);
+            Move(this, dest, heading, pitch);
         }
 
         void conn_ReceivedMessage(string msg)

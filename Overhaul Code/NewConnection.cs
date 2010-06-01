@@ -63,25 +63,27 @@ namespace spacecraft
 		}
 
         void HandleIncomingPacket() {
+			//Spacecraft.Log("Waiting for packet");
             ClientPacket IncomingPacket = ReceivePacket();
+			if(IncomingPacket == null) return;
 
             switch (IncomingPacket.PacketID)
             {
                 case (byte)Packet.PacketType.Ident:
+					Spacecraft.Log("We haz Ident");
                     HandlePlayerSpawn((PlayerIDPacket)IncomingPacket);
                     break;
 
                 case (byte)Packet.PacketType.Message:
+					Spacecraft.Log("We haz Message");
                     HandleMessage((ClientMessagePacket)IncomingPacket);
                     break;
                 case (byte)Packet.PacketType.PlayerSetBlock:
+					Spacecraft.Log("We haz PlayerSetBlock");
                     HandleBlockSet((BlockUpdatePacket)IncomingPacket);
                     break;
                 case (byte)Packet.PacketType.PositionUpdate:
                     HandlePositionUpdate((PositionUpdatePacket)IncomingPacket);
-                    break;
-                case (byte)Packet.PacketType.SpawnPlayer:
-                    HandlePlayerSpawn((PlayerIDPacket)IncomingPacket);
                     break;
                 default:
                     Spacecraft.LogError("Incoming packet does not match any known packet type!");
@@ -116,7 +118,8 @@ namespace spacecraft
         private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
         {
             if (IncomingPacket.Version != PROTOCOL_VERSION) {
-                SendKick("Wrong protocol version.");
+				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
+                //SendKick("Wrong protocol version.");
 				return;
             }
             bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
@@ -179,26 +182,43 @@ namespace spacecraft
             End.Z = M.zdim;
             SendPacket(End);
         }
+		
+		byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
+		int buffsize = 0;
 
         private ClientPacket ReceivePacket() {
-            byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
-            int buffsize = 0;
-
             do
             {
                 try
                 {
-                    int bytesRead = _client.GetStream().Read(buffer, buffsize, buffer.Length - buffsize);
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, 256);
+					if(bytesRead == 0) {
+						Quit();
+						return null;
+					}
                     buffsize += bytesRead;
                 }
-                catch (Exception e)
+                catch (IOException)
                 {
-                    Spacecraft.LogError("Something went wrong while we were reading a packet!\n" + e.Message);
+                    // they probably just disconnected
+					Quit();
+					return null;
                 }
+				catch (Exception e)
+				{
+					Spacecraft.LogError("Something went wrong while we were reading a packet!\n" + e.Message);
+				}
             }
-            while ((Packet.PacketFromLength(buffsize) == Packet.PacketType.UNKNOWN) && buffsize < buffer.Length - 100);
+            while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
 
             ClientPacket P = ClientPacket.FromByteArray(buffer);
+			if(P.PacketID != 0x08) Spacecraft.Log("Packet type is " + P.PacketID.ToString());
+			
+			int len = PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0]));
+			buffsize -= len;
+			byte[] newbuf = new byte[2048];
+			Array.Copy(buffer, len, newbuf, 0, buffsize);
+			buffer = newbuf;
             
             return P;
         }
@@ -266,7 +286,7 @@ namespace spacecraft
         }
 
 
-        public void SendPlayerMovement(NewPlayer player, Position dest, bool self)
+        public void SendPlayerMovement(NewPlayer player, Position dest, byte heading, byte pitch, bool self)
         {
             PlayerMovePacket packet = new PlayerMovePacket();
             packet.PlayerID = player.playerID;
@@ -275,14 +295,18 @@ namespace spacecraft
             packet.X = player.pos.x;
             packet.Y = player.pos.y;
             packet.Z = player.pos.z;
+			packet.Heading = heading;
+			packet.Pitch = pitch;
 
             SendPacket(packet);
         }
 
-        public void HandlePlayerSpawn(NewPlayer Player)
+        public void HandlePlayerSpawn(NewPlayer Player, bool self)
         {
             PlayerSpawnPacket packet = new PlayerSpawnPacket();
             packet.PlayerID = Player.playerID;
+			if(self)
+				packet.PlayerID = 255;
             packet.Name = Player.name;
             packet.X = Player.pos.x;
             packet.Y = Player.pos.y;

@@ -23,7 +23,7 @@ namespace spacecraft
             {
                 if (_contents[i] != this.thisFill)
                 { // Find last non-filler character, and record it.
-                    end = i;
+                    end = i + 1;
                     break; 
                 }
             }
