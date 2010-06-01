@@ -52,7 +52,7 @@ namespace spacecraft
         void ReadThread() {
             while (Connected) {
                 HandleIncomingPacket();
-				Thread.Sleep(0);
+				Thread.Sleep(10);
             }
         }
 		
@@ -61,7 +61,7 @@ namespace spacecraft
 	            while (SendQueue.Count > 0) {
 	                TransmitPacket(SendQueue.Dequeue());
 	            }
-				Thread.Sleep(0);
+				Thread.Sleep(10);
 			}
 		}
 

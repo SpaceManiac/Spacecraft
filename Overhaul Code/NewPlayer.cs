@@ -153,6 +153,8 @@ namespace spacecraft
 
         void conn_PlayerMove(Position dest, byte heading, byte pitch)
         {
+       		if(pos == dest && this.heading == heading && this.pitch == pitch) return;
+       		
             pos = dest;
             this.heading = heading;
             this.pitch = pitch;
@@ -168,7 +170,6 @@ namespace spacecraft
 				Type = (byte)Block.Air;
 			}
 			
-			// Type + 1 is temporary.
 			if(BlockChange != null)
 				BlockChange(new BlockPosition(X, Y, Z), (Block)Type);
 		}
