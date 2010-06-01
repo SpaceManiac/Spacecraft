@@ -121,7 +121,11 @@ namespace spacecraft
 
         public BlockUpdatePacket(byte[] array)
         {
-            throw new NotImplementedException();
+            X = new NetworkShort(array, 1);
+			Y = new NetworkShort(array, 1 + NetworkShort.Size);
+			Z = new NetworkShort(array, 1 + 2 * NetworkShort.Size);
+			Mode = array[1 + 3 * NetworkShort.Size];
+			Type = array[1 + 3 * NetworkShort.Size + 1];
         }
         
         
@@ -155,7 +159,12 @@ namespace spacecraft
 
         public PositionUpdatePacket(byte[] array)
         {
-            throw new NotImplementedException(); 
+            PlayerID = array[1];
+			X = new NetworkShort(array, 2);
+			Y = new NetworkShort(array, 2 + NetworkShort.Size);
+			Z = new NetworkShort(array, 2 + 2 * NetworkShort.Size);
+			Heading = array[2 + 3 * NetworkShort.Size];
+			Pitch = array[2 + 3 * NetworkShort.Size + 1];
         }
 
         override public byte[] ToByteArray()

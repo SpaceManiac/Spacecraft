@@ -105,6 +105,13 @@ namespace spacecraft
     {
         short _content;
         public const int Size = 2;
+		
+		public NetworkShort (byte[] array, int p)
+		{
+			short s = BitConverter.ToInt16(array, p);
+			s = IPAddress.NetworkToHostOrder(s);
+			this = s;
+		}
 
         public static implicit operator short(NetworkShort s)
         {
