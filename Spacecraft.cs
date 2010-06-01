@@ -129,5 +129,19 @@ namespace spacecraft
 		{
 			LogError(String.Format(format, args));
 		}
+		
+		public static string StripColors(string s)
+		{
+			if(s.IndexOf("&") == -1) return s;
+			string r = "";
+			for(int i = 0; i < s.Length; ++i) {
+				if(s[i] == '&' && i != s.Length - 1) {
+					++i;
+				} else {
+					r += s[i];
+				}
+			}
+			return r;
+		}
     }
 }

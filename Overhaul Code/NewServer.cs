@@ -137,12 +137,9 @@ namespace spacecraft
             builder.Append(name);
 
             builder.Append("&public=");
-            if (Config.GetBool("public", false))
-            {
+            if (Config.GetBool("public", false)) {
                 builder.Append("true");
-            }
-            else
-            {
+            } else {
                 builder.Append("false");
             }
 
@@ -180,17 +177,18 @@ namespace spacecraft
                 }
                 else
                 {
-                    Spacecraft.Log("Salt is " + salt);
-                    //Spacecraft.Log("To connect directly to this server, surf to: ");
-                    //Spacecraft.Log(data);
-                    Console.WriteLine("To connect directly, surf to:");
-                    Console.WriteLine(data); 
-                    StreamWriter outfile = File.CreateText("externalurl.txt");
                     int i = data.IndexOf('=');
                     serverhash = data.Substring(i + 1);
+                    
+                    //Spacecraft.Log("Salt is " + salt);
+                    Spacecraft.Log("To connect directly, surf to: ");
+                    Spacecraft.Log(data);
+                    Spacecraft.Log("(This is also in externalurl.txt)");
+                    
+                    StreamWriter outfile = File.CreateText("externalurl.txt");
                     outfile.Write(data);
                     outfile.Close();
-                    Spacecraft.Log("(This is also in externalurl.txt)");
+                    
                     Initialized = true;
                 }
             }
@@ -199,8 +197,6 @@ namespace spacecraft
 
         public void AcceptClient(IAsyncResult Result)
         {
-			Spacecraft.Log("NewServer.AcceptClient");
-			
             TcpClient Client = Listener.EndAcceptTcpClient(Result);
             NewPlayer newPlayer = new NewPlayer(Client, (byte) Players.Count);
 
@@ -223,6 +219,7 @@ namespace spacecraft
             {
                 P.PlayerDisconnects(ID);
             }
+            MessageAll(Color.Yellow + Player.name + " has left");
         }
 
         void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
@@ -245,9 +242,7 @@ namespace spacecraft
 
         void newPlayer_Message(string msg)
         {
-            foreach(NewPlayer P in Players) {
-				P.PrintMessage(msg);
-			}
+            MessageAll(msg);
         }
 
         void newPlayer_Spawn(NewPlayer sender)
@@ -258,6 +253,15 @@ namespace spacecraft
             }
 
             MovePlayer(sender, map.spawn, map.spawnHeading, 0);
+            MessageAll(Color.Yellow + sender.name + " has joined!");
+        }
+        
+        void MessageAll(string message)
+        {
+        	foreach (NewPlayer P in Players) {
+        		P.PrintMessage(message);
+        	}
+        	Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
         }
 
         void MovePlayer(NewPlayer player, Position dest, byte heading, byte pitch) {
