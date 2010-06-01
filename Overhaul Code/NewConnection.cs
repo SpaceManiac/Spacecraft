@@ -52,7 +52,7 @@ namespace spacecraft
         void ReadThread() {
             while (Connected) {
                 HandleIncomingPacket();
-				Thread.Sleep(10);
+				Thread.Sleep(0);
             }
         }
 		
@@ -61,7 +61,7 @@ namespace spacecraft
 	            while (SendQueue.Count > 0) {
 	                TransmitPacket(SendQueue.Dequeue());
 	            }
-				Thread.Sleep(10);
+				Thread.Sleep(0);
 			}
 		}
 
@@ -282,6 +282,16 @@ namespace spacecraft
             P.Message = msg;
             SendPacket(P);
         }
+		
+		public void SendBlockSet(short x, short y, short z, byte type)
+		{
+			SetBlockPacket P = new SetBlockPacket();
+			P.X = x;
+			P.Y = y;
+			P.Z = z;
+			P.Type = type;
+			SendPacket(P);
+		}
 
         public void SendKick(string reason)
         {

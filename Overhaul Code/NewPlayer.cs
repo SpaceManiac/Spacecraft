@@ -122,8 +122,7 @@ namespace spacecraft
 
 		public void BlockSet(BlockPosition pos, Block type)
 		{
-			// ...
-			
+			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)type);
 		}
 		
 		/* ================================================================================
@@ -165,9 +164,14 @@ namespace spacecraft
 		
 		void conn_BlockSet(short X, short Y, short Z, byte Mode, byte Type)
 		{
+			if(Mode == 0x00) {
+				// block destroyed
+				Type = (byte)Block.Air;
+			}
+			
 			// Type + 1 is temporary.
 			if(BlockChange != null)
-				BlockChange(new BlockPosition(X, Y, Z), (Block)(Type + 1));
+				BlockChange(new BlockPosition(X, Y, Z), (Block)Type);
 		}
 
         void conn_ReceivedMessage(string msg)

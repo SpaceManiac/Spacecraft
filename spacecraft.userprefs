@@ -1,27 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Pair.cs" ctype="Workbench">
-    <Files>
-      <File FileName="..\CBMake\bin\proj.xml" Line="1" Column="1" />
-      <File FileName="..\CBMake\ScreenSaverInfo.cbp" Line="1" Column="1" />
-      <File FileName="ChatCommands.cs" Line="1" Column="1" />
-      <File FileName="Map\Map.cs" Line="1" Column="1" />
-      <File FileName="Map\MapIO.cs" Line="1" Column="1" />
-      <File FileName="MinecraftServer.cs" Line="1" Column="1" />
-      <File FileName="Player.cs" Line="1" Column="1" />
-      <File FileName="Spacecraft.cs" Line="1" Column="1" />
-      <File FileName="Map\EscherMath.cs" Line="1" Column="1" />
-      <File FileName="TestingSuite\Program.cs" Line="25" Column="1" />
-      <File FileName="Map\BlockPosition.cs" Line="1" Column="1" />
-      <File FileName="Pair.cs" Line="1" Column="1" />
-    </Files>
+  <MonoDevelop.Ide.Workbench ctype="Workbench">
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
+            <Node name="Overhaul Code" expanded="True" />
             <Node name="Pair.cs" selected="True" />
           </Node>
-          <Node name="TestingSuite" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

@@ -132,10 +132,31 @@ namespace spacecraft
             return b.ToArray();
         }
     }
+	
+	
+	public class SetBlockPacket : ServerPacket
+	{
+		public override byte PacketID { get { return 0x06; } }
+		public NetworkShort X;
+		public NetworkShort Y;
+		public NetworkShort Z;
+		public byte Type;
+		
+		public override byte[] ToByteArray()
+		{
+			Builder<byte> b = new Builder<byte>();
+			b.Append(PacketID);
+			b.Append(X);
+			b.Append(Y);
+			b.Append(Z);
+			b.Append(Type);
+			return b.ToArray();
+		}
+	}
 
-    public class PlayerMovePacket : ServerPacket
-    {
-        public override byte PacketID
+	public class PlayerMovePacket : ServerPacket
+	{
+		public override byte PacketID
         {
             get { return 0x08; }
         }
