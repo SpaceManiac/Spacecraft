@@ -231,6 +231,7 @@ namespace spacecraft
             {
                 P.BlockSet(pos, BlockType);
             }
+            map.SetTile(pos.x, pos.y, pos.z, BlockType);
         }
 
         void newPlayer_Move(NewPlayer sender, Position dest, byte heading, byte pitch)

@@ -37,11 +37,13 @@ namespace spacecraft
         private static void WriteDefaultConfig()
         {
             StreamWriter fh = new StreamWriter(CONFIG_FILENAME);
-            fh.WriteLine("#Hello, world!");
-            fh.WriteLine("port=25565");
-            fh.WriteLine("max-players=16");
-            fh.WriteLine("server-name=Minecraft Server");
-            fh.WriteLine("motd=Powered by " + Color.Green + "Spacecraft");
+            fh.WriteLine("# Spacecraft default configuration file");
+            fh.WriteLine("# This file was auto-generated");
+            fh.WriteLine();
+            fh.WriteLine("port = 25565");
+            fh.WriteLine("max-players = 16");
+            fh.WriteLine("server-name = Minecraft Server");
+            fh.WriteLine("motd = Powered by " + Color.Green + "Spacecraft");
             fh.Close();
         }
 

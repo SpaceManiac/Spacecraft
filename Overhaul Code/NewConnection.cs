@@ -214,7 +214,6 @@ namespace spacecraft
             while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
 
             ClientPacket P = ClientPacket.FromByteArray(buffer);
-			if(P.PacketID != 0x08) Spacecraft.Log("Packet type is " + P.PacketID.ToString());
 			
 			int len = PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0]));
 			buffsize -= len;
