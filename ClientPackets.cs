@@ -38,7 +38,6 @@ namespace spacecraft
                     break;
                 case 0x05:
                     OutValue = new BlockUpdatePacket(array);
-					Spacecraft.Log("Returning a BlockUpdatePacket");
                     break;
                 case 0x08:
                     OutValue = new PositionUpdatePacket(array);
@@ -122,7 +121,6 @@ namespace spacecraft
 
         public BlockUpdatePacket(byte[] array)
         {
-			Spacecraft.Log("Making a BlockUpdatePacket");
             X = new NetworkShort(array, 1);
 			Y = new NetworkShort(array, 1 + NetworkShort.Size);
 			Z = new NetworkShort(array, 1 + 2 * NetworkShort.Size);

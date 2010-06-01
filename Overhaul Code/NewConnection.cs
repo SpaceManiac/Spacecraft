@@ -66,23 +66,19 @@ namespace spacecraft
 		}
 
         void HandleIncomingPacket() {
-			//Spacecraft.Log("Waiting for packet");
             ClientPacket IncomingPacket = ReceivePacket();
 			if(IncomingPacket == null) return;
 
             switch (IncomingPacket.PacketID)
             {
                 case (byte)Packet.PacketType.Ident:
-					Spacecraft.Log("We haz Ident");
                     HandlePlayerIdent((PlayerIDPacket)IncomingPacket);
                     break;
 
                 case (byte)Packet.PacketType.Message:
-					Spacecraft.Log("We haz Message");
                     HandleMessage((ClientMessagePacket)IncomingPacket);
                     break;
                 case (byte)Packet.PacketType.PlayerSetBlock:
-					Spacecraft.Log("We haz PlayerSetBlock");
                     HandleBlockSet((BlockUpdatePacket)IncomingPacket);
                     break;
                 case (byte)Packet.PacketType.PositionUpdate:
@@ -124,7 +120,7 @@ namespace spacecraft
         {
             if (IncomingPacket.Version != PROTOCOL_VERSION) {
 				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
-                //SendKick("Wrong protocol version.");
+                SendKick("Wrong protocol version!");
 				return;
             }
             bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
