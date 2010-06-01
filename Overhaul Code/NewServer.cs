@@ -211,6 +211,8 @@ namespace spacecraft
             newPlayer.Disconnect += new NewPlayer.PlayerDisconnect(newPlayer_Disconnect);
 
             Players.Add(newPlayer);
+			
+			Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
         }
 
         void newPlayer_Disconnect()
@@ -239,9 +241,9 @@ namespace spacecraft
 
         void newPlayer_Spawn(NewPlayer sender)
         {
-            foreach (NewPlayer P in Players)
-            {
+            foreach (NewPlayer P in Players) {
                 P.PlayerJoins(sender);
+				sender.PlayerJoins(P);
             }
 
             MovePlayer(sender, map.spawn, map.spawnHeading, 0);
