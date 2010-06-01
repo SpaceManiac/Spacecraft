@@ -62,13 +62,8 @@ namespace spacecraft
             conn.ReceivedUsername += new NewConnection.UsernameHandler(conn_ReceivedUsername);
             conn.ReceivedMessage += new NewConnection.MessageHandler(conn_ReceivedMessage);
             conn.Disconnect += new NewConnection.DisconnectHandler(conn_Disconnect);
-         
         }
-
-       
-
       
-
         /// <summary>
         /// Should be called to inform the player that they've been kicked.
         /// </summary>
@@ -166,8 +161,5 @@ namespace spacecraft
             if (Disconnect != null)
                 Disconnect();
         }
-
-
     }
-
 }

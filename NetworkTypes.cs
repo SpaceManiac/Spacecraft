@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Net;
 
 namespace spacecraft
 {
@@ -53,7 +54,6 @@ namespace spacecraft
         {
             thisSize = Size;
             thisFill = FILLER_CHAR;
-
 
             _contents = new byte[Size];
             for (int i = 0; i < _contents.Length; i++)
@@ -118,7 +118,7 @@ namespace spacecraft
         }
         public static implicit operator byte[](NetworkShort s)
         {
-            return BitConverter.GetBytes(s._content);
+            return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(s._content));
         }
     }
 }

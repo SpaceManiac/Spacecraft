@@ -18,7 +18,9 @@
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="spacecraft" expanded="True" selected="True" />
+          <Node name="spacecraft" expanded="True">
+            <Node name="Pair.cs" selected="True" />
+          </Node>
           <Node name="TestingSuite" expanded="True" />
         </State>
       </Pad>

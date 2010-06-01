@@ -39,25 +39,30 @@ namespace spacecraft
 
             _client = c;
 
-            Thread T = new Thread(Start);
+            Thread T = new Thread(ReadThread);
             T.Start();
+			
+			Thread T2 = new Thread(WriteThread);
+			T2.Start();
         }
 
-        void Start()
-        {
-            while (Connected)
-            {
-                while (SendQueue.Count > 0)
-                {
-                    TransmitPacket(SendQueue.Dequeue());
-                }
+        void ReadThread() {
+            while (Connected) {
                 HandleIncomingPacket();
+				Thread.Sleep(10);
             }
-
         }
+		
+		void WriteThread() {
+			while (Connected) {
+	            while (SendQueue.Count > 0) {
+	                TransmitPacket(SendQueue.Dequeue());
+	            }
+				Thread.Sleep(10);
+			}
+		}
 
-        void HandleIncomingPacket()
-        {
+        void HandleIncomingPacket() {
             ClientPacket IncomingPacket = ReceivePacket();
 
             switch (IncomingPacket.PacketID)
@@ -110,15 +115,14 @@ namespace spacecraft
 
         private void HandlePlayerSpawn(PlayerIDPacket IncomingPacket)
         {
-            if (IncomingPacket.Version != PROTOCOL_VERSION)
-            {
+            if (IncomingPacket.Version != PROTOCOL_VERSION) {
                 SendKick("Wrong protocol version.");
+				return;
             }
             bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
 
             if (ReceivedUsername != null)
                 ReceivedUsername(IncomingPacket.Username.ToString());
-            
 
             // Send response packet.
             ServerIdentPacket Ident = new ServerIdentPacket();
@@ -150,13 +154,11 @@ namespace spacecraft
             }
 
             int bytesSent = 0;
-            while (compressedData.Length > bytesSent) //  While we still have data to transmit.
+            while (bytesSent < compressedData.Length) //  While we still have data to transmit.
             {
                 LevelChunkPacket P = new LevelChunkPacket(); // New packet.
 
-
                 byte[] Chunk = new byte[NetworkByteArray.Size];
-                        
 
                 int remaining = compressedData.Length - bytesSent;
                 remaining = Math.Min(remaining, NetworkByteArray.Size);
@@ -165,8 +167,8 @@ namespace spacecraft
                 bytesSent += remaining;
  
                 P.ChunkData = new NetworkByteArray(Chunk);
-                P.ChunkLength = (short) (Math.Min(NetworkByteArray.Size, compressedData.Length - bytesSent));
-                P.PercentComplete = (byte)(100 * (bytesSent / compressedData.Length));
+                P.ChunkLength = (short) remaining;
+                P.PercentComplete = (byte) (100 * (bytesSent / compressedData.Length));
 
                 SendPacket(P);
             }
@@ -178,9 +180,7 @@ namespace spacecraft
             SendPacket(End);
         }
 
-
-        private ClientPacket ReceivePacket()
-        {
+        private ClientPacket ReceivePacket() {
             byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
             int buffsize = 0;
 
@@ -202,7 +202,6 @@ namespace spacecraft
             
             return P;
         }
-
 
         private void TransmitPacket(ServerPacket packet)
         {

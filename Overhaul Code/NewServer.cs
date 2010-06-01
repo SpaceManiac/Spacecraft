@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.IO;
@@ -25,10 +25,10 @@ namespace spacecraft
         public List<NewPlayer> Players { get; private set; }
         public Map map { get; protected set; }
         public int salt { get; protected set; }
-        public int port{ get; protected set; }
-        public int maxplayers{ get; protected set; }
-        public string name{ get; protected set; }
-        public string motd{ get; protected set; }
+        public int port { get; protected set; }
+        public int maxplayers { get; protected set; }
+        public string name { get; protected set; }
+        public string motd { get; protected set; }
         public string serverhash { get; protected set; }
 
         
@@ -49,20 +49,17 @@ namespace spacecraft
         public void Start()
         {
             // Initialize the map, using the saved one if it exists.
-            if (File.Exists("level.fcm"))
-            {
-                try
-                {
+            if (File.Exists("level.fcm")) {
+                try {
                     map = Map.Load("level.fcm");
                 }
-                catch
-                {
+                catch {
+					Spacecraft.Log("Could not load level.fcm");
                     map = null;
                 }
             }
             
-            if (map == null)
-            {
+            if (map == null) {
                 map = new Map();
                 map.Generate();
                 map.Save("level.fcm");
@@ -79,6 +76,7 @@ namespace spacecraft
                 Spacecraft.Log("Server MOTD is " + motd);
 
                 Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
+				
 
                 HeartbeatTimer = new System.Timers.Timer(30000);
                 HeartbeatTimer.Elapsed += new ElapsedEventHandler(BeatTick);
@@ -91,8 +89,7 @@ namespace spacecraft
 
                 OnExit.WaitOne();
             }
-            catch (SocketException e)
-            {
+            catch (SocketException e) {
                 Console.WriteLine("SocketException: {0}", e);
             }
             finally
@@ -202,6 +199,8 @@ namespace spacecraft
 
         public void AcceptClient(IAsyncResult Result)
         {
+			Spacecraft.Log("NewServer.AcceptClient");
+			
             TcpClient Client = Listener.EndAcceptTcpClient(Result);
             NewPlayer newPlayer = new NewPlayer(Client, (byte) Players.Count);
 
