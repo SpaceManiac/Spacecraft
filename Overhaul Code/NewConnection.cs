@@ -192,7 +192,7 @@ namespace spacecraft
             {
                 try
                 {
-                    int bytesRead = _client.GetStream().Read(buffer, buffsize, buffer.Length - buffsize);
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, Math.Min(10, buffer.Length - buffsize));
 					if(bytesRead == 0) {
 						Quit();
 						return null;
@@ -208,6 +208,7 @@ namespace spacecraft
 	            catch (InvalidOperationException)
 	            {
 	                Quit();
+	                return null;
 	            }
             }
             while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
