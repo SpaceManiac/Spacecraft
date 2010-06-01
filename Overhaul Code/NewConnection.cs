@@ -31,6 +31,7 @@ namespace spacecraft
         public event DisconnectHandler Disconnect;
 
         bool Connected = true;
+        private object SendQueueMutex = new object();
         Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
 
 
@@ -59,7 +60,9 @@ namespace spacecraft
 		void WriteThread() {
 			while (Connected) {
 	            while (SendQueue.Count > 0) {
-	                TransmitPacket(SendQueue.Dequeue());
+	            	lock(SendQueueMutex) {
+	               	 	TransmitPacket(SendQueue.Dequeue());
+	               	 }
 	            }
 				Thread.Sleep(10);
 			}
@@ -106,13 +109,12 @@ namespace spacecraft
         private void HandleBlockSet(BlockUpdatePacket blockUpdatePacket)
         {
             if (BlockSet != null)
-				BlockSet(blockUpdatePacket.X, blockUpdatePacket.Y, blockUpdatePacket.Z,
-				         blockUpdatePacket.Mode, blockUpdatePacket.Type);
+				BlockSet(blockUpdatePacket.X, blockUpdatePacket.Y, blockUpdatePacket.Z, blockUpdatePacket.Mode, blockUpdatePacket.Type);
         }
 
         private void HandleMessage(ClientMessagePacket messagePacket)
         {
-            if (ReceivedMessage != null)
+            if (messagePacket.Message.ToString() != "" && ReceivedMessage != null)
                 ReceivedMessage(messagePacket.Message.ToString());
         }
 
@@ -247,12 +249,18 @@ namespace spacecraft
         /// <param name="P">The packet to queue.</param>
         private void SendPacket(ServerPacket P)
         {
-            SendQueue.Enqueue(P);
+        	if(P == null) {
+        		throw new Exception("Tried to SendPacket(null)");
+        	}
+        	lock(SendQueueMutex) {
+            	SendQueue.Enqueue(P);
+            }
         }
 
         private void Quit()
         {
             _client.Close();
+            if(!Connected) return;
             Connected = false;
             if (Disconnect != null)
                 Disconnect();
@@ -292,9 +300,7 @@ namespace spacecraft
             DisconnectPacket P = new DisconnectPacket();
             P.Reason = reason;
             SendPacket(P);
-
-            if (Disconnect != null)
-                Disconnect();
+            Quit();
         }
 
 
@@ -334,7 +340,5 @@ namespace spacecraft
             packet.Pitch = Player.pitch;
             SendPacket(packet);
         }
-
-        
     }
 }

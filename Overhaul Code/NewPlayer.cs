@@ -36,7 +36,7 @@ namespace spacecraft
 
         public delegate void PlayerDisconnectHandler(NewPlayer sender);
         /// <summary>
-        /// Triggered when this client sends a message to the server.
+        /// Triggered when this client disconnects from the server.
         /// </summary>
         public event PlayerDisconnectHandler Disconnect;
 
@@ -72,7 +72,7 @@ namespace spacecraft
         /// </summary>
         public void Kick()
         {
-            Kick(null);
+            Kick("You were kicked!");
         }
 
         /// <summary>
@@ -81,6 +81,7 @@ namespace spacecraft
         /// <param name="reason">The reason</param>
         public void Kick(string reason)
         {
+            NewServer.theServ.MessageAll(Color.Yellow + name + " was kicked (" + reason + ")");
             conn.SendKick(reason);
         }
 

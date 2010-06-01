@@ -19,17 +19,17 @@ namespace spacecraft
         public override string ToString()
         {
             int end = Size;
-            for (int i = _contents.Length-1; i > 0; i--) // Starts at the end, counts backwards.
+            for (int i = _contents.Length - 1; i > 0; --i) // Starts at the end, counts backwards.
             {
                 if (_contents[i] != this.thisFill)
                 { // Find last non-filler character, and record it.
-                    end = i + 1;
+                    end = i;
                     break; 
                 }
             }
             string output = Encoding.ASCII.GetString(_contents);
             // If FILLER_CHAR is anything other than null, it'll appear in the parsed string, so we need to take it out.
-            return output.Substring(0, end); 
+            return output.Substring(0, end + 1); 
         }
 
         public static implicit operator byte[](NetworkByteContainer s)
