@@ -1,23 +1,26 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Map\Map.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Overhaul Code\NewConnection.cs" ctype="Workbench">
     <Files>
-      <File FileName="Overhaul Code\NewServer.cs" Line="1" Column="1" />
-      <File FileName="Map\Map.cs" Line="139" Column="25" />
-      <File FileName="Constants.cs" Line="1" Column="1" />
-      <File FileName="ChatCommands.cs" Line="403" Column="51" />
+      <File FileName="Overhaul Code\NewServer.cs" Line="248" Column="57" />
+      <File FileName="Map\Map.cs" Line="299" Column="4" />
+      <File FileName="Constants.cs" Line="267" Column="45" />
+      <File FileName="ChatCommands.cs" Line="687" Column="33" />
       <File FileName="NetworkTypes.cs" Line="50" Column="40" />
-      <File FileName="Overhaul Code\NewConnection.cs" Line="160" Column="30" />
-      <File FileName="Overhaul Code\NewPlayer.cs" Line="136" Column="52" />
+      <File FileName="Overhaul Code\NewConnection.cs" Line="48" Column="30" />
+      <File FileName="Overhaul Code\NewPlayer.cs" Line="69" Column="26" />
+      <File FileName="Player.cs" Line="81" Column="55" />
+      <File FileName="Map\EscherMath.cs" Line="24" Column="32" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
-            <Node name="Map" expanded="True">
-              <Node name="Map.cs" selected="True" />
+            <Node name="Map" expanded="True" />
+            <Node name="Overhaul Code" expanded="True">
+              <Node name="NewConnection.cs" selected="True" />
             </Node>
-            <Node name="Overhaul Code" expanded="True" />
+            <Node name="Utils" expanded="True" />
           </Node>
         </State>
       </Pad>
