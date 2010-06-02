@@ -11,9 +11,9 @@ using System.Web;
 
 namespace spacecraft
 {
-    public partial class NewServer
+    public partial class Server
     {
-        static public NewServer theServ;
+        static public Server theServ;
         static public ManualResetEvent OnExit = new ManualResetEvent(false);
 
         private bool Initialized = false;
@@ -22,7 +22,7 @@ namespace spacecraft
         
         private TcpListener Listener;
 
-        public List<NewPlayer> Players { get; private set; }
+        public List<Player> Players { get; private set; }
         public Map map { get; protected set; }
         public int salt { get; protected set; }
         public int port { get; protected set; }
@@ -33,7 +33,7 @@ namespace spacecraft
 
         
 
-        public NewServer()
+        public Server()
         {
             if (theServ != null) return;
             theServ = this;
@@ -69,7 +69,7 @@ namespace spacecraft
 
             try
             {
-                Players = new List<NewPlayer>();
+                Players = new List<Player>();
 
                 Listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
                 Listener.Start();
@@ -114,14 +114,14 @@ namespace spacecraft
         private void PhysTick(object sender, ElapsedEventArgs y)
         {
             map.Physics();
-            // TODO: Get map physics to work with NewServer.
+            // TODO: Get map physics to work with Server.
         }
         
-        public NewPlayer GetPlayer(string name)
+        public Player GetPlayer(string name)
         {
         	name = name.ToLower();
         	// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
-        	foreach(NewPlayer P in Players) {
+        	foreach(Player P in Players) {
         		if(P.name.ToLower() == name) {
         			return P;
         		}
@@ -212,24 +212,24 @@ namespace spacecraft
         public void AcceptClient(IAsyncResult Result)
         {
             TcpClient Client = Listener.EndAcceptTcpClient(Result);
-            NewPlayer newPlayer = new NewPlayer(Client, (byte) Players.Count);
+            Player Player = new Player(Client, (byte) Players.Count);
 
-            newPlayer.Spawn += new NewPlayer.PlayerSpawnHandler(newPlayer_Spawn);
-            newPlayer.Message += new NewPlayer.PlayerMsgHandler(newPlayer_Message);
-            newPlayer.Move += new NewPlayer.PlayerMoveHandler(newPlayer_Move);
-            newPlayer.BlockChange += new NewPlayer.PlayerBlockChangeHandler(newPlayer_BlockChange);
-            newPlayer.Disconnect += new NewPlayer.PlayerDisconnectHandler(newPlayer_Disconnect);
+            Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
+            Player.Message += new Player.PlayerMsgHandler(Player_Message);
+            Player.Move += new Player.PlayerMoveHandler(Player_Move);
+            Player.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
+            Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
 
-            Players.Add(newPlayer);
+            Players.Add(Player);
 			
 			Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
         }
 
-        void newPlayer_Disconnect(NewPlayer Player)
+        void Player_Disconnect(Player Player)
         {
             byte ID = Player.playerID;
             Players.Remove(Player);
-            foreach (NewPlayer P in Players)
+            foreach (Player P in Players)
             {
                 P.PlayerDisconnects(ID);
             }
@@ -238,34 +238,34 @@ namespace spacecraft
         
         void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
         {
-        	foreach (NewPlayer P in Players)
+        	foreach (Player P in Players)
         	{
         		P.BlockSet(pos, BlockType);
         	}
         }
 
-        void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
+        void Player_BlockChange(BlockPosition pos, Block BlockType)
         {
             map.SetTile(pos.x, pos.y, pos.z, BlockType);
         }
 
-        void newPlayer_Move(NewPlayer sender, Position dest, byte heading, byte pitch)
+        void Player_Move(Player sender, Position dest, byte heading, byte pitch)
         {
-			foreach(NewPlayer P in Players) {
+			foreach(Player P in Players) {
 				if(P != sender) {
 					P.PlayerMoves(sender, dest, heading, pitch);
 				}
 			}
         }
 
-        void newPlayer_Message(string msg)
+        void Player_Message(string msg)
         {
             MessageAll(msg);
         }
 
-        void newPlayer_Spawn(NewPlayer sender)
+        void Player_Spawn(Player sender)
         {
-            foreach (NewPlayer P in Players) {
+            foreach (Player P in Players) {
                 P.PlayerJoins(sender);
 				sender.PlayerJoins(P);
             }
@@ -276,14 +276,14 @@ namespace spacecraft
         
         public void MessageAll(string message)
         {
-        	foreach (NewPlayer P in Players) {
+        	foreach (Player P in Players) {
         		P.PrintMessage(message);
         	}
         	Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
         }
 
-        public void MovePlayer(NewPlayer player, Position dest, byte heading, byte pitch) {
-            foreach (NewPlayer P in Players)
+        public void MovePlayer(Player player, Position dest, byte heading, byte pitch) {
+            foreach (Player P in Players)
             {
                 P.PlayerMoves(player, dest, heading, pitch);
             }
@@ -291,7 +291,7 @@ namespace spacecraft
 
         public void ChangeBlock(BlockPosition pos, Block blockType)
         {
-            foreach (NewPlayer P in Players)
+            foreach (Player P in Players)
             {
                 P.BlockSet(pos, blockType);
             }

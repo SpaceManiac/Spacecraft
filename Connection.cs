@@ -1,551 +1,358 @@
 using System;
-using System.Net.Sockets;
-using System.Text;
-using System.Security.Cryptography;
-using System.IO.Compression;
+using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Collections;
+using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 
 namespace spacecraft
 {
-    public class Connection
+    class Connection
     {
-        private TcpClient client;
-        private MinecraftServer serv { get { return MinecraftServer.theServ; } }
+        static byte PROTOCOL_VERSION = 0x07;
 
-        // temporary until stuff becomes saner!
-        public Player _player;
-        private bool _connected;
+        public delegate void UsernameHandler(string username);
+        public event UsernameHandler ReceivedUsername;
 
-        private byte[] _netbuffer;
-        private byte[] buffer;
-        private int bufsize;
-        private string _name;
+        public delegate void PlayerSpawnHandler();
+        public event PlayerSpawnHandler PlayerSpawn;
 
-        public bool connected { get { return _connected; } }
+        public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
+        public event PlayerMoveHandler PlayerMove;
+		
+		public delegate void BlockSetHandler(short X, short Y, short Z, byte Mode, byte Type);
+		public event BlockSetHandler BlockSet;
 
-        public Player player { get { return _player; } }
-        public string name { get { if (_player == null) { return _name; } else { return _player.name; } } }
-        public string addr { get { return ((IPEndPoint)(client.Client.RemoteEndPoint)).Address.ToString(); } }
+        public delegate void MessageHandler(string msg);
+        public event MessageHandler ReceivedMessage;
 
-        public Connection(TcpClient conn)
+        public delegate void DisconnectHandler();
+        public event DisconnectHandler Disconnect;
+
+		bool Joined = false;
+        bool Connected = true;
+        private object SendQueueMutex = new object();
+        Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
+
+
+        TcpClient _client;
+
+        public Connection(TcpClient c)
         {
-            _connected = true;
-            client = conn;
-            _name = addr;
-            _player = null;
-            _netbuffer = new byte[256];
-            buffer = new byte[512];
-            bufsize = 0;
+            SendQueue = new Queue<ServerPacket>();
 
-            client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
+            _client = c;
+        }
+        
+        public void Start() {
+            Thread T = new Thread(ReadThread);
+            T.Start();
+			
+			Thread T2 = new Thread(WriteThread);
+			T2.Start();
+		}
+
+        void ReadThread() {
+            while (Connected) {
+                HandleIncomingPacket();
+				Thread.Sleep(10);
+            }
+        }
+		
+		void WriteThread() {
+			while (Connected) {
+	            while (SendQueue.Count > 0) {
+	            	lock(SendQueueMutex) {
+	               	 	TransmitPacket(SendQueue.Dequeue());
+	               	 }
+	            }
+				Thread.Sleep(10);
+			}
+		}
+
+        void HandleIncomingPacket() {
+            ClientPacket IncomingPacket = ReceivePacket();
+			if(IncomingPacket == null) return;
+
+            switch (IncomingPacket.PacketID)
+            {
+                case (byte)Packet.PacketType.Ident:
+                    HandlePlayerIdent((PlayerIDPacket)IncomingPacket);
+                    break;
+
+                case (byte)Packet.PacketType.Message:
+                    HandleMessage((ClientMessagePacket)IncomingPacket);
+                    break;
+                case (byte)Packet.PacketType.PlayerSetBlock:
+                    HandleBlockSet((BlockUpdatePacket)IncomingPacket);
+                    break;
+                case (byte)Packet.PacketType.PositionUpdate:
+                    HandlePositionUpdate((PositionUpdatePacket)IncomingPacket);
+                    break;
+                default:
+                    Spacecraft.LogError("Incoming packet does not match any known packet type!");
+                    break;
+            }
         }
 
-        public void ReadCallback(IAsyncResult ar)
+        private void HandlePositionUpdate(PositionUpdatePacket positionUpdatePacket)
         {
-            int bytesRead;
-            try
-            {
-                bytesRead = client.GetStream().EndRead(ar);
-            }
-            catch (Exception e)
-            {
-                _Disconnect();
-                Spacecraft.LogError("Exception in Connection: {0}", e.Message);
-                return;
-            }
-            if (bytesRead == 0)
-            {
-                _Disconnect();
-                return;
-            }
 
-            // append the new _netbuffer stuff to the buffer
-            Array.Copy(_netbuffer, 0, buffer, bufsize, bytesRead);
-            bufsize += bytesRead;
-            //Spacecraft.Log("Read " + bytesRead + " bytes. Total = " + bufsize + ". First = " + buffer[0]);
+            Position pos = new Position(positionUpdatePacket.X, positionUpdatePacket.Y, positionUpdatePacket.Z);
 
-            // check to see if we have a full packet
-            while (bufsize > 0)
-            {
-                Packet.PacketType ptype = (Packet.PacketType)buffer[0];
+            byte heading = positionUpdatePacket.Heading;
+            byte pitch = positionUpdatePacket.Pitch;
 
-                int packsize = PacketLengthInfo.Lookup(ptype);
-                if (packsize == 0)
-                {
-                    break;
-                }
-                else if (bufsize >= packsize)
-                {
-                    // extract packet
-                    byte[] packet = new byte[packsize];
-                    Array.Copy(buffer, packet, packsize);
+            if (PlayerMove != null)
+                PlayerMove(pos, heading, pitch);
 
-                    ptype = (Packet.PacketType)packet[0];
+        }
 
-                    // shift buffer
-                    bufsize -= packsize;
-                    byte[] temp = new byte[buffer.Length];
-                    Array.Copy(buffer, packsize, temp, 0, bufsize);
-                    buffer = temp;
+        private void HandleBlockSet(BlockUpdatePacket blockUpdatePacket)
+        {
+            if (BlockSet != null)
+				BlockSet(blockUpdatePacket.X, blockUpdatePacket.Y, blockUpdatePacket.Z, blockUpdatePacket.Mode, blockUpdatePacket.Type);
+        }
 
-                    if (ptype == Packet.PacketType.Ident)
-                    {
-                        HandleJoin(packet);
-                    }
-                    else if (ptype == Packet.PacketType.PlayerSetBlock)
-                    {
-                        HandleBlock(packet);
-                    }
-                    else if (ptype == Packet.PacketType.PositionUpdate)
-                    {
-                        HandlePosition(packet);
-                    }
-                    else if (ptype == Packet.PacketType.Message)
-                    {
-                        HandleMessage(packet);
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
+        private void HandleMessage(ClientMessagePacket messagePacket)
+        {
+            if (messagePacket.Message.ToString() != "" && ReceivedMessage != null)
+                ReceivedMessage(messagePacket.Message.ToString());
+        }
 
-            // read again
-            try
-            {
-                client.GetStream().BeginRead(_netbuffer, 0, _netbuffer.Length, new AsyncCallback(ReadCallback), this);
-            }
-            catch (Exception e)
-            {
-                _Disconnect();
-                Spacecraft.LogError("Exception in Connection: {0}", e.Message);
+        private void HandlePlayerIdent(PlayerIDPacket IncomingPacket)
+        {
+        	if (Joined) {
+        		SendKick("You identified twice!");
+        		return;
+        	}
+        	
+            if (IncomingPacket.Version != PROTOCOL_VERSION) {
+				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
+                SendKick("Wrong protocol version!");
 				return;
             }
-        }
+            bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
+            
+            if (Config.GetBool("verify-names", true) && !success) {
+            	Spacecraft.Log(IncomingPacket.Username.ToString() + " attempted to join, but didn't verify");
+            	SendKick("Your name wasn't verified by minecraft.net!");
+            	return;
+           	}
+           	
+           	Joined = true;
 
-        // ===================================================================
-        // static helpers
+            if (ReceivedUsername != null)
+                ReceivedUsername(IncomingPacket.Username.ToString());
 
-        private static short Host2Net(short x)
-        {
-            return IPAddress.HostToNetworkOrder(x);
-        }
-        private static short Net2Host(short x)
-        {
-            return IPAddress.NetworkToHostOrder(x);
-        }
+            // Send response packet.
+            ServerIdentPacket Ident = new ServerIdentPacket();
 
-        private static string GetStrArray(byte[] data, int max)
-        {
-            string ret = "", sep = "";
-            for (int i = 0; i < data.Length && i < max; ++i)
+            Ident.MOTD = Server.theServ.motd;
+            Ident.Name = Server.theServ.name;
+            Ident.Version = PROTOCOL_VERSION;
+
+            TransmitPacket(Ident);
+
+            SendMap();
+
+            if (PlayerSpawn != null)
             {
-                ret += sep + data[i].ToString("x2").ToUpper();
-                sep = " ";
-            }
-            return ret;
-        }
-
-        private static string MD5sum(string Value)
-        {
-            MD5CryptoServiceProvider x = new MD5CryptoServiceProvider();
-            byte[] data = Encoding.ASCII.GetBytes(Value);
-            data = x.ComputeHash(data);
-            StringBuilder ret = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
-                ret.Append(data[i].ToString("x2").ToLower());
-            return ret.ToString();
-        }
-
-
-        private static void InsertString(byte[] packet, int i, string str)
-        {
-            str = (str + new string(' ', 64)).Substring(0, 64);
-            Array.Copy(Encoding.ASCII.GetBytes(str), 0, packet, i, 64);
-        }
-        private static string ExtractString(byte[] packet, int i)
-        {
-            return Encoding.ASCII.GetString(packet, i, 64).TrimEnd();
-        }
-
-        public static void MsgAll(string msg)
-        {
-            MinecraftServer.theServ.SendAll(PacketMessage(msg));
-        }
-
-        // ===================================================================
-        // nonstatic helpers
-
-        private void _Disconnect()
-        {
-            if (_connected)
-            {
-                Spacecraft.Log(name + " disconnected");
-                _connected = false;
-                if (_player != null)
-                {
-                    MsgAll(Color.Yellow + name + " has quit.");
-                    serv.SendAll(PacketDespawnPlayer(_player));
-                }
-            }
-        }
-
-        public void Send(byte[] data)
-        {
-            try
-            {
-                client.GetStream().Write(data, 0, data.Length);
-            }
-            catch (InvalidOperationException)
-            {
-                _Disconnect();
-            }
-            catch (IOException)
-            {
-                _Disconnect();
+                PlayerSpawn();
             }
         }
 
         private void SendMap()
         {
-            byte[] levelInit = new byte[] { (byte)Packet.PacketType.LevelInit };
-            Send(levelInit);
-			
-			byte[] compressedData;
+            Map M = Server.theServ.map;
+            SendPacket(new LevelInitPacket());
+
+            byte[] compressedData; 
             using (MemoryStream memstr = new MemoryStream())
             {
-                serv.map.GetCompressedCopy(memstr, true);
+                M.GetCompressedCopy(memstr, true);
                 compressedData = memstr.ToArray();
-			}
-			
+            }
+
             int bytesSent = 0;
-            while(bytesSent < compressedData.Length)
+            while (bytesSent < compressedData.Length) //  While we still have data to transmit.
             {
-                byte[] packet = new byte[1028];
-                packet[0] = (byte)Packet.PacketType.LevelChunk;
+                LevelChunkPacket P = new LevelChunkPacket(); // New packet.
 
-                int chunkSize = compressedData.Length - bytesSent;
-                if (chunkSize > 1024) {
-					chunkSize = 1024;
-				}
-				
-                byte[] sizebytes = BitConverter.GetBytes(Host2Net((short)chunkSize));
-				Array.Copy(sizebytes, 0, packet, 1, 2);
-                Array.Copy(compressedData, bytesSent, packet, 3, chunkSize);
+                byte[] Chunk = new byte[NetworkByteArray.Size];
 
-                packet[1027] = (byte)(100.0 * bytesSent / compressedData.Length);
-                Send(packet);
-				
-				bytesSent += chunkSize;
+                int remaining = compressedData.Length - bytesSent;
+                remaining = Math.Min(remaining, NetworkByteArray.Size);
+
+                Array.Copy(compressedData, bytesSent, Chunk, 0, remaining);
+                bytesSent += remaining;
+ 
+                P.ChunkData = new NetworkByteArray(Chunk);
+                P.ChunkLength = (short) remaining;
+                P.PercentComplete = (byte) (100 * (bytesSent / compressedData.Length));
+
+                SendPacket(P);
             }
 
-            byte[] xdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.xdim));
-            byte[] ydim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.ydim));
-            byte[] zdim = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.zdim));
-
-            byte[] levelFin = new byte[(int)Packet.PacketLength.LevelFinish];
-            levelFin[0] = (byte)Packet.PacketType.LevelFinish;
-            Array.Copy(xdim, 0, levelFin, 1, 2);
-            Array.Copy(ydim, 0, levelFin, 3, 2);
-            Array.Copy(zdim, 0, levelFin, 5, 2);
-            Send(levelFin);
+            LevelEndPacket End = new LevelEndPacket();
+            End.X = M.xdim;
+            End.Y = M.ydim;
+            End.Z = M.zdim;
+            SendPacket(End);
         }
+		
+		byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
+		int buffsize = 0;
 
-        private void SendServerInfo()
-        {
-            byte[] packet = new byte[131];
-            packet[0] = 0x00;
-            packet[1] = 0x07; // protocol version
-            InsertString(packet, 2, serv.name);
-            InsertString(packet, 66, serv.motd);
-            packet[130] = 0x00;
-            if (_player.rank >= Rank.Mod)
+        private ClientPacket ReceivePacket() {
+            do
             {
-                packet[130] = 0x64;
-            }
-            Send(packet);
-        }
-
-        public void Kick(string reason)
-        {
-            Spacecraft.Log(name + " was kicked: " + reason);
-            MsgAll(Color.Red + name + " was kicked!");
-            _connected = false;
-            Send(PacketKick(reason));
-        }
-
-        public void Message(string msg)
-        {
-            Send(PacketMessage(msg));
-        }
-
-        // ===================================================================
-        // nonstatic Handle* functions
-
-        private void HandleJoin(byte[] packet)
-        {
-            byte protocol = packet[1];
-            if (protocol != 0x07)
-            {
-                Spacecraft.Log("Warning: " + name + " (" + addr + ") had a protcol version of 0x" + String.Format("{0:X}", protocol));
-                Kick("Wrong protocol version 0x" + String.Format("{0:X}", protocol) + ": contact server admin");
-                return;
-            }
-            string username = Encoding.ASCII.GetString(packet, 2, 64).Trim();
-            string key = Encoding.ASCII.GetString(packet, 66, 64).Trim();
-            byte unused = packet[130];
-            _name = username;
-
-            if (Config.GetBool("verify-names", true) && MD5sum(serv.salt + username) != key)
-            {
-                Spacecraft.Log(name + " (" + addr + ") wasn't verified");
-                Kick("The name wasn't verified by minecraft.net!");
-                return;
-            }
-
-            _player = new Player(username);
-
-            if (_player.rank == Rank.Banned)
-            {
-                Spacecraft.Log(name + " (" + addr + ") tried to connect, but is banned.");
-                Kick("Sorry, you're not allowed on this server!");
-                return;
-            }
-
-            Spacecraft.Log(name + " (" + addr + ") has joined! pid = " + player.pid);
-            SendServerInfo();
-            SendMap();
-            Thread.Sleep(100);
-            serv.SendAllExcept(PacketSpawnPlayer(_player), this);
-            ArrayList players = serv.GetAllPlayers();
-            for (int i = 0; i < players.Count; ++i)
-            {
-                Player p = (Player)(players[i]);
-                if (p == _player || p == null) continue;
-                Send(PacketSpawnPlayer((Player)(players[i])));
-            }
-            Send(PacketTeleportSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.spawnHeading, 0));
-            Send(PacketSpawnSelf(serv.map.spawn.x, serv.map.spawn.y, serv.map.spawn.z, serv.map.spawnHeading, 0));
-            MsgAll(Color.Yellow + name + " has joined!");
-            Message(Color.Yellow + "You're a " + Player.RankColor(_player.rank) + player.rank.ToString() + Color.Yellow + ". See /help for info");
-        }
-
-        private void HandleBlock(byte[] packet)
-        {
-            short x = Net2Host(BitConverter.ToInt16(packet, 1));
-            short y = Net2Host(BitConverter.ToInt16(packet, 3));
-            short z = Net2Host(BitConverter.ToInt16(packet, 5));
-            byte mode = packet[7];
-            Block type = (Block)(packet[8]);
-
-            BitConverter.GetBytes(IPAddress.HostToNetworkOrder(serv.map.Length));
-
-            if (mode == 0x01)
-            { // place
-                if (type == Block.Obsidian && _player.placing)
+                try
                 {
-                    type = _player.placeType;
+                    int bytesRead = _client.GetStream().Read(buffer, buffsize, Math.Min(10, buffer.Length - buffsize));
+					if(bytesRead == 0) {
+						Quit();
+						return null;
+					}
+                    buffsize += bytesRead;
                 }
-                if (type == Block.Stair && y > 0 && serv.map.GetTile(x, (short)(y - 1), z) == Block.Stair)
+                catch (IOException)
                 {
-                    Send(PacketSetBlock(x, y, z, Block.Air));
-                    type = Block.DoubleStair;
-                    y = (short)(y - 1);
+                    // they probably just disconnected
+					Quit();
+					return null;
                 }
-                serv.map.SetTile(x, y, z, type);
-                serv.SendAll(PacketSetBlock(x, y, z, type));
+	            catch (InvalidOperationException)
+	            {
+	                Quit();
+	                return null;
+	            }
             }
-            else
-            { // delete
-                serv.map.SetTile(x, y, z, Block.Air);
-                serv.SendAll(PacketSetBlock(x, y, z, Block.Air));
-            }
+            while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
+
+            ClientPacket P = ClientPacket.FromByteArray(buffer);
+			
+			int len = PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0]));
+			buffsize -= len;
+			byte[] newbuf = new byte[2048];
+			Array.Copy(buffer, len, newbuf, 0, buffsize);
+			buffer = newbuf;
+            
+            return P;
         }
 
-        private void HandlePosition(byte[] packet)
+        private void TransmitPacket(ServerPacket packet)
         {
-            byte pid = packet[1]; // always 255
-            short x = Net2Host(BitConverter.ToInt16(packet, 2));
-            short y = Net2Host(BitConverter.ToInt16(packet, 4));
-            short z = Net2Host(BitConverter.ToInt16(packet, 6));
-            byte heading = packet[8];
-            byte pitch = packet[9];
-            if (player.PositionUpdate(x, y, z, heading, pitch))
+            try
             {
-                serv.SendAll(PacketPositionUpdate(player));
+                byte[] bytes = packet;
+                _client.GetStream().Write(bytes, 0, bytes.Length);
             }
-        }
-
-
-        private void HandleMessage(byte[] packet)
-        {
-            string msg = ExtractString(packet, 2);
-            if (msg[0] == '@')
+            catch (IOException)
             {
-                // private messages
-                int i = msg.IndexOf(' ');
-                string username = msg.Substring(1);
-                string message = "";
-                if (i > 0)
-                {
-                    username = msg.Substring(1, i - 1);
-                    if (i != msg.Length - 1)
-                    {
-                        message = msg.Substring(i + 1);
-                    }
-                }
-                if (message != "")
-                {
-                    Connection c = MinecraftServer.theServ.GetConnection(username);
-                    if (c == null)
-                    {
-                        Message(Color.DarkRed + "No such user " + username);
-                    }
-                    else
-                    {
-                        Message(Color.Purple + ">" + username + "> " + message);
-                        c.Message(Color.Purple + "[" + name + "] " + message);
-                    }
-                }
+                Quit();
             }
-            else if (msg[0] == '/')
+            catch (InvalidOperationException)
             {
-                int i = msg.IndexOf(' ');
-                string cmd = msg.Substring(1);
-                string args = "";
-                if (i > 0)
-                {
-                    cmd = msg.Substring(1, i - 1);
-                    if (i != msg.Length - 1)
-                    {
-                        args = msg.Substring(i + 1);
-                    }
-                }
-                //ChatCommandHandling.Execute(this, cmd, args);
-            }
-            else
-            {
-                MsgAll(name + ": " + msg);
-                Spacecraft.Log(name + ": " + msg);
+                Quit();
             }
         }
 
-        public void ResendMap()
+        /// <summary>
+        /// Queue a packet for sending.
+        /// </summary>
+        /// <param name="P">The packet to queue.</param>
+        private void SendPacket(ServerPacket P)
         {
-            SendServerInfo();
-            SendMap();
+        	if(P == null) {
+        		throw new Exception("Tried to SendPacket(null)");
+        	}
+        	lock(SendQueueMutex) {
+            	SendQueue.Enqueue(P);
+            }
         }
 
-        // ===================================================================
-        // static Packet* functions
-
-        public static byte[] PacketSetBlock(short x, short y, short z, Block block)
+        private void Quit()
         {
-            byte[] packet = new byte[(int)(Packet.PacketLength.ServerSetBlock)];
-            packet[0] = (byte)Packet.PacketType.ServerSetBlock;
-            byte[] bytex = BitConverter.GetBytes(Host2Net(x));
-            byte[] bytey = BitConverter.GetBytes(Host2Net(y));
-            byte[] bytez = BitConverter.GetBytes(Host2Net(z));
-            packet[1] = bytex[0]; packet[2] = bytex[1];
-            packet[3] = bytey[0]; packet[4] = bytey[1];
-            packet[5] = bytez[0]; packet[6] = bytez[1];
-            packet[7] = (byte)block;
-            return packet;
+            _client.Close();
+            if (!Connected) return;
+            Connected = false;
+            if (!Joined) return;
+            if (Disconnect != null)
+                Disconnect();
         }
 
-        public static byte[] PacketPositionUpdate(Player player)
+        private bool IsHashCorrect(string name, string hash)
         {
-            byte[] packet = new byte[(int)Packet.PacketLength.PositionUpdate];
-            packet[0] = (byte)Packet.PacketType.PositionUpdate;
-            byte[] bytex = BitConverter.GetBytes(Host2Net(player.x));
-            byte[] bytey = BitConverter.GetBytes(Host2Net(player.y));
-            byte[] bytez = BitConverter.GetBytes(Host2Net(player.z));
-            packet[1] = player.pid;
-            packet[2] = bytex[0]; packet[3] = bytex[1];
-            packet[4] = bytey[0]; packet[5] = bytey[1];
-            packet[6] = bytez[0]; packet[7] = bytez[1];
-            packet[8] = player.heading;
-            packet[9] = player.pitch;
-            return packet;
+            string salt = Server.theServ.salt.ToString();
+            string combined = salt + name;
+            string properHash = Spacecraft.MD5sum(combined);
+
+            return (hash == properHash);
         }
 
-        public static byte[] PacketTeleportSelf(short x, short y, short z, byte heading, byte pitch)
+        public void DisplayMessage(string msg)
         {
-            byte[] packet = new byte[(int)Packet.PacketLength.PositionUpdate];
-            packet[0] = (byte)Packet.PacketType.PositionUpdate;
-            byte[] bytex = BitConverter.GetBytes(Host2Net(x));
-            byte[] bytey = BitConverter.GetBytes(Host2Net(y));
-            byte[] bytez = BitConverter.GetBytes(Host2Net(z));
-            packet[1] = 255;
-            packet[2] = bytex[0]; packet[3] = bytex[1];
-            packet[4] = bytey[0]; packet[5] = bytey[1];
-            packet[6] = bytez[0]; packet[7] = bytez[1];
-            packet[8] = heading;
-            packet[9] = pitch;
-            return packet;
+            ServerMessagePacket P = new ServerMessagePacket();
+            P.Message = msg;
+            SendPacket(P);
+        }
+		
+		public void SendBlockSet(short x, short y, short z, byte type)
+		{
+			SetBlockPacket P = new SetBlockPacket();
+			P.X = x;
+			P.Y = y;
+			P.Z = z;
+			P.Type = type;
+			SendPacket(P);
+		}
+
+        public void SendKick(string reason)
+        {
+            DisconnectPacket P = new DisconnectPacket();
+            P.Reason = reason;
+            TransmitPacket(P); // Send the packet immediatly, as we have no need for players who haven't verified.
+            Quit();
         }
 
-        public static byte[] PacketSpawnPlayer(Player player)
+
+        public void SendPlayerMovement(Player player, Position dest, byte heading, byte pitch, bool self)
         {
-            byte[] packet = new byte[(int)Packet.PacketLength.SpawnPlayer];
-            packet[0] = (byte)Packet.PacketType.SpawnPlayer;
-            packet[1] = player.pid;
-            InsertString(packet, 2, player.name);
-            byte[] bytex = BitConverter.GetBytes(Host2Net(player.x));
-            byte[] bytey = BitConverter.GetBytes(Host2Net(player.y));
-            byte[] bytez = BitConverter.GetBytes(Host2Net(player.z));
-            packet[66] = bytex[0]; packet[67] = bytex[1];
-            packet[68] = bytey[0]; packet[69] = bytey[1];
-            packet[70] = bytez[0]; packet[71] = bytez[1];
-            packet[72] = player.heading;
-            packet[73] = player.pitch;
-            return packet;
+            PlayerMovePacket packet = new PlayerMovePacket();
+            packet.PlayerID = player.playerID;
+            if (self)
+                packet.PlayerID = 255;
+            packet.X = player.pos.x;
+            packet.Y = player.pos.y;
+            packet.Z = player.pos.z;
+			packet.Heading = heading;
+			packet.Pitch = pitch;
+
+            SendPacket(packet);
         }
 
-        public static byte[] PacketSpawnSelf(short x, short y, short z, byte heading, byte pitch)
+        internal void SendPlayerDisconnect(byte ID)
         {
-            byte[] packet = new byte[(int)Packet.PacketLength.SpawnPlayer];
-            packet[0] = (byte)Packet.PacketType.SpawnPlayer;
-            packet[1] = 255;
-            InsertString(packet, 2, "MYNAME");
-            byte[] bytex = BitConverter.GetBytes(Host2Net(x));
-            byte[] bytey = BitConverter.GetBytes(Host2Net(y));
-            byte[] bytez = BitConverter.GetBytes(Host2Net(z));
-            packet[66] = bytex[0]; packet[67] = bytex[1];
-            packet[68] = bytey[0]; packet[69] = bytey[1];
-            packet[70] = bytez[0]; packet[71] = bytez[1];
-            packet[72] = heading;
-            packet[73] = pitch;
-            return packet;
+            DespawnPacket packet = new DespawnPacket();
+            packet.PlayerID = ID;
+            SendPacket(packet);
         }
 
-        public static byte[] PacketDespawnPlayer(Player player)
+        public void HandlePlayerSpawn(Player Player, bool self)
         {
-            byte[] packet = new byte[(int)Packet.PacketLength.DespawnPlayer];
-            packet[0] = (byte)Packet.PacketType.DespawnPlayer;
-            packet[1] = player.pid;
-            return packet;
-        }
-
-        public static byte[] PacketMessage(string msg)
-        {
-            byte[] packet = new byte[(int)Packet.PacketLength.Message];
-            packet[0] = (byte)Packet.PacketType.Message;
-            packet[1] = 0;
-            InsertString(packet, 2, msg);
-            return packet;
-        }
-
-        public static byte[] PacketKick(string reason)
-        {
-            byte[] packet = new byte[65];
-            packet[0] = 0x0e;
-            InsertString(packet, 1, reason);
-            return packet;
+            PlayerSpawnPacket packet = new PlayerSpawnPacket();
+            packet.PlayerID = Player.playerID;
+			if(self)
+				packet.PlayerID = 255;
+            packet.Name = Player.name;
+            packet.X = Player.pos.x;
+            packet.Y = Player.pos.y;
+            packet.Z = Player.pos.z;
+            packet.Heading = Player.heading;
+            packet.Pitch = Player.pitch;
+            SendPacket(packet);
         }
     }
 }

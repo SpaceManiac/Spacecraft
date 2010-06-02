@@ -29,7 +29,7 @@ namespace spacecraft
                 LoadRanks();
 
                 //MinecraftServer serv = new MinecraftServer();
-                NewServer serv = new NewServer();
+                Server serv = new Server();
 
                 serv.Start();
 
@@ -50,7 +50,7 @@ namespace spacecraft
 
         public static void LoadRanks()
         {
-            NewPlayer.PlayerRanks.Clear();
+            Player.PlayerRanks.Clear();
             StreamReader Reader = new StreamReader("admins.txt");
             string[] Lines = Reader.ReadToEnd().Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             Reader.Close();
@@ -64,7 +64,7 @@ namespace spacecraft
 
                 string[] people = parts[1].Split(',');
                 foreach(string name in people) {
-                    NewPlayer.PlayerRanks[name.Trim()] = rank;
+                    Player.PlayerRanks[name.Trim().ToLower()] = rank;
                 }
             }
         }

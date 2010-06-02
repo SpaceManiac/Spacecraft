@@ -42,11 +42,11 @@ namespace spacecraft
         /// <summary>
         /// Lookup the command cmd, and execute it using args as the arguments. sender is used to post error messages back to the user.
         /// </summary>
-        /// <param name="sender">The NewPlayer attempting to execute the command.</param>
+        /// <param name="sender">The Player attempting to execute the command.</param>
         /// <param name="cmd">Command to execute, e.g. "me"</param>
         /// <param name="args">Argument passed to command, e.g. "uses /me sucessfully"</param>
         /// 
-        static public void Execute(NewPlayer sender, string cmd, string args)
+        static public void Execute(Player sender, string cmd, string args)
         {
             if (Commands.ContainsKey(cmd))
             {
@@ -65,7 +65,7 @@ namespace spacecraft
             }
         }
 
-        static public void WrapMessage(NewPlayer sendto, string message)
+        static public void WrapMessage(Player sendto, string message)
         {
             while (message.Length > 60)
             {
@@ -108,7 +108,7 @@ namespace spacecraft
         {
             public abstract Rank RankNeeded { get; }
             public abstract string HelpMsg { get; }
-            public abstract void Run(NewPlayer sender, string cmd, string arg);
+            public abstract void Run(Player sender, string cmd, string arg);
         }
 
         public class Help : ChatCommandBase
@@ -123,11 +123,11 @@ namespace spacecraft
                 get { return "/help: displays help information"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.CommandResult + "You are a " + Player.RankColor(sender.rank) + sender.rank.ToString());
+                    sender.PrintMessage(Color.CommandResult + "You are a " + RankInfo.RankColor(sender.rank) + sender.rank.ToString());
                     string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender.rank);
                     ChatCommandHandling.WrapMessage(sender, commands);
                 }
@@ -159,7 +159,7 @@ namespace spacecraft
                 get { return "/me: third-person roleplay-like actions"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 /* /me /me Easter egg. */
                 if (args == "/me")
@@ -173,7 +173,7 @@ namespace spacecraft
                 }
                 else
                 {
-                    NewServer.theServ.MessageAll(" * " + sender.name + " " + args);
+                    Server.theServ.MessageAll(" * " + sender.name + " " + args);
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace spacecraft
                 get { return "/bring: teleports a player to you (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 if (args == "")
                 {
@@ -198,11 +198,11 @@ namespace spacecraft
                 }
                 else
                 {
-                    NewPlayer p = NewServer.theServ.GetPlayer(args);
+                    Player p = Server.theServ.GetPlayer(args);
                     if (p == null) {
                         sender.PrintMessage(Color.CommandError + "No such player " + args);
                     } else {
-                        NewServer.theServ.MovePlayer(p, sender.pos, sender.heading, sender.pitch);
+                        Server.theServ.MovePlayer(p, sender.pos, sender.heading, sender.pitch);
                         Spacecraft.Log(sender.name + " brought " + args);
                     }
                 }
@@ -221,11 +221,11 @@ namespace spacecraft
                 get { return "/exit: shuts down the server (admin)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 Spacecraft.Log(sender.name + " shut down the server");
-                //NewServer.theServ.SendAll(NewPlayer.PacketKick("Server is shutting down!"));
-                NewServer.OnExit.Set();
+                //Server.theServ.SendAll(Player.PacketKick("Server is shutting down!"));
+                Server.OnExit.Set();
             }
         }
 
@@ -241,9 +241,9 @@ namespace spacecraft
                 get { return "/setspawn: sets the global spawn point (admin)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
-                NewServer.theServ.map.SetSpawn(sender.pos, sender.heading);
+                Server.theServ.map.SetSpawn(sender.pos, sender.heading);
                 sender.PrintMessage(Color.CommandResult + "Spawn point set");
                 Spacecraft.Log(sender.name + " set the spawn point");
             }
@@ -261,7 +261,7 @@ namespace spacecraft
                 get { return "/place: place special blocks (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
             	args = args.ToLower();
                 if (args == "")
@@ -305,7 +305,7 @@ namespace spacecraft
                 get { return "/teleport, /tp: teleport to a player (builder+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 if (args == "")
                 {
@@ -314,14 +314,14 @@ namespace spacecraft
                 else
                 {
                     string pname = args;
-                    NewPlayer p = NewServer.theServ.GetPlayer(pname);
+                    Player p = Server.theServ.GetPlayer(pname);
                     if (p == null)
                     {
                         sender.PrintMessage(Color.CommandError + "No such player " + pname);
                     }
                     else
                     {
-                        NewServer.theServ.MovePlayer(sender, p.pos, p.heading, p.pitch);
+                        Server.theServ.MovePlayer(sender, p.pos, p.heading, p.pitch);
                         Spacecraft.Log(sender.name + " telported to " + p.name);
                     }
                 }
@@ -340,7 +340,7 @@ namespace spacecraft
                 get { return "/kick, /k: kick a player (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 if (args == "")
                 {
@@ -349,7 +349,7 @@ namespace spacecraft
                 else
                 {
                     string pname = args;
-                    NewPlayer c = NewServer.theServ.GetPlayer(pname);
+                    Player c = Server.theServ.GetPlayer(pname);
                     if (c == null)
                     {
                         sender.PrintMessage(Color.CommandError + "No such player " + pname);
@@ -375,7 +375,7 @@ namespace spacecraft
                 get { return "/broadcast, /say: broadcast a message in yellow text (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 if (args == "")
                 {
@@ -384,7 +384,7 @@ namespace spacecraft
                 else
                 {
                     Spacecraft.Log("{" + sender.name + "} " + args);
-                    NewServer.theServ.MessageAll(Color.Announce + args);
+                    Server.theServ.MessageAll(Color.Announce + args);
                 }
             }
         }
@@ -401,9 +401,9 @@ namespace spacecraft
                 get { return "/dehydrate: remove all liquids in case of flood (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
-                NewServer.theServ.map.Dehydrate();
+                Server.theServ.map.Dehydrate();
                 Spacecraft.Log(sender.name + " dehydrated the map");
             }
         }
@@ -420,9 +420,9 @@ namespace spacecraft
                 get { return "/mob: spawn an AI mob (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
-                //NewServer.theServ.SpawnMob(sender._player, args);
+                //Server.theServ.SpawnMob(sender._player, args);
             }
         }
 
@@ -438,7 +438,7 @@ namespace spacecraft
                 get { return "/resend: resend the map for testing purposes (brokenish)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 //sender.ResendMap();
             }
@@ -456,7 +456,7 @@ namespace spacecraft
                 get { return "/rerank: reload ranks from the rank (mod+)"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 Spacecraft.LoadRanks();
                 Spacecraft.Log(sender.name + " reloaded the ranks");
@@ -476,7 +476,7 @@ namespace spacecraft
                 get { return "/clear: clears the chat log"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 for (int ww = 0; ww < 20; ++ww)
                 {
@@ -497,7 +497,7 @@ namespace spacecraft
                 get { return "/config: manages raw server options"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
                 string[] argv = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (argv.Length == 0)
@@ -536,10 +536,10 @@ namespace spacecraft
                 get { return "/go: teleports you to a landmark"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = NewServer.theServ.map;
+                Map map = Server.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -551,7 +551,7 @@ namespace spacecraft
                     {
                         Position p = map.landmarks[args].First;
                         byte heading = map.landmarks[args].Second;
-                        NewServer.theServ.MovePlayer(sender, p, heading, 0);
+                        Server.theServ.MovePlayer(sender, p, heading, 0);
                         sender.PrintMessage(Color.CommandResult + "Teleported to landmark " + args);
                     }
                     else
@@ -574,10 +574,10 @@ namespace spacecraft
                 get { return "/mark: creates a landmark"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = NewServer.theServ.map;
+                Map map = Server.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -593,7 +593,7 @@ namespace spacecraft
                     {
                         byte heading = sender.heading;
                         map.landmarks.Add(args, new Pair<Position, byte>(sender.pos, heading));
-                        NewServer.theServ.MessageAll(Color.Announce + sender.name + " created landmark " + args);
+                        Server.theServ.MessageAll(Color.Announce + sender.name + " created landmark " + args);
                     }
                 }
             }
@@ -611,10 +611,10 @@ namespace spacecraft
                 get { return "/rmmark: removes a landmark"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
 				args = args.Trim().ToLower();
-                Map map = NewServer.theServ.map;
+                Map map = Server.theServ.map;
                 if (args == "")
                 {
                     string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
@@ -625,7 +625,7 @@ namespace spacecraft
                     if (map.landmarks.ContainsKey(args))
                     {
                         map.landmarks.Remove(args);
-						NewServer.theServ.MessageAll(Color.Announce + sender.name + " removed landmark " + args);
+						Server.theServ.MessageAll(Color.Announce + sender.name + " removed landmark " + args);
                     }
                     else
                     {
@@ -647,17 +647,17 @@ namespace spacecraft
                 get { return "/whois: get information on a user"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
 				args = args.Trim();
-                NewPlayer p = NewServer.theServ.GetPlayer(args);
-				Rank r = Player.LookupRank(args);
+                Player p = Server.theServ.GetPlayer(args);
+				Rank r = Player.RankOf(args);
 				if(p == null) {
 					sender.PrintMessage(Color.CommandResult + args + " is offline");
-					sender.PrintMessage(Color.CommandResult + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.CommandResult + args + " is a " + RankInfo.RankColor(r) + r.ToString());
 				} else {
 					sender.PrintMessage(Color.CommandResult + args + " is online");
-					sender.PrintMessage(Color.CommandResult + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.CommandResult + args + " is a " + RankInfo.RankColor(r) + r.ToString());
 					sender.PrintMessage(Color.CommandResult + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
 				}
             }
@@ -676,16 +676,16 @@ namespace spacecraft
                 get { return "/physics [true|false]: Enables/disables physics."; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string arg)
+            public override void Run(Player sender, string cmd, string arg)
             {
                 if (arg != "")
                 {
-                    NewServer.theServ.map.PhysicsOn = (arg == "true");
-                    NewServer.theServ.MessageAll(Color.Announce + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
+                    Server.theServ.map.PhysicsOn = (arg == "true");
+                    Server.theServ.MessageAll(Color.Announce + "Physics running - " + Server.theServ.map.PhysicsOn.ToString());
                 }
                 else
                 {
-                    sender.PrintMessage(Color.CommandResult + "Physics running is " + NewServer.theServ.map.PhysicsOn.ToString());
+                    sender.PrintMessage(Color.CommandResult + "Physics running is " + Server.theServ.map.PhysicsOn.ToString());
                 }
             }
         }
@@ -702,12 +702,12 @@ namespace spacecraft
                 get { return "What does /conwiz do? What DOESN'T it do?"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string arg)
+            public override void Run(Player sender, string cmd, string arg)
             {
                 Position oldpos = sender.pos;
                 Position pos = new Position((short)(oldpos.x / 32), (short)(oldpos.y / 32), (short)(oldpos.z / 32));
 
-                Map map = NewServer.theServ.map;
+                Map map = Server.theServ.map;
 
                 int value = Spacecraft.random.Next(21, 36);
 
@@ -719,11 +719,11 @@ namespace spacecraft
                         {
                             if (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) == 5)
                             {
-                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z),(Block) value);
+                                Server.theServ.ChangeBlock(new BlockPosition(x, y, z),(Block) value);
                             }
                             if (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 5)
                             {
-                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z), Block.Air);
+                                Server.theServ.ChangeBlock(new BlockPosition(x, y, z), Block.Air);
                             }
                         }
                     }
@@ -744,7 +744,7 @@ namespace spacecraft
                 get { return "/convert [block] [repl]: Replace [block] with [repl]"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string args)
+            public override void Run(Player sender, string cmd, string args)
             {
             	args = args.ToLower();
 
@@ -765,7 +765,7 @@ namespace spacecraft
 
 				Block From = BlockInfo.names[parts[0]];
                 Block To = BlockInfo.names[parts[1]];
-                Map map = NewServer.theServ.map;
+                Map map = Server.theServ.map;
                 
                 int i = 0;
 	            for (short x = 0; x < map.xdim; x++) {

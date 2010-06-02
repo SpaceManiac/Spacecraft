@@ -1,4 +1,4 @@
-
+/*
 using System;
 using System.Collections;
 
@@ -16,7 +16,7 @@ namespace spacecraft
 
         public void Update()
         {
-            MinecraftServer serv = MinecraftServer.theServ;
+            //MinecraftServer serv = MinecraftServer.theServ;
 
             time += (1.0 / 30);
             if (time < 1)
@@ -40,7 +40,8 @@ namespace spacecraft
                 time = 0;
                 //Update(serv);
             }
-            serv.SendAll(Connection.PacketPositionUpdate(this));
+            //serv.SendAll(Connection.PacketPositionUpdate(this));
         }
     }
 }
+*/
