@@ -166,13 +166,19 @@ namespace spacecraft
 		
 		void conn_BlockSet(short X, short Y, short Z, byte Mode, byte Type)
 		{
+			Block type = (Block)Type;
 			if(Mode == 0x00) {
 				// block destroyed
-				Type = (byte)Block.Air;
+				type = Block.Air;
+			} else {
+				// block placed
+				if(placing && type == Block.Obsidian) {
+					type = placeType;
+				}
 			}
 			
 			if(BlockChange != null)
-				BlockChange(new BlockPosition(X, Y, Z), (Block)Type);
+				BlockChange(new BlockPosition(X, Y, Z), type);
 		}
 
         void conn_ReceivedMessage(string msg)
