@@ -34,7 +34,7 @@ namespace spacecraft
             Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
             Commands.Add("config", new ChatCommands.Configure());
 			Commands.Add("whois", new ChatCommands.WhoIs());
-            Commands.Add("conspiracywizard", new ChatCommands.ConspiracyWizard());
+            Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
             Commands.Add("physics", new ChatCommands.Physics());
             Commands.Add("convert", new ChatCommands.Convert());
         }
@@ -776,13 +776,13 @@ namespace spacecraft
 	                } 
 	            }
 	            
-	            if(i > 200) {
-	            	sender.PrintMessage(Color.CommandError + "Not allowed to convert " + i + " (>200) blocks at once");
+				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
+	            if(i > 500) {
+	            	sender.PrintMessage(Color.CommandResult + "Converting max of 500 " + From.ToString() + " to " + To.ToString() + "...");
 	            } else {
-					Spacecraft.Log(sender.name + " converted all " + From.ToString() + " to " + To.ToString());
 	                sender.PrintMessage(Color.CommandResult + "Converting " + i + " " + From.ToString() + " to " + To.ToString() + "...");
-	                map.ReplaceAll(From, To);
                 }
+	            map.ReplaceAll(From, To, 500);
             }
         }
     }

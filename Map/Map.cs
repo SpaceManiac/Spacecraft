@@ -252,14 +252,17 @@ namespace spacecraft
             } // lock(physicsMutex)
         }
         
-        public void ReplaceAll(Block From, Block To)
+        public void ReplaceAll(Block From, Block To, int max)
         {
         	lock(PhysicsMutex) {
+        		int total = 0;
 	            for (short x = 0; x < xdim; x++) {
 	                for (short y = 0; y < ydim; y++) {
 	                    for (short z = 0; z < zdim; z++) {
-	                        if (GetTile(x, y, z) == From)
+	                        if (GetTile(x, y, z) == From) {
 	                            SetSend(x, y, z, To);
+	                            if(++total >= max) return;
+	                        }
 	                    }
 	                } 
 	            }
@@ -268,7 +271,7 @@ namespace spacecraft
 
         public void Dehydrate()
         {
-            ReplaceAll(Block.Water, Block.Air);
+            ReplaceAll(Block.Water, Block.Air, 5000);
         }
 
         public void SetSend(short x, short y, short z, Block tile)
