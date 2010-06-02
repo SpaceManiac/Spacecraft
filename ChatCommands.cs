@@ -55,13 +55,13 @@ namespace spacecraft
                     	Commands[cmd].Run(sender, cmd, args);
                     }
                     catch(NotImplementedException) {
-                    	sender.PrintMessage(Color.DarkRed + "That command's not implemented!");
+                    	sender.PrintMessage(Color.CommandError + "That command's not implemented!");
                     }
                 } else {
-                    sender.PrintMessage(Color.DarkRed + "You don't have permission to do that.");
+                    sender.PrintMessage(Color.CommandError + "You don't have permission to do that.");
                 }
             } else {
-                sender.PrintMessage(Color.DarkRed + "Unknown command " + cmd);
+                sender.PrintMessage(Color.CommandError + "Unknown command " + cmd);
             }
         }
 
@@ -70,10 +70,10 @@ namespace spacecraft
             while (message.Length > 60)
             {
                 int i = message.LastIndexOf(' ', 60, 60);
-                sendto.PrintMessage(Color.Teal + message.Substring(0, i));
+                sendto.PrintMessage(Color.CommandResult + message.Substring(0, i));
                 message = message.Substring(i);
             }
-            sendto.PrintMessage(Color.Teal + message);
+            sendto.PrintMessage(Color.CommandResult + message);
         }
 
         static public string GetHelp(string cmd)
@@ -127,7 +127,7 @@ namespace spacecraft
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.Teal + "You are a " + Player.RankColor(sender.rank) + sender.rank.ToString());
+                    sender.PrintMessage(Color.CommandResult + "You are a " + Player.RankColor(sender.rank) + sender.rank.ToString());
                     string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender.rank);
                     ChatCommandHandling.WrapMessage(sender, commands);
                 }
@@ -137,11 +137,11 @@ namespace spacecraft
                     string help = ChatCommandHandling.GetHelp(args);
                     if (help == "")
                     {
-                        sender.PrintMessage(Color.DarkRed + "No help text on /" + args);
+                        sender.PrintMessage(Color.CommandError + "No help text on /" + args);
                     }
                     else
                     {
-                        sender.PrintMessage(Color.Teal + help);
+                        sender.PrintMessage(Color.CommandResult + help);
                     }
                 }
             }
@@ -194,13 +194,13 @@ namespace spacecraft
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.CommandError + "No player specified");
                 }
                 else
                 {
                     NewPlayer p = NewServer.theServ.GetPlayer(args);
                     if (p == null) {
-                        sender.PrintMessage(Color.DarkRed + "No such player " + args);
+                        sender.PrintMessage(Color.CommandError + "No such player " + args);
                     } else {
                         NewServer.theServ.MovePlayer(p, sender.pos, sender.heading, sender.pitch);
                         Spacecraft.Log(sender.name + " brought " + args);
@@ -244,7 +244,7 @@ namespace spacecraft
             public override void Run(NewPlayer sender, string cmd, string args)
             {
                 NewServer.theServ.map.SetSpawn(sender.pos, sender.heading);
-                sender.PrintMessage(Color.Teal + "Spawn point set");
+                sender.PrintMessage(Color.CommandResult + "Spawn point set");
                 Spacecraft.Log(sender.name + " set the spawn point");
             }
         }
@@ -268,11 +268,11 @@ namespace spacecraft
                     if (sender.placing)
                     {
                         sender.placing = false;
-                        sender.PrintMessage(Color.Teal + "No longer placing");
+                        sender.PrintMessage(Color.CommandResult + "No longer placing");
                     }
                     else
                     {
-                        sender.PrintMessage(Color.DarkRed + "No block specified");
+                        sender.PrintMessage(Color.CommandError + "No block specified");
                     }
                 }
                 else
@@ -282,11 +282,11 @@ namespace spacecraft
                     {
                         sender.placing = true;
                         sender.placeType = BlockInfo.names[b];
-                        sender.PrintMessage(Color.Teal + "Placing " + b + " in place of Obsidian. Use /place to cancel");
+                        sender.PrintMessage(Color.CommandResult + "Placing " + b + " in place of Obsidian. Use /place to cancel");
                     }
                     else
                     {
-                        sender.PrintMessage(Color.DarkRed + "Unknown block " + b);
+                        sender.PrintMessage(Color.CommandError + "Unknown block " + b);
                     }
                 }
             }
@@ -308,7 +308,7 @@ namespace spacecraft
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.CommandError + "No player specified");
                 }
                 else
                 {
@@ -316,7 +316,7 @@ namespace spacecraft
                     NewPlayer p = NewServer.theServ.GetPlayer(pname);
                     if (p == null)
                     {
-                        sender.PrintMessage(Color.DarkRed + "No such player " + pname);
+                        sender.PrintMessage(Color.CommandError + "No such player " + pname);
                     }
                     else
                     {
@@ -343,7 +343,7 @@ namespace spacecraft
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.DarkRed + "No player specified");
+                    sender.PrintMessage(Color.CommandError + "No player specified");
                 }
                 else
                 {
@@ -351,7 +351,7 @@ namespace spacecraft
                     NewPlayer c = NewServer.theServ.GetPlayer(pname);
                     if (c == null)
                     {
-                        sender.PrintMessage(Color.DarkRed + "No such player " + pname);
+                        sender.PrintMessage(Color.CommandError + "No such player " + pname);
                     }
                     else
                     {
@@ -378,12 +378,12 @@ namespace spacecraft
             {
                 if (args == "")
                 {
-                    sender.PrintMessage(Color.DarkRed + "No message specified");
+                    sender.PrintMessage(Color.CommandError + "No message specified");
                 }
                 else
                 {
                     Spacecraft.Log("{" + sender.name + "} " + args);
-                    NewServer.theServ.MessageAll(Color.Yellow + args);
+                    NewServer.theServ.MessageAll(Color.Announce + args);
                 }
             }
         }
@@ -459,7 +459,7 @@ namespace spacecraft
             {
                 Spacecraft.LoadRanks();
                 Spacecraft.Log(sender.name + " reloaded the ranks");
-                sender.PrintMessage(Color.Teal + "Ranks reloaded");
+                sender.PrintMessage(Color.CommandResult + "Ranks reloaded");
             }
         }
 
@@ -509,11 +509,11 @@ namespace spacecraft
                     string r = Config.Get(argv[0], null);
                     if (r == null)
                     {
-                        sender.PrintMessage(Color.Teal + "No option " + argv[0] + " defined");
+                        sender.PrintMessage(Color.CommandResult + "No option " + argv[0] + " defined");
                     }
                     else
                     {
-                        sender.PrintMessage(Color.Teal + "Option " + argv[0] + " is " + r);
+                        sender.PrintMessage(Color.CommandResult + "Option " + argv[0] + " is " + r);
                     }
                 }
                 else if (argv.Length == 2)
@@ -551,11 +551,11 @@ namespace spacecraft
                         Position p = map.landmarks[args].First;
                         byte heading = map.landmarks[args].Second;
                         NewServer.theServ.MovePlayer(sender, p, heading, 0);
-                        sender.PrintMessage(Color.Teal + "Teleported to landmark " + args);
+                        sender.PrintMessage(Color.CommandResult + "Teleported to landmark " + args);
                     }
                     else
                     {
-                        sender.PrintMessage(Color.DarkRed + "No such landmark " + args);
+                        sender.PrintMessage(Color.CommandError + "No such landmark " + args);
                     }
                 }
             }
@@ -586,13 +586,13 @@ namespace spacecraft
                 {
                     if (map.landmarks.ContainsKey(args))
                     {
-                        sender.PrintMessage(Color.DarkRed + "Landmark " + args + " already exists");
+                        sender.PrintMessage(Color.CommandError + "Landmark " + args + " already exists");
                     }
                     else
                     {
                         byte heading = sender.heading;
                         map.landmarks.Add(args, new Pair<Position, byte>(sender.pos, heading));
-                        NewServer.theServ.MessageAll(Color.Yellow + sender.name + " created landmark " + args);
+                        NewServer.theServ.MessageAll(Color.Announce + sender.name + " created landmark " + args);
                     }
                 }
             }
@@ -624,11 +624,11 @@ namespace spacecraft
                     if (map.landmarks.ContainsKey(args))
                     {
                         map.landmarks.Remove(args);
-						NewServer.theServ.MessageAll(Color.Yellow + sender.name + " removed landmark " + args);
+						NewServer.theServ.MessageAll(Color.Announce + sender.name + " removed landmark " + args);
                     }
                     else
                     {
-                        sender.PrintMessage(Color.DarkRed + "No such landmark " + args);
+                        sender.PrintMessage(Color.CommandError + "No such landmark " + args);
                     }
                 }
             }
@@ -652,12 +652,12 @@ namespace spacecraft
                 NewPlayer p = NewServer.theServ.GetPlayer(args);
 				Rank r = Player.LookupRank(args);
 				if(p == null) {
-					sender.PrintMessage(Color.Teal + args + " is offline");
-					sender.PrintMessage(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.CommandResult + args + " is offline");
+					sender.PrintMessage(Color.CommandResult + args + " is a " + Player.RankColor(r) + r.ToString());
 				} else {
-					sender.PrintMessage(Color.Teal + args + " is online");
-					sender.PrintMessage(Color.Teal + args + " is a " + Player.RankColor(r) + r.ToString());
-					sender.PrintMessage(Color.Teal + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
+					sender.PrintMessage(Color.CommandResult + args + " is online");
+					sender.PrintMessage(Color.CommandResult + args + " is a " + Player.RankColor(r) + r.ToString());
+					sender.PrintMessage(Color.CommandResult + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
 				}
             }
         }
@@ -680,7 +680,7 @@ namespace spacecraft
                 if (arg != "")
                 {
                     NewServer.theServ.map.PhysicsOn = (arg == "true");
-                    NewServer.theServ.MessageAll(Color.Yellow + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
+                    NewServer.theServ.MessageAll(Color.Announce + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
                 }
                 else
                 {
