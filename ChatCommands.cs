@@ -766,10 +766,23 @@ namespace spacecraft
                     return;
                 }
                 Map map = NewServer.theServ.map;
-
-				Spacecraft.Log(sender.name + " converted all " + From.ToString() + " to " + To.ToString());
-                sender.PrintMessage(Color.CommandResult + "Converting " + From.ToString() + " to " + To.ToString() + "...");
-                map.ReplaceAll(From, To);
+                
+                int i = 0;
+	            for (short x = 0; x < map.xdim; x++) {
+	                for (short y = 0; y < map.ydim; y++) {
+	                    for (short z = 0; z < map.zdim; z++) {
+	                        if (map.GetTile(x, y, z) == From) ++i;
+	                    }
+	                } 
+	            }
+	            
+	            if(i > 200) {
+	            	sender.PrintMessage(Color.CommandError + "Not allowed to convert " + i + " (>200) blocks at once");
+	            } else {
+					Spacecraft.Log(sender.name + " converted all " + From.ToString() + " to " + To.ToString());
+	                sender.PrintMessage(Color.CommandResult + "Converting " + i + " " + From.ToString() + " to " + To.ToString() + "...");
+	                map.ReplaceAll(From, To);
+                }
             }
         }
     }
