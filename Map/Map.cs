@@ -187,7 +187,7 @@ namespace spacecraft
                         if (tile == Block.Sand || tile == Block.Gravel)
                         {
                         	short lowY = y;
-                        	if(GetTile(x, (short)(lowY - 1), z) == Block.Air || BlockInfo.IsFluid(GetTile(x, (short)(lowY - 1), z)))) {
+                        	if(GetTile(x, (short)(lowY - 1), z) == Block.Air || BlockInfo.IsFluid(GetTile(x, (short)(lowY - 1), z))))) {
                         		--lowY;
                         	}
                         	if(lowY != y) {
