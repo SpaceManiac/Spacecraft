@@ -1,5 +1,8 @@
-#Hello, world!
-port=13000
-max-players=16
-server-name=Minecraft Server
-motd=Powered by &aSpacecraft
+# Spacecraft default configuration file
+# This file was auto-generated
+
+port = 13000
+server-name = Minecraft Server
+motd = Powered by &aSpacecraft
+max-players = 16
+verify-names = true

@@ -30,6 +30,7 @@ namespace spacecraft
         public delegate void DisconnectHandler();
         public event DisconnectHandler Disconnect;
 
+		bool Joined = false;
         bool Connected = true;
         private object SendQueueMutex = new object();
         Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
@@ -126,6 +127,14 @@ namespace spacecraft
 				return;
             }
             bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
+            
+            if (Config.GetBool("verify-names", true) && !success) {
+            	Spacecraft.Log(IncomingPacket.Username.ToString() + " attempted to join, but didn't verify");
+            	SendKick("Your name wasn't verified by minecraft.net!");
+            	return;
+           	}
+           	
+           	Joined = true;
 
             if (ReceivedUsername != null)
                 ReceivedUsername(IncomingPacket.Username.ToString());
@@ -260,20 +269,18 @@ namespace spacecraft
         private void Quit()
         {
             _client.Close();
-            if(!Connected) return;
+            if (!Connected) return;
             Connected = false;
+            if (!Joined) return;
             if (Disconnect != null)
                 Disconnect();
         }
 
         private bool IsHashCorrect(string name, string hash)
         {
-            MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();
-
-            string salt = NewServer.theServ.salt.ToString(); //MinecraftServer.theServ.salt.ToString();
+            string salt = NewServer.theServ.salt.ToString();
             string combined = salt + name;
-            Byte[] combinedBytes = Encoding.ASCII.GetBytes(combined);
-            string properHash = provider.ComputeHash(combinedBytes).ToString();
+            string properHash = Spacecraft.MD5sum(combined);
 
             return (hash == properHash);
         }

@@ -41,9 +41,10 @@ namespace spacecraft
             fh.WriteLine("# This file was auto-generated");
             fh.WriteLine();
             fh.WriteLine("port = 25565");
-            fh.WriteLine("max-players = 16");
             fh.WriteLine("server-name = Minecraft Server");
             fh.WriteLine("motd = Powered by " + Color.Green + "Spacecraft");
+            fh.WriteLine("max-players = 16");
+            fh.WriteLine("verify-names = true");
             fh.Close();
         }
 

@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 //using System.Threading;
 using System.Web;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace spacecraft
 {
@@ -130,5 +132,16 @@ namespace spacecraft
 			}
 			return r;
 		}
+
+        public static string MD5sum(string Value)
+        {
+            MD5CryptoServiceProvider x = new MD5CryptoServiceProvider();
+            byte[] data = Encoding.ASCII.GetBytes(Value);
+            data = x.ComputeHash(data);
+            StringBuilder ret = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+                ret.Append(data[i].ToString("x2").ToLower());
+            return ret.ToString();
+        }
     }
 }
