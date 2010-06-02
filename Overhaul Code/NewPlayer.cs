@@ -147,7 +147,8 @@ namespace spacecraft
 
         void conn_PlayerSpawn()
         {
-           
+            if(name == null)
+            	throw new Exception("tonoes?");
             if (Spawn != null)
                 Spawn(this);
         }

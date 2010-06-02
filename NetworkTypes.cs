@@ -48,7 +48,6 @@ namespace spacecraft
     {
         new public const byte FILLER_CHAR = 0x20;
         new public const int Size = 64;
-
        
         public NetworkString(byte[] raw)
         {
@@ -74,8 +73,6 @@ namespace spacecraft
     {
         new public const int  Size = 1024;
         new public const byte FILLER_CHAR = 0x00;
-
-
 
         public NetworkByteArray(byte[] bar)
         {

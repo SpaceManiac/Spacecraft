@@ -5,4 +5,4 @@ port = 13000
 server-name = Minecraft Server
 motd = Powered by &aSpacecraft
 max-players = 16
-verify-names = true
+verify-names = false

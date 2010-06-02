@@ -214,7 +214,7 @@ namespace spacecraft
             }
         }
 
-        public void Dehydrate(MinecraftServer srv)
+        public void Dehydrate()
         {
             physicsSuspended = true;
             for (short x = 0; x < xdim; ++x)

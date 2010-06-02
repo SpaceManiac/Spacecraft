@@ -48,7 +48,12 @@ namespace spacecraft
             if (Commands.ContainsKey(cmd))
             {
                 if (sender.rank >= Commands[cmd].RankNeeded) {
-                    Commands[cmd].Run(sender, cmd, args);
+                	try {
+                    	Commands[cmd].Run(sender, cmd, args);
+                    }
+                    catch(NotImplementedException) {
+                    	sender.PrintMessage(Color.DarkRed + "That command's not implemented!");
+                    }
                 } else {
                     sender.PrintMessage(Color.DarkRed + "You don't have permission to do that.");
                 }
@@ -395,7 +400,7 @@ namespace spacecraft
 
             public override void Run(NewPlayer sender, string cmd, string args)
             {
-                //NewServer.theServ.map.Dehydrate(NewServer.theServ);
+                NewServer.theServ.map.Dehydrate();
                 Spacecraft.Log(sender.name + " dehydrated the map");
             }
         }
