@@ -24,8 +24,8 @@ namespace spacecraft
 					for(short z = 0; z < map.zdim; ++z) {
 						BlockPosition p = new BlockPosition(x, y, z);
 						BlockPosition p2 = CoordsTo(map, p, mode);
-						newmap[Map.BlockIndex2(p2.x, p2.y, p2.z, newdim.x, newdim.z)] =
-							map.data[Map.BlockIndex2(p.x, p.y, p.z, dim.x, dim.z)];
+						newmap[Map.BlockIndex(p2.x, p2.y, p2.z, newdim.x, newdim.z)] =
+							map.data[Map.BlockIndex(p.x, p.y, p.z, dim.x, dim.z)];
 					}
 				}
 			}

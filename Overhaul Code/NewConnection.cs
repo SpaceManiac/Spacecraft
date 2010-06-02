@@ -43,13 +43,15 @@ namespace spacecraft
             SendQueue = new Queue<ServerPacket>();
 
             _client = c;
-
+        }
+        
+        public void Start() {
             Thread T = new Thread(ReadThread);
             T.Start();
 			
 			Thread T2 = new Thread(WriteThread);
 			T2.Start();
-        }
+		}
 
         void ReadThread() {
             while (Connected) {

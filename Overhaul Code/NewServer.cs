@@ -245,10 +245,6 @@ namespace spacecraft
 
         void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
         {
-            foreach (NewPlayer P in Players)
-            {
-                P.BlockSet(pos, BlockType);
-            }
             map.SetTile(pos.x, pos.y, pos.z, BlockType);
         }
 

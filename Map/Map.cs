@@ -168,11 +168,11 @@ namespace spacecraft
 	                            }
 	                            if (tile == Block.Dirt && lit && Spacecraft.random.NextDouble() < 0.2)
 	                            {
-	                                SetSend(x, y, z, Block.Grass);
+	                                SetTile(x, y, z, Block.Grass);
 	                            }
 	                            if (tile == Block.Grass && !lit && Spacecraft.random.NextDouble() < 0.7)
 	                            {
-	                                SetSend(x, y, z, Block.Dirt);
+	                                SetTile(x, y, z, Block.Dirt);
 	                            }
 	                        }
 	                        // water & lava
@@ -238,15 +238,15 @@ namespace spacecraft
             
 	            foreach (PhysicsTask task in FluidList) {
 	                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
-	                    SetSend(task.x, task.y, task.z, task.tile);
+	                    SetTile(task.x, task.y, task.z, task.tile);
 	                }
 	            }
 	            foreach (PhysicsTask task in SandList) {
-	            	SetSend(task.x, task.y, task.z, task.tile);
+	            	SetTile(task.x, task.y, task.z, task.tile);
 	            }
 	            foreach (PhysicsTask task in SpongeList) {
 	                if (BlockInfo.IsFluid(GetTile(task.x, task.y, task.z))) {
-	                    SetSend(task.x, task.y, task.z, task.tile);
+	                    SetTile(task.x, task.y, task.z, task.tile);
 	                }
 	            }
             } // lock(physicsMutex)
@@ -260,7 +260,7 @@ namespace spacecraft
 	                for (short y = 0; y < ydim; y++) {
 	                    for (short z = 0; z < zdim; z++) {
 	                        if (GetTile(x, y, z) == From) {
-	                            SetSend(x, y, z, To);
+	                            SetTile(x, y, z, To);
 	                            if(++total >= max) return;
 	                        }
 	                    }
@@ -274,7 +274,7 @@ namespace spacecraft
             ReplaceAll(Block.Water, Block.Air, 5000);
         }
 
-        public void SetSend(short x, short y, short z, Block tile)
+        public void SetTile(short x, short y, short z, Block tile)
         {
             if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
             data[BlockIndex(x, y, z)] = (byte)tile;
@@ -282,31 +282,20 @@ namespace spacecraft
             	BlockChange(this, new BlockPosition(x, y, z), tile);
         }
 
-        public int BlockIndex(short x, short y, short z)
-        {
-            return ((y * zdim + z) * xdim + x);
-        }
-
-        public int BlockIndex2(short x, short y, short z)
-        {
-            return ((y * zdim + z) * xdim + x);
-        }
-
-		public static int BlockIndex2(short x, short y, short z, short xdim, short zdim)
-		{
-			return ((y * zdim + z) * xdim + x);
-		}
-
-        public void SetTile(short x, short y, short z, Block tile)
-        {
-            if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-            data[BlockIndex(x, y, z)] = (byte)tile;
-        }
-
         public Block GetTile(short x, short y, short z)
         {
             if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return Block.Adminium;
             return (Block)data[BlockIndex(x, y, z)];
         }
+
+        public int BlockIndex(short x, short y, short z)
+        {
+            return ((y * zdim + z) * xdim + x);
+        }
+        
+		public static int BlockIndex(short x, short y, short z, short xdim, short zdim)
+		{
+			return ((y * zdim + z) * xdim + x);
+		}
     }
 }

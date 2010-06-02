@@ -61,10 +61,12 @@ namespace spacecraft
 
             conn.PlayerMove += new NewConnection.PlayerMoveHandler(conn_PlayerMove);
             conn.PlayerSpawn += new NewConnection.PlayerSpawnHandler(conn_PlayerSpawn);
-            conn.BlockSet += new NewConnection.BlockSetHandler(conn_BlockSet);
             conn.ReceivedUsername += new NewConnection.UsernameHandler(conn_ReceivedUsername);
+            conn.BlockSet += new NewConnection.BlockSetHandler(conn_BlockSet);
             conn.ReceivedMessage += new NewConnection.MessageHandler(conn_ReceivedMessage);
             conn.Disconnect += new NewConnection.DisconnectHandler(conn_Disconnect);
+            
+            conn.Start();
         }
       
         /// <summary>

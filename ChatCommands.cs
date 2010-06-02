@@ -684,7 +684,7 @@ namespace spacecraft
                 }
                 else
                 {
-                    sender.Message(Color.CommandResult + "Physics running is " + NewServer.theServ.map.PhysicsOn.ToString());
+                    sender.PrintMessage(Color.CommandResult + "Physics running is " + NewServer.theServ.map.PhysicsOn.ToString());
                 }
             }
         }
