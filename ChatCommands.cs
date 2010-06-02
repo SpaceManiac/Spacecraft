@@ -661,6 +661,7 @@ namespace spacecraft
 					sender.PrintMessage(Color.Teal + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
 				}
             }
+<<<<<<< HEAD:ChatCommands.cs
         }
 
         public class Physics : ChatCommandBase
@@ -782,7 +783,5 @@ namespace spacecraft
                 }
             }
         }
-
-
     }
 }
