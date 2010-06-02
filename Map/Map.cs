@@ -42,9 +42,6 @@ namespace spacecraft
             physicsCount = 0;
             data = new byte[] { 0x02, 0x03, 0x04, 0x05 };
             xdim = 0; ydim = 0; zdim = 0;
-            //StreamWriter s = new StreamWriter("test.txt");
-            //foo.Serialize(s.BaseStream, this);
-            //s.Close();
         }
 
         public string[] GetLandmarkList()
@@ -71,21 +68,15 @@ namespace spacecraft
             xdim = DefaultWidth;
             ydim = DefaultHeight;
             zdim = DefaultDepth;
-            spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
+            spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 64), (short)(16 * zdim));
             // Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
             data = new byte[Length];
-            for (short x = 0; x < xdim; ++x)
-            {
-                for (short z = 0; z < zdim; ++z)
-                {
-                    for (short y = 0; y < ydim / 2; ++y)
-                    {
-                        if (y == ydim / 2 - 1)
-                        {
+            for (short x = 0; x < xdim; ++x) {
+                for (short z = 0; z < zdim; ++z) {
+                    for (short y = 0; y < ydim / 2; ++y) {
+                        if (y == ydim / 2 - 1) {
                             SetTile(x, y, z, Block.Grass);
-                        }
-                        else
-                        {
+                        } else {
                             SetTile(x, y, z, Block.Dirt);
                         }
                     }
@@ -96,10 +87,8 @@ namespace spacecraft
         // zips a copy of the block array
         public void GetCompressedCopy(Stream stream, bool prependBlockCount)
         {
-            using (GZipStream compressor = new GZipStream(stream, CompressionMode.Compress))
-            {
-                if (prependBlockCount)
-                {
+            using (GZipStream compressor = new GZipStream(stream, CompressionMode.Compress)) {
+                if (prependBlockCount) {
                     // convert block count to big-endian
                     int convertedBlockCount = IPAddress.HostToNetworkOrder(data.Length);
                     // write block count to gzip stream
@@ -118,6 +107,7 @@ namespace spacecraft
             physicsCount++;
 
             List<PhysicsTask> FluidList = new List<PhysicsTask>();
+            List<PhysicsTask> SandList = new List<PhysicsTask>();
             List<PhysicsTask> SpongeList = new List<PhysicsTask>();
 
             for (short x = 0; x < xdim; ++x)
@@ -193,21 +183,32 @@ namespace spacecraft
                                 }
                             }
                         }
+                        // sand and gravel
+                        if (tile == Block.Sand || tile == Block.Gravel)
+                        {
+                        	short lowY = y;
+                        	if(GetTile(x, (short)(lowY - 1), z) == Block.Air || BlockInfo.IsFluid(GetTile(x, (short)(lowY - 1), z)))) {
+                        		--lowY;
+                        	}
+                        	if(lowY != y) {
+	                        	SandList.Add(new PhysicsTask(x, y, z, Block.Air));
+	                        	SandList.Add(new PhysicsTask(x, lowY, z, tile));
+	                        }
+                        }
                     }
                 }
             }
 
-            foreach (PhysicsTask task in FluidList)
-            {
-                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air)))
-                {
+            foreach (PhysicsTask task in FluidList) {
+                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
                     SetSend(task.x, task.y, task.z, task.tile);
                 }
             }
-            foreach (PhysicsTask task in SpongeList)
-            {
-                if (GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava || GetTile(task.x, task.y, task.z) == Block.StillWater)
-                {
+            foreach (PhysicsTask task in SandList) {
+            	SetSend(task.x, task.y, task.z, task.tile);
+            }
+            foreach (PhysicsTask task in SpongeList) {
+                if (BlockInfo.IsFluid(GetTile(task.x, task.y, task.z))) {
                     SetSend(task.x, task.y, task.z, task.tile);
                 }
             }
