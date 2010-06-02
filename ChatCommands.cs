@@ -263,6 +263,7 @@ namespace spacecraft
 
             public override void Run(NewPlayer sender, string cmd, string args)
             {
+            	args = args.ToLower();
                 if (args == "")
                 {
                     if (sender.placing)
@@ -698,7 +699,7 @@ namespace spacecraft
 
             public override string HelpMsg
             {
-                get { return "What does /conspiracywizard do? What DOESN'T it do?"; }
+                get { return "What does /conwiz do? What DOESN'T it do?"; }
             }
 
             public override void Run(NewPlayer sender, string cmd, string arg)
@@ -727,6 +728,7 @@ namespace spacecraft
                         }
                     }
                 }
+                Spacecraft.Log(sender.name + " helped with conspiracies");
             }
         }
 
@@ -742,11 +744,11 @@ namespace spacecraft
                 get { return "/convert [block] [repl]: Replace [block] with [repl]"; }
             }
 
-            public override void Run(NewPlayer sender, string cmd, string arg)
+            public override void Run(NewPlayer sender, string cmd, string args)
             {
-                
+            	args = args.ToLower();
 
-                string[] parts = arg.Split(new char[]{' '});
+                string[] parts = args.Split(new char[]{' '});
                 if (parts.Length < 2)
                 {
                     sender.PrintMessage(Color.CommandError + "Too few arguments!");

@@ -119,9 +119,10 @@ namespace spacecraft
         
         public NewPlayer GetPlayer(string name)
         {
+        	name = name.ToLower();
         	// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
         	foreach(NewPlayer P in Players) {
-        		if(P.name == name) {
+        		if(P.name.ToLower() == name) {
         			return P;
         		}
         	}
