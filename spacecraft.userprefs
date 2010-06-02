@@ -2,9 +2,13 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Map\Map.cs" ctype="Workbench">
     <Files>
-      <File FileName="Overhaul Code\NewServer.cs" Line="242" Column="27" />
-      <File FileName="Map\Map.cs" Line="111" Column="68" />
-      <File FileName="Constants.cs" Line="77" Column="73" />
+      <File FileName="Overhaul Code\NewServer.cs" Line="1" Column="1" />
+      <File FileName="Map\Map.cs" Line="139" Column="25" />
+      <File FileName="Constants.cs" Line="1" Column="1" />
+      <File FileName="ChatCommands.cs" Line="403" Column="51" />
+      <File FileName="NetworkTypes.cs" Line="50" Column="40" />
+      <File FileName="Overhaul Code\NewConnection.cs" Line="160" Column="30" />
+      <File FileName="Overhaul Code\NewPlayer.cs" Line="136" Column="52" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

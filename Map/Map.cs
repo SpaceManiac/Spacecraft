@@ -109,6 +109,39 @@ namespace spacecraft
             List<PhysicsTask> FluidList = new List<PhysicsTask>();
             List<PhysicsTask> SandList = new List<PhysicsTask>();
             List<PhysicsTask> SpongeList = new List<PhysicsTask>();
+            
+            short y_1 = (short)(ydim / 2 - 1);
+            short y_2 = (short)(ydim / 2 - 2);
+            short z2 = (short)(zdim - 1);
+            for (short x = 0; x < xdim; ++x) {
+            	if(GetTile(x, y_1, 0) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x, y_1, 0, Block.Water));
+            	}
+            	if(GetTile(x, y_1, z2) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x, y_1, z2, Block.Water));
+            	}
+            	if(GetTile(x, y_2, 0) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x, y_2, 0, Block.Water));
+            	}
+            	if(GetTile(x, y_2, z2) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x, y_2, z2, Block.Water));
+            	}
+            }
+            short x2 = (short)(xdim - 1);
+            for (short z = 1; z < zdim - 1; ++z) {
+            	if(GetTile(0, y_1, z) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(0, y_1, z, Block.Water));
+            	}
+            	if(GetTile(x2, y_1, z) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x2, y_1, z, Block.Water));
+            	}
+            	if(GetTile(0, y_2, z) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(0, y_2, z, Block.Water));
+            	}
+            	if(GetTile(x2, y_2, z) == Block.Air) {
+            		FluidList.Add(new PhysicsTask(x2, y_2, z, Block.Water));
+            	}
+            }
 
             for (short x = 0; x < xdim; ++x)
             {
