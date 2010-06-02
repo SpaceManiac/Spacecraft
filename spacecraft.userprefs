@@ -1,12 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Map\Map.cs" ctype="Workbench">
+    <Files>
+      <File FileName="Overhaul Code\NewServer.cs" Line="242" Column="27" />
+      <File FileName="Map\Map.cs" Line="111" Column="68" />
+      <File FileName="Constants.cs" Line="77" Column="73" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
+            <Node name="Map" expanded="True">
+              <Node name="Map.cs" selected="True" />
+            </Node>
             <Node name="Overhaul Code" expanded="True" />
-            <Node name="Pair.cs" selected="True" />
           </Node>
         </State>
       </Pad>
