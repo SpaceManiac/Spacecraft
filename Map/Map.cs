@@ -272,6 +272,9 @@ namespace spacecraft
         public void Dehydrate()
         {
             ReplaceAll(Block.Water, Block.Air, 5000);
+            ReplaceAll(Block.Lava, Block.Air, 5000);
+            ReplaceAll(Block.StillWater, Block.Air, 5000);
+            ReplaceAll(Block.StillLava, Block.Air, 5000);
         }
 
         public void SetTile(short x, short y, short z, Block tile)
