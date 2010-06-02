@@ -62,9 +62,10 @@ namespace spacecraft
         Obsidian = 49,
 
         // indev only
-        I_Torch = 0x32,
+        /*I_Torch = 0x32,
         I_Fire = 0x33,
-        I_InfWater = 0x34
+        I_InfWater = 0x34*/
+        // Not needed, since we don't do INDEV.
     }
 
     public static class BlockInfo

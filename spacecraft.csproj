@@ -38,16 +38,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builder.cs" />
+    <Compile Include="Utils\Builder.cs" />
     <Compile Include="ChatCommands.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Utils\Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="NetworkTypes.cs" />
     <Compile Include="Overhaul Code\NewConnection.cs" />
     <Compile Include="Overhaul Code\NewPlayer.cs" />
     <Compile Include="Overhaul Code\NewServer.cs" />
     <Compile Include="ClientPackets.cs" />
-    <Compile Include="Pair.cs" />
+    <Compile Include="Utils\Pair.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Connection.cs" />

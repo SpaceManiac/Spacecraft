@@ -311,7 +311,7 @@ namespace spacecraft
         {
             DisconnectPacket P = new DisconnectPacket();
             P.Reason = reason;
-            SendPacket(P);
+            TransmitPacket(P); // Send the packet immediatly, as we have no need for players who haven't verified.
             Quit();
         }
 

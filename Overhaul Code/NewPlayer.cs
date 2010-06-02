@@ -204,7 +204,7 @@ namespace spacecraft
                         P.PrintMessage(Color.Purple + "[" + this.name + "] " + message);
                     }
                 }
-            } else if (msg[0] == '/') {
+            } else if (msg[0] == '/' && msg[1] != '/') {
             	// command; process before sending onwards
             	
                 int i = msg.IndexOf(' ');

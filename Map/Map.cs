@@ -35,13 +35,15 @@ namespace spacecraft
         public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
         private uint physicsCount;
-        private bool physicsSuspended = false;
+        public bool PhysicsSuspended = false;
 
         public Map()
         {
             physicsCount = 0;
-            data = new byte[] { 0x02, 0x03, 0x04, 0x05 };
-            xdim = 0; ydim = 0; zdim = 0;
+            //data = new byte[];
+            xdim = 0; 
+            ydim = 0; 
+            zdim = 0;
         }
 
         public string[] GetLandmarkList()
@@ -102,7 +104,7 @@ namespace spacecraft
 
         public void Physics()
         {
-            if (physicsSuspended) return;
+            if (PhysicsSuspended) return;
             // run twice per second
             physicsCount++;
 
@@ -177,7 +179,7 @@ namespace spacecraft
                             if (tile != Block.Lava || physicsCount % 2 == 0)
                             {
                                 Block under = GetTile(x, (short)(y - 1), z);
-                                if (!BlockInfo.IsFluid(under) && under != Block.Air)
+                                if (true)//!BlockInfo.IsFluid(under) && under != Block.Air)
                                 {
                                     if (GetTile((short)(x + 1), y, z) == Block.Air)
                                     {
@@ -247,9 +249,9 @@ namespace spacecraft
             }
         }
 
-        public void Dehydrate()
+        public void Dehydrate(NewServer Serv)
         {
-            physicsSuspended = true;
+            PhysicsSuspended = true;
             for (short x = 0; x < xdim; ++x)
             {
                 for (short y = 0; y < ydim; ++y)
@@ -258,12 +260,12 @@ namespace spacecraft
                     {
                         if (GetTile(x, y, z) == Block.Water || GetTile(x, y, z) == Block.Lava)
                         {
-                            SetSend(x, y, z, Block.Air);
+                            Serv.ChangeBlock(new BlockPosition(x, y, z), Block.Air);
                         }
                     }
                 }
             }
-            physicsSuspended = false;
+            PhysicsSuspended = false;
         }
 
         public void SetSend(short x, short y, short z, Block tile)

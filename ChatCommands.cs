@@ -34,6 +34,9 @@ namespace spacecraft
             Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
             Commands.Add("config", new ChatCommands.Configure());
 			Commands.Add("whois", new ChatCommands.WhoIs());
+            Commands.Add("conspiracywizard", new ChatCommands.ConspiracyWizard());
+            Commands.Add("physics", new ChatCommands.Physics());
+            Commands.Add("convert", new ChatCommands.Convert());
         }
 
         /// <summary>
@@ -400,7 +403,7 @@ namespace spacecraft
 
             public override void Run(NewPlayer sender, string cmd, string args)
             {
-                NewServer.theServ.map.Dehydrate();
+                NewServer.theServ.map.Dehydrate(NewServer.theServ);
                 Spacecraft.Log(sender.name + " dehydrated the map");
             }
         }
@@ -427,7 +430,7 @@ namespace spacecraft
         {
             public override Rank RankNeeded
             {
-                get { return Rank.Guest; }
+                get { return Rank.Admin; }
             }
 
             public override string HelpMsg
@@ -659,5 +662,117 @@ namespace spacecraft
 				}
             }
         }
+
+        public class Physics : ChatCommandBase
+        {
+
+            public override Rank RankNeeded
+            {
+                get { return Rank.Admin; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "/physics [true|false]: Enables/disables physics."; }
+            }
+
+            public override void Run(NewPlayer sender, string cmd, string arg)
+            {
+                if (arg != "")
+                {
+                    NewServer.theServ.map.PhysicsSuspended = (arg == "true");
+                }
+                else
+                {
+                    NewServer.theServ.map.PhysicsSuspended = !NewServer.theServ.map.PhysicsSuspended;
+                }
+            }
+        }
+
+        public class ConspiracyWizard : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Admin; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "What does /conspiracywizard do? What DOESN'T it do?"; }
+            }
+
+            public override void Run(NewPlayer sender, string cmd, string arg)
+            {
+                Position oldpos = sender.pos;
+                Position pos = new Position((short)(oldpos.x / 32), (short)(oldpos.y / 32), (short)(oldpos.z / 32));
+
+                Map map = NewServer.theServ.map;
+
+                for (short x = 0; x < map.xdim; x++)
+                {
+                    for (short y = 0; y < map.ydim; y++)
+                    {
+                        for (short z = 0; z < map.zdim; z++)
+                        {
+                            if (Math.Abs(pos.x - x) == 5 || Math.Abs(pos.y - y) == 5 || Math.Abs(pos.z - z) == 5)
+                            {
+                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z),Block.Green);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public class Convert : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Admin; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "/nuke [block] [repl]: Replaces all instances of [block] with [repl]"; }
+            }
+
+            public override void Run(NewPlayer sender, string cmd, string arg)
+            {
+                sender.PrintMessage(arg);
+
+                string[] parts = arg.Split(new char[]{' '});
+                if (parts.Length < 2)
+                {
+                    sender.PrintMessage("Too few arguments!");
+                }
+
+                Block To, From;
+                try
+                {
+                    From = (Block)Enum.Parse(Block.Air.GetType(), parts[0]);
+                    To = (Block)Enum.Parse(Block.Air.GetType(), parts[1]);
+                }
+                catch (ArgumentException)
+                {
+                    sender.PrintMessage(Color.Red + "No such block.");
+                    return;
+                }
+                Map map = NewServer.theServ.map;
+
+                for (short x = 0; x < map.xdim; x++)
+                {
+                    for (short y = 0; y < map.ydim; y++)
+                    {
+                        for (short z = 0; z < map.zdim; z++)
+                        {
+                            if (map.GetTile(x, y, z) == From)
+                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z), To);
+                        }
+                    } 
+                }
+            }
+        }
+
+
     }
 }

@@ -292,6 +292,15 @@ namespace spacecraft
             }
         }
 
+        public void ChangeBlock(BlockPosition pos, Block blockType)
+        {
+            foreach (NewPlayer P in Players)
+            {
+                P.BlockSet(pos, blockType);
+            }
+            map.SetTile(pos.x, pos.y, pos.z, blockType);
+        }
+
         public void Shutdown()
         {
             Spacecraft.Log("Spacecraft is shutting down...");
