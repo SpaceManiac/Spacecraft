@@ -3,3 +3,4 @@ bin/Debug/server.log
 bin/Debug/externalurl.txt
 bin/Debug/*.fcm.*
 *.pidb
+bin/Debug/*.pdb

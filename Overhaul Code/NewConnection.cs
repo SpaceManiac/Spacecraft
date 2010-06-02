@@ -121,6 +121,11 @@ namespace spacecraft
 
         private void HandlePlayerIdent(PlayerIDPacket IncomingPacket)
         {
+        	if (Joined) {
+        		SendKick("You identified twice!");
+        		return;
+        	}
+        	
             if (IncomingPacket.Version != PROTOCOL_VERSION) {
 				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
                 SendKick("Wrong protocol version!");

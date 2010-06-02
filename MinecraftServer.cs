@@ -111,7 +111,7 @@ namespace spacecraft
 
         private void PhysTimer(object x, ElapsedEventArgs y)
         {
-            map.Physics(this);
+            map.Physics();
         }
 
         private void MobTimer(object x, ElapsedEventArgs y)

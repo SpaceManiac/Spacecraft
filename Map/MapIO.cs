@@ -224,7 +224,7 @@ namespace spacecraft
             }
 			
             File.Move(tempFileName, fileName);
-            Spacecraft.Log("Saved map succesfully to {0}", fileName);
+            //Spacecraft.Log("Saved map succesfully to {0}", fileName);
             return true;
         }
 

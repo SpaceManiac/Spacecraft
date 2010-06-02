@@ -12,6 +12,12 @@ namespace spacecraft
     public partial class Map
     {
 		// continued in MapIO.cs
+
+        public delegate void BlockChangeHandler(Map map, BlockPosition pos, Block type);
+        /// <summary>
+        /// Triggred when a block is changed by map processes
+        /// </summary>
+        public event BlockChangeHandler BlockChange;
 		
         public const uint levelFormatID = 0xFC000002;
         private static short DefaultHeight = 64, DefaultWidth = 64, DefaultDepth = 64;
@@ -105,7 +111,7 @@ namespace spacecraft
 
         // ==== Simulation ====
 
-        public void Physics(MinecraftServer srv)
+        public void Physics()
         {
             if (physicsSuspended) return;
             // run twice per second
@@ -135,11 +141,11 @@ namespace spacecraft
                             }
                             if (tile == Block.Dirt && lit && Spacecraft.random.NextDouble() < 0.2)
                             {
-                                SetSend(srv, x, y, z, Block.Grass);
+                                SetSend(x, y, z, Block.Grass);
                             }
                             if (tile == Block.Grass && !lit && Spacecraft.random.NextDouble() < 0.7)
                             {
-                                SetSend(srv, x, y, z, Block.Dirt);
+                                SetSend(x, y, z, Block.Dirt);
                             }
                         }
                         // water & lava
@@ -195,14 +201,14 @@ namespace spacecraft
             {
                 if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air)))
                 {
-                    SetSend(srv, task.x, task.y, task.z, task.tile);
+                    SetSend(task.x, task.y, task.z, task.tile);
                 }
             }
             foreach (PhysicsTask task in SpongeList)
             {
                 if (GetTile(task.x, task.y, task.z) == Block.Water || GetTile(task.x, task.y, task.z) == Block.Lava || GetTile(task.x, task.y, task.z) == Block.StillWater)
                 {
-                    SetSend(srv, task.x, task.y, task.z, task.tile);
+                    SetSend(task.x, task.y, task.z, task.tile);
                 }
             }
         }
@@ -218,7 +224,7 @@ namespace spacecraft
                     {
                         if (GetTile(x, y, z) == Block.Water || GetTile(x, y, z) == Block.Lava)
                         {
-                            SetSend(srv, x, y, z, Block.Air);
+                            SetSend(x, y, z, Block.Air);
                         }
                     }
                 }
@@ -226,11 +232,12 @@ namespace spacecraft
             physicsSuspended = false;
         }
 
-        public void SetSend(MinecraftServer srv, short x, short y, short z, Block tile)
+        public void SetSend(short x, short y, short z, Block tile)
         {
             if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-            SetTile(x, y, z, tile);
-            srv.SendAll(Connection.PacketSetBlock(x, y, z, tile));
+            data[BlockIndex(x, y, z)] = (byte)tile;
+            if(BlockChange != null)
+            	BlockChange(this, new BlockPosition(x, y, z), tile);
         }
 
         public int BlockIndex(short x, short y, short z)

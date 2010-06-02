@@ -64,6 +64,8 @@ namespace spacecraft
                 map.Generate();
                 map.Save("level.fcm");
             }
+            
+            map.BlockChange += new Map.BlockChangeHandler(map_BlockChange);
 
             try
             {
@@ -111,7 +113,7 @@ namespace spacecraft
 
         private void PhysTick(object sender, ElapsedEventArgs y)
         {
-            //map.Physics(this);
+            map.Physics();
             // TODO: Get map physics to work with NewServer.
         }
         
@@ -231,6 +233,14 @@ namespace spacecraft
                 P.PlayerDisconnects(ID);
             }
             MessageAll(Color.Yellow + Player.name + " has left");
+        }
+        
+        void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
+        {
+        	foreach (NewPlayer P in Players)
+        	{
+        		P.BlockSet(pos, BlockType);
+        	}
         }
 
         void newPlayer_BlockChange(BlockPosition pos, Block BlockType)
