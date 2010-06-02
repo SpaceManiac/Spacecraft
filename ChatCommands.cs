@@ -681,6 +681,7 @@ namespace spacecraft
                 if (arg != "")
                 {
                     NewServer.theServ.map.PhysicsSuspended = (arg == "true");
+                    NewServer.theServ.MessageAll("Physics running: " + NewServer.theServ.map.PhysicsSuspended.ToString());
                 }
                 else
                 {
@@ -708,15 +709,21 @@ namespace spacecraft
 
                 Map map = NewServer.theServ.map;
 
+                int value = Spacecraft.random.Next(21, 36);
+
                 for (short x = 0; x < map.xdim; x++)
                 {
                     for (short y = 0; y < map.ydim; y++)
                     {
                         for (short z = 0; z < map.zdim; z++)
                         {
-                            if (Math.Abs(pos.x - x) == 5 || Math.Abs(pos.y - y) == 5 || Math.Abs(pos.z - z) == 5)
+                            if (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) == 5)
                             {
-                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z),Block.Green);
+                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z),(Block) value);
+                            }
+                            if (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 5)
+                            {
+                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z), Block.Air);
                             }
                         }
                     }
@@ -733,17 +740,18 @@ namespace spacecraft
 
             public override string HelpMsg
             {
-                get { return "/nuke [block] [repl]: Replaces all instances of [block] with [repl]"; }
+                get { return "/convert [block] [repl]: Replace [block] with [repl]"; }
             }
 
             public override void Run(NewPlayer sender, string cmd, string arg)
             {
-                sender.PrintMessage(arg);
+                
 
                 string[] parts = arg.Split(new char[]{' '});
                 if (parts.Length < 2)
                 {
                     sender.PrintMessage("Too few arguments!");
+                    return;
                 }
 
                 Block To, From;
@@ -758,6 +766,8 @@ namespace spacecraft
                     return;
                 }
                 Map map = NewServer.theServ.map;
+
+                sender.PrintMessage("Converting " + From.ToString() + " to " + To.ToString() + "...");
 
                 for (short x = 0; x < map.xdim; x++)
                 {
