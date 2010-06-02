@@ -684,8 +684,7 @@ namespace spacecraft
                 }
                 else
                 {
-                    NewServer.theServ.map.PhysicsOn = !NewServer.theServ.map.PhysicsOn;
-                    NewServer.theServ.MessageAll(Color.Yellow + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
+                    sender.Message(Color.CommandResult + "Physics running is " + NewServer.theServ.map.PhysicsOn.ToString());
                 }
             }
         }
@@ -753,18 +752,17 @@ namespace spacecraft
                     sender.PrintMessage(Color.CommandError + "Too few arguments!");
                     return;
                 }
-
-                Block To, From;
-                try
-                {
-                    From = (Block)Enum.Parse(typeof(Block), parts[0]);
-                    To = (Block)Enum.Parse(typeof(Block), parts[1]);
-                }
-                catch (ArgumentException)
-                {
-                    sender.PrintMessage(Color.CommandError + "No such block.");
+                
+                if(!BlockInfo.NameExists(parts[0])) {
+                    sender.PrintMessage(Color.CommandError + "No such block " + parts[0]);
+                    return;
+                } else if(!BlockInfo.NameExists(parts[1])) {
+                	sender.PrintMessage(Color.CommandError + "No such block " + parts[1]);
                     return;
                 }
+
+				Block From = BlockInfo.names[parts[0]];
+                Block To = BlockInfo.names[parts[1]];
                 Map map = NewServer.theServ.map;
                 
                 int i = 0;
