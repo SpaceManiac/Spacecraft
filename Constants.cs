@@ -272,6 +272,11 @@ namespace spacecraft
         public const string Pink = "&d";
         public const string Yellow = "&e";
         public const string White = "&f";
+        
+        public const string Announce = Yellow;
+        public const string PrivateMsg = Purple;
+        public const string CommandResult = Teal;
+        public const string CommandError = DarkRed;
     }
 
     public enum Rank

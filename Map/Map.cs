@@ -35,7 +35,8 @@ namespace spacecraft
         public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
         private uint physicsCount;
-        public bool PhysicsSuspended = false;
+        public bool PhysicsOn = true;
+        private object PhysicsMutex = new object();
 
         public Map()
         {
@@ -104,7 +105,7 @@ namespace spacecraft
 
         public void Physics()
         {
-            if (PhysicsSuspended) return;
+            if (!PhysicsOn) return;
             // run twice per second
             physicsCount++;
 
@@ -112,160 +113,162 @@ namespace spacecraft
             List<PhysicsTask> SandList = new List<PhysicsTask>();
             List<PhysicsTask> SpongeList = new List<PhysicsTask>();
             
-            short y_1 = (short)(ydim / 2 - 1);
-            short y_2 = (short)(ydim / 2 - 2);
-            short z2 = (short)(zdim - 1);
-            for (short x = 0; x < xdim; ++x) {
-            	if(GetTile(x, y_1, 0) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x, y_1, 0, Block.Water));
-            	}
-            	if(GetTile(x, y_1, z2) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x, y_1, z2, Block.Water));
-            	}
-            	if(GetTile(x, y_2, 0) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x, y_2, 0, Block.Water));
-            	}
-            	if(GetTile(x, y_2, z2) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x, y_2, z2, Block.Water));
-            	}
-            }
-            short x2 = (short)(xdim - 1);
-            for (short z = 1; z < zdim - 1; ++z) {
-            	if(GetTile(0, y_1, z) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(0, y_1, z, Block.Water));
-            	}
-            	if(GetTile(x2, y_1, z) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x2, y_1, z, Block.Water));
-            	}
-            	if(GetTile(0, y_2, z) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(0, y_2, z, Block.Water));
-            	}
-            	if(GetTile(x2, y_2, z) == Block.Air) {
-            		FluidList.Add(new PhysicsTask(x2, y_2, z, Block.Water));
-            	}
-            }
-
-            for (short x = 0; x < xdim; ++x)
-            {
-                for (short y = 0; y < ydim; ++y)
-                {
-                    for (short z = 0; z < zdim; ++z)
-                    {
-                        Block tile = GetTile(x, y, z);
-                        if (physicsCount % 10 == 0)
-                        {
-                            // grass
-                            bool lit = true;
-                            for (short y2 = (short)(y + 1); y2 < ydim; ++y2)
-                            {
-                                if (BlockInfo.IsOpaque(GetTile(x, y2, z)))
-                                {
-                                    lit = false;
-                                    break;
-                                }
-                            }
-                            if (tile == Block.Dirt && lit && Spacecraft.random.NextDouble() < 0.2)
-                            {
-                                SetSend(x, y, z, Block.Grass);
-                            }
-                            if (tile == Block.Grass && !lit && Spacecraft.random.NextDouble() < 0.7)
-                            {
-                                SetSend(x, y, z, Block.Dirt);
-                            }
-                        }
-                        // water & lava
-                        if (tile == Block.Water || tile == Block.Lava)
-                        {
-                            if (tile != Block.Lava || physicsCount % 2 == 0)
-                            {
-                                Block under = GetTile(x, (short)(y - 1), z);
-                                if (true)//!BlockInfo.IsFluid(under) && under != Block.Air)
-                                {
-                                    if (GetTile((short)(x + 1), y, z) == Block.Air)
-                                    {
-                                        FluidList.Add(new PhysicsTask((short)(x + 1), y, z, tile));
-                                    }
-                                    if (GetTile((short)(x - 1), y, z) == Block.Air)
-                                    {
-                                        FluidList.Add(new PhysicsTask((short)(x - 1), y, z, tile));
-                                    }
-                                    if (GetTile(x, y, (short)(z + 1)) == Block.Air)
-                                    {
-                                        FluidList.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
-                                    }
-                                    if (GetTile(x, y, (short)(z - 1)) == Block.Air)
-                                    {
-                                        FluidList.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
-                                    }
-                                }
-                                if (GetTile(x, (short)(y - 1), z) == Block.Air)
-                                {
-                                    FluidList.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
-                                }
-                            }
-                        }
-                        // sponges
-                        if (tile == Block.Sponge)
-                        {
-                            for (short diffX = -2; diffX <= 2; diffX++)
-                            {
-                                for (short diffY = -2; diffY <= 2; diffY++)
-                                {
-                                    for (short diffZ = -2; diffZ <= 2; diffZ++)
-                                    {
-                                        SpongeList.Add(new PhysicsTask((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
-                                    }
-                                }
-                            }
-                        }
-                        // sand and gravel
-                        if (tile == Block.Sand || tile == Block.Gravel)
-                        {
-                        	short lowY = y;
-                        	if(GetTile(x, (short)(lowY - 1), z) == Block.Air || BlockInfo.IsFluid(GetTile(x, (short)(lowY - 1), z))) {
-                        		--lowY;
-                        	}
-                        	if(lowY != y) {
-	                        	SandList.Add(new PhysicsTask(x, y, z, Block.Air));
-	                        	SandList.Add(new PhysicsTask(x, lowY, z, tile));
+            lock(PhysicsMutex) {
+	            short y_1 = (short)(ydim / 2 - 1);
+	            short y_2 = (short)(ydim / 2 - 2);
+	            short z2 = (short)(zdim - 1);
+	            for (short x = 0; x < xdim; ++x) {
+	            	if(GetTile(x, y_1, 0) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x, y_1, 0, Block.Water));
+	            	}
+	            	if(GetTile(x, y_1, z2) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x, y_1, z2, Block.Water));
+	            	}
+	            	if(GetTile(x, y_2, 0) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x, y_2, 0, Block.Water));
+	            	}
+	            	if(GetTile(x, y_2, z2) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x, y_2, z2, Block.Water));
+	            	}
+	            }
+	            short x2 = (short)(xdim - 1);
+	            for (short z = 1; z < zdim - 1; ++z) {
+	            	if(GetTile(0, y_1, z) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(0, y_1, z, Block.Water));
+	            	}
+	            	if(GetTile(x2, y_1, z) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x2, y_1, z, Block.Water));
+	            	}
+	            	if(GetTile(0, y_2, z) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(0, y_2, z, Block.Water));
+	            	}
+	            	if(GetTile(x2, y_2, z) == Block.Air) {
+	            		FluidList.Add(new PhysicsTask(x2, y_2, z, Block.Water));
+	            	}
+	            }
+	
+	            for (short x = 0; x < xdim; ++x)
+	            {
+	                for (short y = 0; y < ydim; ++y)
+	                {
+	                    for (short z = 0; z < zdim; ++z)
+	                    {
+	                        Block tile = GetTile(x, y, z);
+	                        if (physicsCount % 10 == 0)
+	                        {
+	                            // grass
+	                            bool lit = true;
+	                            for (short y2 = (short)(y + 1); y2 < ydim; ++y2)
+	                            {
+	                                if (BlockInfo.IsOpaque(GetTile(x, y2, z)))
+	                                {
+	                                    lit = false;
+	                                    break;
+	                                }
+	                            }
+	                            if (tile == Block.Dirt && lit && Spacecraft.random.NextDouble() < 0.2)
+	                            {
+	                                SetSend(x, y, z, Block.Grass);
+	                            }
+	                            if (tile == Block.Grass && !lit && Spacecraft.random.NextDouble() < 0.7)
+	                            {
+	                                SetSend(x, y, z, Block.Dirt);
+	                            }
 	                        }
-                        }
-                    }
-                }
-            }
-
-            foreach (PhysicsTask task in FluidList) {
-                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
-                    SetSend(task.x, task.y, task.z, task.tile);
-                }
-            }
-            foreach (PhysicsTask task in SandList) {
-            	SetSend(task.x, task.y, task.z, task.tile);
-            }
-            foreach (PhysicsTask task in SpongeList) {
-                if (BlockInfo.IsFluid(GetTile(task.x, task.y, task.z))) {
-                    SetSend(task.x, task.y, task.z, task.tile);
-                }
-            }
+	                        // water & lava
+	                        if (tile == Block.Water || tile == Block.Lava)
+	                        {
+	                            if (tile != Block.Lava || physicsCount % 2 == 0)
+	                            {
+	                                Block under = GetTile(x, (short)(y - 1), z);
+	                                if (true)//!BlockInfo.IsFluid(under) && under != Block.Air)
+	                                {
+	                                    if (GetTile((short)(x + 1), y, z) == Block.Air)
+	                                    {
+	                                        FluidList.Add(new PhysicsTask((short)(x + 1), y, z, tile));
+	                                    }
+	                                    if (GetTile((short)(x - 1), y, z) == Block.Air)
+	                                    {
+	                                        FluidList.Add(new PhysicsTask((short)(x - 1), y, z, tile));
+	                                    }
+	                                    if (GetTile(x, y, (short)(z + 1)) == Block.Air)
+	                                    {
+	                                        FluidList.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
+	                                    }
+	                                    if (GetTile(x, y, (short)(z - 1)) == Block.Air)
+	                                    {
+	                                        FluidList.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
+	                                    }
+	                                }
+	                                if (GetTile(x, (short)(y - 1), z) == Block.Air)
+	                                {
+	                                    FluidList.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
+	                                }
+	                            }
+	                        }
+	                        // sponges
+	                        if (tile == Block.Sponge)
+	                        {
+	                            for (short diffX = -2; diffX <= 2; diffX++)
+	                            {
+	                                for (short diffY = -2; diffY <= 2; diffY++)
+	                                {
+	                                    for (short diffZ = -2; diffZ <= 2; diffZ++)
+	                                    {
+	                                        SpongeList.Add(new PhysicsTask((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
+	                                    }
+	                                }
+	                            }
+	                        }
+	                        // sand and gravel
+	                        if (tile == Block.Sand || tile == Block.Gravel)
+	                        {
+	                        	short lowY = y;
+	                        	if(GetTile(x, (short)(lowY - 1), z) == Block.Air || BlockInfo.IsFluid(GetTile(x, (short)(lowY - 1), z))) {
+	                        		--lowY;
+	                        	}
+	                        	if(lowY != y) {
+		                        	SandList.Add(new PhysicsTask(x, y, z, Block.Air));
+		                        	SandList.Add(new PhysicsTask(x, lowY, z, tile));
+		                        }
+	                        }
+	                    } // z
+	                } // y
+                } // x
+            
+	            foreach (PhysicsTask task in FluidList) {
+	                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
+	                    SetSend(task.x, task.y, task.z, task.tile);
+	                }
+	            }
+	            foreach (PhysicsTask task in SandList) {
+	            	SetSend(task.x, task.y, task.z, task.tile);
+	            }
+	            foreach (PhysicsTask task in SpongeList) {
+	                if (BlockInfo.IsFluid(GetTile(task.x, task.y, task.z))) {
+	                    SetSend(task.x, task.y, task.z, task.tile);
+	                }
+	            }
+            } // lock(physicsMutex)
+        }
+        
+        public void ReplaceAll(Block From, Block To)
+        {
+        	lock(PhysicsMutex) {
+	            for (short x = 0; x < xdim; x++) {
+	                for (short y = 0; y < ydim; y++) {
+	                    for (short z = 0; z < zdim; z++) {
+	                        if (GetTile(x, y, z) == From)
+	                            SetSend(x, y, z, To);
+	                    }
+	                } 
+	            }
+            } // lock(PhysicsMutex)
         }
 
-        public void Dehydrate(NewServer Serv)
+        public void Dehydrate()
         {
-            PhysicsSuspended = true;
-            for (short x = 0; x < xdim; ++x)
-            {
-                for (short y = 0; y < ydim; ++y)
-                {
-                    for (short z = 0; z < zdim; ++z)
-                    {
-                        if (GetTile(x, y, z) == Block.Water || GetTile(x, y, z) == Block.Lava)
-                        {
-                            Serv.ChangeBlock(new BlockPosition(x, y, z), Block.Air);
-                        }
-                    }
-                }
-            }
-            PhysicsSuspended = false;
+            ReplaceAll(Block.Water, Block.Air);
         }
 
         public void SetSend(short x, short y, short z, Block tile)

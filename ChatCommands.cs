@@ -164,17 +164,16 @@ namespace spacecraft
                 /* /me /me Easter egg. */
                 if (args == "/me")
                 {
-                    sender.PrintMessage(Color.Teal + "Red alert, /me /me found, PMing all players!");
-                    sender.PrintMessage(Color.Teal + "Easter egg get!");
+                    sender.PrintMessage(Color.CommandResult + "Red alert, /me /me found, PMing all players!");
+                    sender.PrintMessage(Color.CommandResult + "Easter egg get!");
                 }
                 else if (args == "")
                 {
-                    sender.PrintMessage(Color.DarkRed + "No /me message specified");
+                    sender.PrintMessage(Color.CommandError + "No /me message specified");
                 }
                 else
                 {
                     NewServer.theServ.MessageAll(" * " + sender.name + " " + args);
-                    Spacecraft.Log("* " + sender.name + " " + args);
                 }
             }
         }
@@ -403,7 +402,7 @@ namespace spacecraft
 
             public override void Run(NewPlayer sender, string cmd, string args)
             {
-                NewServer.theServ.map.Dehydrate(NewServer.theServ);
+                NewServer.theServ.map.Dehydrate();
                 Spacecraft.Log(sender.name + " dehydrated the map");
             }
         }
@@ -661,7 +660,6 @@ namespace spacecraft
 					sender.PrintMessage(Color.Teal + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
 				}
             }
-<<<<<<< HEAD:ChatCommands.cs
         }
 
         public class Physics : ChatCommandBase
@@ -681,12 +679,13 @@ namespace spacecraft
             {
                 if (arg != "")
                 {
-                    NewServer.theServ.map.PhysicsSuspended = (arg == "true");
-                    NewServer.theServ.MessageAll("Physics running: " + NewServer.theServ.map.PhysicsSuspended.ToString());
+                    NewServer.theServ.map.PhysicsOn = (arg == "true");
+                    NewServer.theServ.MessageAll(Color.Yellow + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
                 }
                 else
                 {
-                    NewServer.theServ.map.PhysicsSuspended = !NewServer.theServ.map.PhysicsSuspended;
+                    NewServer.theServ.map.PhysicsOn = !NewServer.theServ.map.PhysicsOn;
+                    NewServer.theServ.MessageAll(Color.Yellow + "Physics running - " + NewServer.theServ.map.PhysicsOn.ToString());
                 }
             }
         }
@@ -751,36 +750,26 @@ namespace spacecraft
                 string[] parts = arg.Split(new char[]{' '});
                 if (parts.Length < 2)
                 {
-                    sender.PrintMessage("Too few arguments!");
+                    sender.PrintMessage(Color.CommandError + "Too few arguments!");
                     return;
                 }
 
                 Block To, From;
                 try
                 {
-                    From = (Block)Enum.Parse(Block.Air.GetType(), parts[0]);
-                    To = (Block)Enum.Parse(Block.Air.GetType(), parts[1]);
+                    From = (Block)Enum.Parse(typeof(Block), parts[0]);
+                    To = (Block)Enum.Parse(typeof(Block), parts[1]);
                 }
                 catch (ArgumentException)
                 {
-                    sender.PrintMessage(Color.Red + "No such block.");
+                    sender.PrintMessage(Color.CommandError + "No such block.");
                     return;
                 }
                 Map map = NewServer.theServ.map;
 
-                sender.PrintMessage("Converting " + From.ToString() + " to " + To.ToString() + "...");
-
-                for (short x = 0; x < map.xdim; x++)
-                {
-                    for (short y = 0; y < map.ydim; y++)
-                    {
-                        for (short z = 0; z < map.zdim; z++)
-                        {
-                            if (map.GetTile(x, y, z) == From)
-                                NewServer.theServ.ChangeBlock(new BlockPosition(x, y, z), To);
-                        }
-                    } 
-                }
+				Spacecraft.Log(sender.name + " converted all " + From.ToString() + " to " + To.ToString());
+                sender.PrintMessage(Color.CommandResult + "Converting " + From.ToString() + " to " + To.ToString() + "...");
+                map.ReplaceAll(From, To);
             }
         }
     }

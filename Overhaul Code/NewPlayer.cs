@@ -198,13 +198,13 @@ namespace spacecraft
                 if (message != "") {
                     NewPlayer P = NewServer.theServ.GetPlayer(username);
                     if (P == null) {
-                        PrintMessage(Color.DarkRed + "No such user " + username);
+                        PrintMessage(Color.CommandError + "No such user " + username);
                     } else {
-                        PrintMessage(Color.Purple + ">" + username + "> " + message);
-                        P.PrintMessage(Color.Purple + "[" + this.name + "] " + message);
+                        PrintMessage(Color.PrivateMsg + ">" + username + "> " + message);
+                        P.PrintMessage(Color.PrivateMsg + "[" + this.name + "] " + message);
                     }
                 }
-            } else if (msg[0] == '/' && msg[1] != '/') {
+            } else if (msg[0] == '/') {
             	// command; process before sending onwards
             	
                 int i = msg.IndexOf(' ');
