@@ -51,6 +51,7 @@ namespace spacecraft
         
         public bool placing;
         public Block placeType;
+        public bool painting;
 
         public Player(TcpClient client, byte ID)
         {
@@ -175,7 +176,7 @@ namespace spacecraft
 		void conn_BlockSet(short X, short Y, short Z, byte Mode, byte Type)
 		{
 			Block type = (Block)Type;
-			if(Mode == 0x00) {
+			if(Mode == 0x00 && !painting) {
 				// block destroyed
 				type = Block.Air;
 			} else {
