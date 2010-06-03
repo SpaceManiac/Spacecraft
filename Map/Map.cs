@@ -20,7 +20,7 @@ namespace spacecraft
         public event BlockChangeHandler BlockChange;
 		
         public const uint levelFormatID = 0xFC000002;
-        private static short DefaultHeight = 64, DefaultWidth = 64, DefaultDepth = 64;
+        private static short DefaultHeight, DefaultWidth, DefaultDepth;
 
         public byte[] data { get; protected set; }
         public int Length { get { return xdim * ydim * zdim; } }
@@ -45,6 +45,14 @@ namespace spacecraft
             xdim = 0; 
             ydim = 0; 
             zdim = 0;
+            
+            DefaultDepth = (short) Config.GetInt("Depth", 64);
+            DefaultHeight = (short)Config.GetInt("Height", 64);
+            DefaultWidth = (short)Config.GetInt("Width", 64);
+
+            DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)255));
+            DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)255));
+            DefaultHeight = (short)Math.Max((short)0, Math.Min(DefaultHeight, (short)255));
         }
 
         public string[] GetLandmarkList()
