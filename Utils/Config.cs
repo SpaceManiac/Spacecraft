@@ -53,8 +53,7 @@ namespace spacecraft
 		public static string GetDefinedList()
 		{
 			string r = "";
-			foreach (KeyValuePair<string, string> kvp in _Config)
-			{
+			foreach (KeyValuePair<string, string> kvp in _Config) {
 				r += " " + kvp.Key;
 			}
 			return r;
@@ -67,10 +66,6 @@ namespace spacecraft
 			else
 				return def;
 		}
-		public static string Get(string key)
-		{
-			return Get(key, null);
-		}
 
 		public static bool GetBool(string key, bool def)
 		{
@@ -81,10 +76,6 @@ namespace spacecraft
 				val = val.ToLower();
 			return (val != null && val == "1" || val == "yes" || val == "true" || val == "on");
 		}
-		public static bool GetBool(string key)
-		{
-			return GetBool(key, false);
-		}
 
 		public static int GetInt(string key, int def)
 		{
@@ -93,10 +84,6 @@ namespace spacecraft
 				return def;
 			else
 				return Convert.ToInt32(val);
-		}
-		public static int GetInt(string key)
-		{
-			return GetInt(key, 0);
 		}
 
 		public static bool Contains(string key)
