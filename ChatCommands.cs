@@ -769,50 +769,22 @@ namespace spacecraft
                 Block To = BlockInfo.names[parts[1]];
                 Map map = Server.theServ.map;
                 Position pos = sender.pos;
-                pos = new Position((short)(pos.x / 32), (short)(pos.y / 32), (short)(pos.z / 32));
+                pos = new BlockPosition((short)(pos.x / 32), (short)(pos.y / 32), (short)(pos.z / 32));
 
-                int i = 0;
-	            for (short x = 0; x < map.xdim; x++) {
-	                for (short y = 0; y < map.ydim; y++) {
-	                    for (short z = 0; z < map.zdim; z++) {
-                            if (
-                                map.GetTile(x, y, z) == From
-                                && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20)
-                                )
+                for (short x = 0; x < map.xdim; x++) {
+                    for (short y = 0; y < map.ydim; y++) {
+                        for (short z = 0; z < map.zdim; z++) {
+                            if (map.GetTile(x, y, z) == From && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20))
                             {
-                                ++i;
-                            }
-	                    }
-	                } 
-	            }
-	            
-				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
-
-                for (short x = 0; x < map.xdim; x++)
-                {
-                    for (short y = 0; y < map.ydim; y++)
-                    {
-                        for (short z = 0; z < map.zdim; z++)
-                        {
-                            if (
-                                map.GetTile(x, y, z) == From
-                                && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20)
-                                )
-                            {
+                            	++i;
                                 map.SetTile(x, y, z, To);
                             }
                         }
                     }
                 }
                 
-                
-                
-                /*if(i > 2500) {
-	            	sender.PrintMessage(Color.CommandResult + "Converting max of 2500 " + From.ToString() + " to " + To.ToString() + "...");
-	            } else {
-	                sender.PrintMessage(Color.CommandResult + "Converting " + i + " " + From.ToString() + " to " + To.ToString() + "...");
-                }
-	            map.ReplaceAll(From, To, 2500);*/
+                sender.PrintMessage("Converted " + i.ToString + " " + From.ToString() + " to " + To.ToString());
+				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
             }
         }
         public class Save : ChatCommandBase
@@ -852,8 +824,5 @@ namespace spacecraft
                 sender.PrintMessage("Paint mode:" + sender.painting.ToString());
             }
         }
-     
-
-
     }
 }
