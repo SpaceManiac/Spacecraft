@@ -38,6 +38,7 @@ namespace spacecraft
             Commands.Add("physics", new ChatCommands.Physics());
             Commands.Add("convert", new ChatCommands.Convert());
             Commands.Add("save", new ChatCommands.Save());
+            Commands.Add("paint", new ChatCommands.Paint());
         }
 
         /// <summary>
@@ -805,7 +806,25 @@ namespace spacecraft
             }
         }
 
-      
+        public class Paint : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Builder; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "Toggle painting mode. In painting mode, removes turn into places."; }
+            }
+
+            public override void Run(Player sender, string cmd, string arg)
+            {
+                sender.painting = !sender.painting;
+                sender.PrintMessage("Paint mode:" + sender.painting.ToString());
+            }
+        }
+     
 
 
     }
