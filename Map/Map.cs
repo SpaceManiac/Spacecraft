@@ -236,9 +236,11 @@ namespace spacecraft
 	                } // y
                 } // x
             
+            	int flUpdates = 0;
 	            foreach (PhysicsTask task in FluidList) {
 	                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
 	                    SetTile(task.x, task.y, task.z, task.tile);
+	                    if(++flUpdates >= 500) break;
 	                }
 	            }
 	            foreach (PhysicsTask task in SandList) {
@@ -271,10 +273,11 @@ namespace spacecraft
 
         public void Dehydrate()
         {
-            ReplaceAll(Block.Water, Block.Air, 5000);
-            ReplaceAll(Block.Lava, Block.Air, 5000);
-            ReplaceAll(Block.StillWater, Block.Air, 5000);
-            ReplaceAll(Block.StillLava, Block.Air, 5000);
+        	int max = xdim * ydim * zdim;
+            ReplaceAll(Block.Water, Block.Air, max);
+            ReplaceAll(Block.Lava, Block.Air, max);
+            ReplaceAll(Block.StillWater, Block.Air, max);
+            ReplaceAll(Block.StillLava, Block.Air, max);
         }
 
         public void SetTile(short x, short y, short z, Block tile)
