@@ -1,29 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ChatCommands.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Constants\Blocks.cs" ctype="Workbench">
     <Files>
-      <File FileName="Map\Map.cs" Line="277" Column="58" />
-      <File FileName="ChatCommands.cs" Line="649" Column="1" />
-      <File FileName="NetworkTypes.cs" Line="1" Column="1" />
-      <File FileName="Map\EscherMath.cs" Line="1" Column="1" />
-      <File FileName="d:\projects\Downstairs\spacecraft\Robot.cs" Line="47" Column="3" />
-      <File FileName="Player.cs" Line="67" Column="46" />
-      <File FileName="Constants\Constants.cs" Line="27" Column="10" />
-      <File FileName="Constants\Blocks.cs" Line="1" Column="1" />
-      <File FileName="Constants\Ranks.cs" Line="29" Column="7" />
-      <File FileName="Constants\Colors.cs" Line="1" Column="14" />
-      <File FileName="Spacecraft.cs" Line="67" Column="27" />
-      <File FileName="Server.cs" Line="266" Column="20" />
-      <File FileName="Connection.cs" Line="288" Column="33" />
+      <File FileName="ChatCommands.cs" Line="14" Column="1" />
+      <File FileName="Constants\Blocks.cs" Line="151" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
-            <Node name="Constants" expanded="True" />
+            <Node name="Constants" expanded="True">
+              <Node name="Blocks.cs" selected="True" />
+            </Node>
             <Node name="Map" expanded="True" />
             <Node name="Utils" expanded="True" />
-            <Node name="ChatCommands.cs" selected="True" />
           </Node>
         </State>
       </Pad>
