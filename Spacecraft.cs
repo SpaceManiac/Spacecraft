@@ -16,24 +16,21 @@ namespace spacecraft
 		public static void Main()
 		{
 			try {
-				Log("{0} is starting...", "Spacecraft");
-				if (!File.Exists("admins.txt"))
-				{
+				Log("Spacecraft is starting...");
+				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating.");
 					File.Create("admins.txt");
 				}
 
-				if (Config.GetInt("random-seed", -1) != -1) // Check to see whether we have an RNG seed.
-				{
-					random = new Random(Config.GetInt("random-seed"));
-				}
-				else
-				{
+				// allow an explicit seed
+				int seed = Config.GetInt("random-seed", -1);
+				if (seed != -1) {
+					random = new Random(seed);
+				} else {
 					random = new Random();
 				}
 				LoadRanks();
 
-				//MinecraftServer serv = new MinecraftServer();
 				Server serv = new Server();
 
 				serv.Start();

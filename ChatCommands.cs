@@ -768,9 +768,9 @@ namespace spacecraft
 				Block From = BlockInfo.names[parts[0]];
 				Block To = BlockInfo.names[parts[1]];
 				Map map = Server.theServ.map;
-				Position pos = sender.pos;
-				pos = new BlockPosition((short)(pos.x / 32), (short)(pos.y / 32), (short)(pos.z / 32));
+				BlockPosition pos = new BlockPosition((short)(sender.pos.x / 32), (short)(sender.pos.y / 32), (short)(sender.pos.z / 32));
 
+				int i = 0;
 				for (short x = 0; x < map.xdim; x++) {
 					for (short y = 0; y < map.ydim; y++) {
 						for (short z = 0; z < map.zdim; z++) {
@@ -783,7 +783,7 @@ namespace spacecraft
 					}
 				}
 
-				sender.PrintMessage("Converted " + i.ToString + " " + From.ToString() + " to " + To.ToString());
+				sender.PrintMessage("Converted " + i.ToString() + " " + From.ToString() + " to " + To.ToString());
 				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
 			}
 		}

@@ -69,7 +69,7 @@ namespace spacecraft
 
 		public static bool GetBool(string key, bool def)
 		{
-			string val = Get(key);
+			string val = Get(key, null);
 			if (val == null)
 				return def;
 			else
@@ -79,7 +79,7 @@ namespace spacecraft
 
 		public static int GetInt(string key, int def)
 		{
-			string val = Get(key);
+			string val = Get(key, null);
 			if (val == null)
 				return def;
 			else
