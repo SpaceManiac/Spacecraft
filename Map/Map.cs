@@ -240,7 +240,7 @@ namespace spacecraft
 	            foreach (PhysicsTask task in FluidList) {
 	                if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
 	                    SetTile(task.x, task.y, task.z, task.tile);
-	                    if(++flUpdates >= 500) break;
+	                    if(++flUpdates >= 3000) break;
 	                }
 	            }
 	            foreach (PhysicsTask task in SandList) {

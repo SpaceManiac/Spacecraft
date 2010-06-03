@@ -47,12 +47,12 @@ namespace spacecraft
         public void Start()
         {
             // Initialize the map, using the saved one if it exists.
-            if (File.Exists("level.fcm")) {
+            if (File.Exists(Map.levelName)) {
                 try {
-                    map = Map.Load("level.fcm");
+                    map = Map.Load(Map.levelName);
                 }
                 catch {
-					Spacecraft.Log("Could not load level.fcm");
+                    Spacecraft.Log("Could not load" + Map.levelName);
                     map = null;
                 }
             }
@@ -60,7 +60,7 @@ namespace spacecraft
             if (map == null) {
                 map = new Map();
                 map.Generate();
-                map.Save("level.fcm");
+                map.Save(Map.levelName);
             }
             
             map.BlockChange += new Map.BlockChangeHandler(map_BlockChange);
@@ -107,7 +107,7 @@ namespace spacecraft
         	while(Running) {
         		if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
         			Heartbeat();
-        			map.Save("level.fcm");
+                    map.Save(Map.levelName);
         			GC.Collect();
         			lastHeartbeat = clock.Elapsed.TotalSeconds;
         		}
@@ -304,7 +304,7 @@ namespace spacecraft
         public void Shutdown()
         {
             Spacecraft.Log("Spacecraft is shutting down...");
-            map.Save("level.fcm");
+            map.Save(Map.levelName);
         }
     }
 }

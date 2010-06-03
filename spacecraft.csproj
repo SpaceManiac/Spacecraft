@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -58,7 +58,7 @@
     <Compile Include="Map\EscherMath.cs" />
     <Compile Include="Map\BlockPosition.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="Constants\Constants.cs" />
+    <Compile Include="Constants\Packets.cs" />
     <Compile Include="Constants\Blocks.cs" />
     <Compile Include="Constants\Ranks.cs" />
     <Compile Include="Constants\Colors.cs" />

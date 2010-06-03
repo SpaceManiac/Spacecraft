@@ -11,6 +11,8 @@ namespace spacecraft
 {
 	public partial class Map
 	{
+        public const string levelName = "level.fcm";
+
 		// continued in Map.cs
 		
         // ==== Loading ====
@@ -224,7 +226,7 @@ namespace spacecraft
             }
 			
             File.Move(tempFileName, fileName);
-            //Spacecraft.Log("Saved map succesfully to {0}", fileName);
+            File.Delete(tempFileName);
             return true;
         }
 

@@ -37,6 +37,7 @@ namespace spacecraft
             Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
             Commands.Add("physics", new ChatCommands.Physics());
             Commands.Add("convert", new ChatCommands.Convert());
+            Commands.Add("save", new ChatCommands.Save());
         }
 
         /// <summary>
@@ -668,7 +669,7 @@ namespace spacecraft
 
             public override Rank RankNeeded
             {
-                get { return Rank.Admin; }
+                get { return Rank.Mod; }
             }
 
             public override string HelpMsg
@@ -785,5 +786,27 @@ namespace spacecraft
 	            map.ReplaceAll(From, To, 2500);
             }
         }
+        public class Save : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Admin; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "Saves the current map to disk."; }
+            }
+
+            public override void Run(Player sender, string cmd, string arg)
+            {
+                Server.theServ.map.Save(Map.levelName);
+                Spacecraft.Log(sender.name + " saved the map.");
+            }
+        }
+
+      
+
+
     }
 }

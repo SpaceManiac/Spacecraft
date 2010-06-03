@@ -23,9 +23,15 @@ namespace spacecraft
                     Log("Note: admins.txt does not exist, creating.");
                     File.Create("admins.txt");
                 }
-               
-				random = new Random();
 
+                if (Config.GetInt("random-seed", -1) != -1) // Check to see whether we have an RNG seed.
+                {
+                    random = new Random(Config.GetInt("random-seed"));
+                }
+                else
+                {
+                    random = new Random();
+                }
                 LoadRanks();
 
                 //MinecraftServer serv = new MinecraftServer();
