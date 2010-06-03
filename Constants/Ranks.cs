@@ -11,11 +11,11 @@ namespace spacecraft {
 		Mod,
 		Admin
 	}
-	
+
 	public static class RankInfo
 	{
 		private static Dictionary<Rank, string> colors;
-		
+
 		public static string RankColor(Rank rank)
 		{
 			if(colors.ContainsKey(rank)) {
@@ -24,7 +24,7 @@ namespace spacecraft {
 				return Color.Black;
 			}
 		}
-		
+
 		static RankInfo()
 		{
 			colors = new Dictionary<Rank, string>();

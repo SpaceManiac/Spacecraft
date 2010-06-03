@@ -48,7 +48,7 @@ namespace spacecraft
 		public Position pos { get; protected set; }
 		public byte heading { get; protected set; }
 		public byte pitch { get; protected set; }
-		
+
 		public bool placing;
 		public Block placeType;
 		public bool painting;
@@ -66,10 +66,10 @@ namespace spacecraft
 			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
 			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
 			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
-			
+
 			conn.Start();
 		}
-	  
+
 		/// <summary>
 		/// Should be called to inform the player that they've been kicked.
 		/// </summary>
@@ -165,7 +165,7 @@ namespace spacecraft
 		void conn_PlayerMove(Position dest, byte heading, byte pitch)
 		{
 	   		if(pos == dest && this.heading == heading && this.pitch == pitch) return;
-	   		
+
 			pos = dest;
 			this.heading = heading;
 			this.pitch = pitch;
@@ -215,7 +215,7 @@ namespace spacecraft
 				}
 			} else if (msg[0] == '/') {
 				// command; process before sending onwards
-				
+
 				int i = msg.IndexOf(' ');
 				string cmd = msg.Substring(1);
 				string args = "";
@@ -225,7 +225,7 @@ namespace spacecraft
 						args = msg.Substring(i + 1);
 					}
 				}
-				
+
 				ChatCommandHandling.Execute(this, cmd, args);
 			}
 			else

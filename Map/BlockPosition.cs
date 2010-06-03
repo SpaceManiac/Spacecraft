@@ -34,7 +34,7 @@ public struct BlockPosition
 	{
 		return !A.Equals(B);
 	}
-	
+
 	public override string ToString()
 	{
 		return "(" + x.ToString() + "," + y.ToString() + "," + z.ToString() + ")";

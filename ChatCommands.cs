@@ -11,7 +11,7 @@ namespace spacecraft
 		static ChatCommandHandling()
 		{
 			Commands = new Dictionary<String, ChatCommands.ChatCommandBase>();
-			
+
 			Commands.Add("me", new ChatCommands.ThirdPerson());
 			Commands.Add("help", new ChatCommands.Help());
 			Commands.Add("teleport", new ChatCommands.Teleport());
@@ -47,7 +47,7 @@ namespace spacecraft
 		/// <param name="sender">The Player attempting to execute the command.</param>
 		/// <param name="cmd">Command to execute, e.g. "me"</param>
 		/// <param name="args">Argument passed to command, e.g. "uses /me sucessfully"</param>
-		/// 
+		///
 		static public void Execute(Player sender, string cmd, string args)
 		{
 			if (Commands.ContainsKey(cmd))
@@ -636,7 +636,7 @@ namespace spacecraft
 				}
 			}
 		}
-		
+
 		public class WhoIs : ChatCommandBase
 		{
 			public override Rank RankNeeded
@@ -756,7 +756,7 @@ namespace spacecraft
 					sender.PrintMessage(Color.CommandError + "Too few arguments!");
 					return;
 				}
-				
+
 				if(!BlockInfo.NameExists(parts[0])) {
 					sender.PrintMessage(Color.CommandError + "No such block " + parts[0]);
 					return;
@@ -782,7 +782,7 @@ namespace spacecraft
 						}
 					}
 				}
-				
+
 				sender.PrintMessage("Converted " + i.ToString + " " + From.ToString() + " to " + To.ToString());
 				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
 			}

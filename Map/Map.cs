@@ -18,7 +18,7 @@ namespace spacecraft
 		/// Triggred when a block is changed by map processes
 		/// </summary>
 		public event BlockChangeHandler BlockChange;
-		
+
 		public const uint levelFormatID = 0xFC000002;
 		private static short DefaultHeight, DefaultWidth, DefaultDepth;
 
@@ -42,10 +42,10 @@ namespace spacecraft
 		{
 			physicsCount = 0;
 			//data = new byte[];
-			xdim = 0; 
-			ydim = 0; 
+			xdim = 0;
+			ydim = 0;
 			zdim = 0;
-			
+
 			DefaultDepth = (short) Config.GetInt("Depth", 64);
 			DefaultHeight = (short)Config.GetInt("Height", 64);
 			DefaultWidth = (short)Config.GetInt("Width", 64);
@@ -120,7 +120,7 @@ namespace spacecraft
 			List<PhysicsTask> FluidList = new List<PhysicsTask>();
 			List<PhysicsTask> SandList = new List<PhysicsTask>();
 			List<PhysicsTask> SpongeList = new List<PhysicsTask>();
-			
+
 			lock(PhysicsMutex) {
 				short y_1 = (short)(ydim / 2 - 1);
 				short y_2 = (short)(ydim / 2 - 2);
@@ -154,7 +154,7 @@ namespace spacecraft
 						FluidList.Add(new PhysicsTask(x2, y_2, z, Block.Water));
 					}
 				}
-	
+
 				for (short x = 0; x < xdim; ++x)
 				{
 					for (short y = 0; y < ydim; ++y)
@@ -243,7 +243,7 @@ namespace spacecraft
 						} // z
 					} // y
 				} // x
-			
+
 				int flUpdates = 0;
 				foreach (PhysicsTask task in FluidList) {
 					if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
@@ -261,7 +261,7 @@ namespace spacecraft
 				}
 			} // lock(physicsMutex)
 		}
-		
+
 		public void ReplaceAll(Block From, Block To, int max)
 		{
 			lock(PhysicsMutex) {
@@ -274,7 +274,7 @@ namespace spacecraft
 								if(++total >= max) return;
 							}
 						}
-					} 
+					}
 				}
 			} // lock(PhysicsMutex)
 		}
@@ -306,7 +306,7 @@ namespace spacecraft
 		{
 			return ((y * zdim + z) * xdim + x);
 		}
-		
+
 		public static int BlockIndex(short x, short y, short z, short xdim, short zdim)
 		{
 			return ((y * zdim + z) * xdim + x);

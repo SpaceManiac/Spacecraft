@@ -48,7 +48,7 @@ namespace spacecraft
 				default:
 					throw new ArgumentException("Byte array does not match any known packet");
 			}
-			 
+
 			return OutValue;
 		}
 	}
@@ -126,8 +126,8 @@ namespace spacecraft
 			Mode = array[1 + 3 * NetworkShort.Size];
 			Type = array[1 + 3 * NetworkShort.Size + 1];
 		}
-		
-		
+
+
 		override public byte[] ToByteArray()
 		{
 			Builder<Byte> b = new Builder<byte>();

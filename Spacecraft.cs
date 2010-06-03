@@ -12,7 +12,7 @@ namespace spacecraft
 	class Spacecraft
 	{
 		public static Random random;
-		
+
 		public static void Main()
 		{
 			try {
@@ -81,7 +81,7 @@ namespace spacecraft
 			if (!File.Exists("server.log")) {
 				File.Create("server.log");
 			}
-			
+
 			lock (logfileMutex) {
 				StreamWriter sw = new StreamWriter("server.log", true);
 				if (text == "") {
@@ -116,7 +116,7 @@ namespace spacecraft
 				Log("ERROR! Check error.log for details!");
 			}
 		}
-		
+
 		public static void LogError(string format, params object[] args)
 		{
 			LogError(String.Format(format, args));

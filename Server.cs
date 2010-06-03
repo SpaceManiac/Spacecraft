@@ -19,7 +19,7 @@ namespace spacecraft
 		static private bool Running = true;
 
 		private bool Initialized = false;
-		
+
 		private TcpListener Listener;
 
 		public List<Player> Players { get; private set; }
@@ -56,13 +56,13 @@ namespace spacecraft
 					map = null;
 				}
 			}
-			
+
 			if (map == null) {
 				map = new Map();
 				map.Generate();
 				map.Save(Map.levelName);
 			}
-			
+
 			map.BlockChange += new Map.BlockChangeHandler(map_BlockChange);
 
 			try
@@ -74,12 +74,12 @@ namespace spacecraft
 				Spacecraft.Log("Listening on port " + port.ToString());
 				Spacecraft.Log("Server name is " + name);
 				Spacecraft.Log("Server MOTD is " + motd);
-				
+
 				Running = true;
 
 				Thread T = new Thread(AcceptClientThread);
 				T.Start();
-				
+
 				Thread T2 = new Thread(TimerThread);
 				T2.Start();
 
@@ -97,7 +97,7 @@ namespace spacecraft
 
 			Shutdown();
 		}
-		
+
 		private void TimerThread()
 		{
 			Stopwatch clock = new Stopwatch();
@@ -118,25 +118,25 @@ namespace spacecraft
 				Thread.Sleep(10);
 			}
 		}
-		
+
 		public void AcceptClientThread()
 		{
 			while(Running) {
 				TcpClient Client = Listener.AcceptTcpClient();
 				Player Player = new Player(Client, (byte) Players.Count);
-				
+
 				Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
 				Player.Message += new Player.PlayerMsgHandler(Player_Message);
 				Player.Move += new Player.PlayerMoveHandler(Player_Move);
 				Player.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
 				Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
-				
+
 				Players.Add(Player);
-				
+
 				Thread.Sleep(10);
 			}
 		}
-		
+
 		public Player GetPlayer(string name)
 		{
 			name = name.ToLower();
@@ -209,16 +209,16 @@ namespace spacecraft
 				} else {
 					int i = data.IndexOf('=');
 					serverhash = data.Substring(i + 1);
-					
+
 					//Spacecraft.Log("Salt is " + salt);
 					Spacecraft.Log("To connect directly, surf to: ");
 					Spacecraft.Log(data);
 					Spacecraft.Log("(This is also in externalurl.txt)");
-					
+
 					StreamWriter outfile = File.CreateText("externalurl.txt");
 					outfile.Write(data);
 					outfile.Close();
-					
+
 					Initialized = true;
 				}
 			}
@@ -234,7 +234,7 @@ namespace spacecraft
 			}
 			MessageAll(Color.Yellow + Player.name + " has left");
 		}
-		
+
 		void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
 		{
 			foreach (Player P in Players)
@@ -272,7 +272,7 @@ namespace spacecraft
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
 			MessageAll(Color.Yellow + sender.name + " has joined!");
 		}
-		
+
 		public void MessageAll(string message)
 		{
 			foreach (Player P in Players) {

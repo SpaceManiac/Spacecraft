@@ -20,7 +20,7 @@ namespace spacecraft
 
 		public delegate void PlayerMoveHandler(Position dest, byte heading, byte pitch);
 		public event PlayerMoveHandler PlayerMove;
-		
+
 		public delegate void BlockSetHandler(short X, short Y, short Z, byte Mode, byte Type);
 		public event BlockSetHandler BlockSet;
 
@@ -43,11 +43,11 @@ namespace spacecraft
 
 			_client = c;
 		}
-		
+
 		public void Start() {
 			Thread T = new Thread(ReadThread);
 			T.Start();
-			
+
 			Thread T2 = new Thread(WriteThread);
 			T2.Start();
 		}
@@ -58,7 +58,7 @@ namespace spacecraft
 				Thread.Sleep(10);
 			}
 		}
-		
+
 		void WriteThread() {
 			while (Connected) {
 				while (SendQueue.Count > 0) {
@@ -126,20 +126,20 @@ namespace spacecraft
 				SendKick("You identified twice!");
 				return;
 			}
-			
+
 			if (IncomingPacket.Version != PROTOCOL_VERSION) {
 				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
 				SendKick("Wrong protocol version!");
 				return;
 			}
 			bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
-			
+
 			if (Config.GetBool("verify-names", true) && !success) {
 				Spacecraft.Log(IncomingPacket.Username.ToString() + " attempted to join, but didn't verify");
 				SendKick("Your name wasn't verified by minecraft.net!");
 				return;
 		   	}
-		   	
+
 		   	Joined = true;
 
 			if (ReceivedUsername != null)
@@ -167,7 +167,7 @@ namespace spacecraft
 			Map M = Server.theServ.map;
 			SendPacket(new LevelInitPacket());
 
-			byte[] compressedData; 
+			byte[] compressedData;
 			using (MemoryStream memstr = new MemoryStream())
 			{
 				M.GetCompressedCopy(memstr, true);
@@ -186,7 +186,7 @@ namespace spacecraft
 
 				Array.Copy(compressedData, bytesSent, Chunk, 0, remaining);
 				bytesSent += remaining;
- 
+
 				P.ChunkData = new NetworkByteArray(Chunk);
 				P.ChunkLength = (short) remaining;
 				P.PercentComplete = (byte) (100 * (bytesSent / compressedData.Length));
@@ -200,7 +200,7 @@ namespace spacecraft
 			End.Z = M.zdim;
 			SendPacket(End);
 		}
-		
+
 		byte[] buffer = new byte[2048]; // No packet is 2048 bytes long, so we shouldn't ever overflow.
 		int buffsize = 0;
 
@@ -231,13 +231,13 @@ namespace spacecraft
 			while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
 
 			ClientPacket P = ClientPacket.FromByteArray(buffer);
-			
+
 			int len = PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0]));
 			buffsize -= len;
 			byte[] newbuf = new byte[2048];
 			Array.Copy(buffer, len, newbuf, 0, buffsize);
 			buffer = newbuf;
-			
+
 			return P;
 		}
 
@@ -297,7 +297,7 @@ namespace spacecraft
 			P.Message = msg;
 			SendPacket(P);
 		}
-		
+
 		public void SendBlockSet(short x, short y, short z, byte type)
 		{
 			SetBlockPacket P = new SetBlockPacket();

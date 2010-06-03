@@ -11,7 +11,7 @@ namespace spacecraft
 		ZPlus,
 		ZMinus
 	}
-	
+
 	public static class EscherMath
 	{
 		public static Pair<byte[], BlockPosition> MapDataTo(Map map, EscherMode mode)
@@ -31,7 +31,7 @@ namespace spacecraft
 			}
 			return new Pair<byte[], BlockPosition>(newmap, newdim);
 		}
-		
+
 		public static BlockPosition CoordsTo(Map map, BlockPosition pos, EscherMode mode)
 		{
 			int xmax, ymax, zmax;
@@ -45,7 +45,7 @@ namespace spacecraft
 			short x = pos.x;
 			short y = pos.y;
 			short z = pos.z;
-			
+
 			switch(mode) {
 			case EscherMode.XPlus:
 				return new BlockPosition(ymax - y, x, z);
@@ -62,7 +62,7 @@ namespace spacecraft
 				return pos;
 			}
 		}
-		
+
 		public static BlockPosition CoordsFrom(Map map, BlockPosition pos, EscherMode mode)
 		{
 			int xmax, ymax, zmax;
@@ -76,8 +76,8 @@ namespace spacecraft
 			int x = pos.x;
 			int y = pos.y;
 			int z = pos.z;
-			
-			
+
+
 			switch(mode) {
 			case EscherMode.XPlus:
 				return new BlockPosition(y, ymax - x, z);
@@ -94,12 +94,12 @@ namespace spacecraft
 				return pos;
 			}
 		}
-		
+
 		public static EscherMode RandomMode()
 		{
 			return (EscherMode)(1 + (int)(Spacecraft.random.NextDouble() * 5));
 		}
-		
+
 		public static EscherMode Invert(EscherMode mode)
 		{
 			switch(mode) {
@@ -116,7 +116,7 @@ namespace spacecraft
 			case EscherMode.None:
 			default:
 				return EscherMode.YMinus;
-			
+
 
 			}
 		}

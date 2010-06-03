@@ -32,8 +32,8 @@ namespace spacecraft
 	}
 
 	/// <summary>
-	/// Quoth documentation: 
-	/// "Sent to clients periodically. The only way a client can disconnect at the moment is to force 
+	/// Quoth documentation:
+	/// "Sent to clients periodically. The only way a client can disconnect at the moment is to force
 	/// it closed, which does not let the server know. The ping packet is used to determine if the connection is still open."
 	/// </summary>
 	public class PingPacket : ServerPacket
@@ -104,7 +104,7 @@ namespace spacecraft
 			b.Append(Z);
 			return b.ToArray();
 		}
-	
+
 	}
 
 	public class PlayerSpawnPacket : ServerPacket
@@ -132,8 +132,8 @@ namespace spacecraft
 			return b.ToArray();
 		}
 	}
-	
-	
+
+
 	public class SetBlockPacket : ServerPacket
 	{
 		public override byte PacketID { get { return 0x06; } }
@@ -141,7 +141,7 @@ namespace spacecraft
 		public NetworkShort Y;
 		public NetworkShort Z;
 		public byte Type;
-		
+
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();

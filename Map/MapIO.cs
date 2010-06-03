@@ -14,7 +14,7 @@ namespace spacecraft
 		public const string levelName = "level.fcm";
 
 		// continued in Map.cs
-		
+
 		// ==== Loading ====
 
 		public static Map Load(string filename)
@@ -35,7 +35,7 @@ namespace spacecraft
 					throw new FileLoadException("Unknown map file format.");
 			}
 		}
-		
+
 		public static Map LoadFCM(string filename)
 		{
 			FileStream fs = null;
@@ -224,7 +224,7 @@ namespace spacecraft
 			{
 				File.Delete(fileName);
 			}
-			
+
 			File.Move(tempFileName, fileName);
 			File.Delete(tempFileName);
 			return true;
