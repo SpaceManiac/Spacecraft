@@ -694,7 +694,7 @@ namespace spacecraft
         {
             public override Rank RankNeeded
             {
-                get { return Rank.Admin; }
+                get { return Rank.Mod; }
             }
 
             public override string HelpMsg
@@ -777,12 +777,12 @@ namespace spacecraft
 	            }
 	            
 				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
-	            if(i > 500) {
-	            	sender.PrintMessage(Color.CommandResult + "Converting max of 500 " + From.ToString() + " to " + To.ToString() + "...");
+	            if(i > 2500) {
+	            	sender.PrintMessage(Color.CommandResult + "Converting max of 2500 " + From.ToString() + " to " + To.ToString() + "...");
 	            } else {
 	                sender.PrintMessage(Color.CommandResult + "Converting " + i + " " + From.ToString() + " to " + To.ToString() + "...");
                 }
-	            map.ReplaceAll(From, To, 500);
+	            map.ReplaceAll(From, To, 2500);
             }
         }
     }

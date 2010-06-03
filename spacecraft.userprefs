@@ -1,26 +1,29 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Overhaul Code\NewConnection.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ChatCommands.cs" ctype="Workbench">
     <Files>
-      <File FileName="Overhaul Code\NewServer.cs" Line="248" Column="57" />
-      <File FileName="Map\Map.cs" Line="299" Column="4" />
-      <File FileName="Constants.cs" Line="267" Column="45" />
-      <File FileName="ChatCommands.cs" Line="687" Column="33" />
-      <File FileName="NetworkTypes.cs" Line="50" Column="40" />
-      <File FileName="Overhaul Code\NewConnection.cs" Line="48" Column="30" />
-      <File FileName="Overhaul Code\NewPlayer.cs" Line="69" Column="26" />
-      <File FileName="Player.cs" Line="81" Column="55" />
-      <File FileName="Map\EscherMath.cs" Line="24" Column="32" />
+      <File FileName="Map\Map.cs" Line="277" Column="58" />
+      <File FileName="ChatCommands.cs" Line="649" Column="1" />
+      <File FileName="NetworkTypes.cs" Line="1" Column="1" />
+      <File FileName="Map\EscherMath.cs" Line="1" Column="1" />
+      <File FileName="d:\projects\Downstairs\spacecraft\Robot.cs" Line="47" Column="3" />
+      <File FileName="Player.cs" Line="67" Column="46" />
+      <File FileName="Constants\Constants.cs" Line="27" Column="10" />
+      <File FileName="Constants\Blocks.cs" Line="1" Column="1" />
+      <File FileName="Constants\Ranks.cs" Line="29" Column="7" />
+      <File FileName="Constants\Colors.cs" Line="1" Column="14" />
+      <File FileName="Spacecraft.cs" Line="67" Column="27" />
+      <File FileName="Server.cs" Line="266" Column="20" />
+      <File FileName="Connection.cs" Line="288" Column="33" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="spacecraft" expanded="True">
+            <Node name="Constants" expanded="True" />
             <Node name="Map" expanded="True" />
-            <Node name="Overhaul Code" expanded="True">
-              <Node name="NewConnection.cs" selected="True" />
-            </Node>
             <Node name="Utils" expanded="True" />
+            <Node name="ChatCommands.cs" selected="True" />
           </Node>
         </State>
       </Pad>

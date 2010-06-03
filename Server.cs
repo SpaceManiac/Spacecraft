@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Timers;
 using System.Web;
+using System.Diagnostics;
 
 namespace spacecraft
 {
@@ -15,10 +16,9 @@ namespace spacecraft
     {
         static public Server theServ;
         static public ManualResetEvent OnExit = new ManualResetEvent(false);
+        static private bool Running = true;
 
         private bool Initialized = false;
-        private System.Timers.Timer HeartbeatTimer;
-        private System.Timers.Timer PhysTimer;
         
         private TcpListener Listener;
 
@@ -30,8 +30,6 @@ namespace spacecraft
         public string name { get; protected set; }
         public string motd { get; protected set; }
         public string serverhash { get; protected set; }
-
-        
 
         public Server()
         {
@@ -76,20 +74,17 @@ namespace spacecraft
                 Spacecraft.Log("Listening on port " + port.ToString());
                 Spacecraft.Log("Server name is " + name);
                 Spacecraft.Log("Server MOTD is " + motd);
+                
+                Running = true;
 
-                Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
-				
-
-                HeartbeatTimer = new System.Timers.Timer(30000);
-                HeartbeatTimer.Elapsed += new ElapsedEventHandler(BeatTick);
-                HeartbeatTimer.Start();
-                Heartbeat();
-
-                PhysTimer = new System.Timers.Timer(500);
-                PhysTimer.Elapsed += new ElapsedEventHandler(PhysTick);
-                PhysTimer.Start();
+                Thread T = new Thread(AcceptClientThread);
+                T.Start();
+                
+                Thread T2 = new Thread(TimerThread);
+                T2.Start();
 
                 OnExit.WaitOne();
+                Running = false;
             }
             catch (SocketException e) {
                 Console.WriteLine("SocketException: {0}", e);
@@ -102,19 +97,44 @@ namespace spacecraft
 
             Shutdown();
         }
-
-
-        private void BeatTick(object sender, ElapsedEventArgs y)
+        
+        private void TimerThread()
         {
-            Heartbeat();
-            map.Save("level.fcm");
-            GC.Collect();
+        	Stopwatch clock = new Stopwatch();
+        	clock.Start();
+        	double lastHeartbeat = -30;
+        	double lastPhysics = -0.5;
+        	while(Running) {
+        		if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
+        			Heartbeat();
+        			map.Save("level.fcm");
+        			GC.Collect();
+        			lastHeartbeat = clock.Elapsed.TotalSeconds;
+        		}
+        		if(clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
+        			map.Physics();
+        			lastPhysics = clock.Elapsed.TotalSeconds;
+        		}
+	            Thread.Sleep(10);
+        	}
         }
 
-        private void PhysTick(object sender, ElapsedEventArgs y)
+        public void AcceptClientThread()
         {
-            map.Physics();
-            // TODO: Get map physics to work with Server.
+        	while(Running) {
+	            TcpClient Client = Listener.AcceptTcpClient();
+	            Player Player = new Player(Client, (byte) Players.Count);
+	
+	            Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
+	            Player.Message += new Player.PlayerMsgHandler(Player_Message);
+	            Player.Move += new Player.PlayerMoveHandler(Player_Move);
+	            Player.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
+	            Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
+	
+	            Players.Add(Player);
+	            
+	            Thread.Sleep(10);
+	        }
         }
         
         public Player GetPlayer(string name)
@@ -206,23 +226,6 @@ namespace spacecraft
                     Initialized = true;
                 }
             }
-        }
-
-
-        public void AcceptClient(IAsyncResult Result)
-        {
-            TcpClient Client = Listener.EndAcceptTcpClient(Result);
-            Player Player = new Player(Client, (byte) Players.Count);
-
-            Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
-            Player.Message += new Player.PlayerMsgHandler(Player_Message);
-            Player.Move += new Player.PlayerMoveHandler(Player_Move);
-            Player.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
-            Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
-
-            Players.Add(Player);
-			
-			Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptClient),null);
         }
 
         void Player_Disconnect(Player Player)
