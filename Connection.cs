@@ -90,7 +90,12 @@ namespace spacecraft
 					HandlePositionUpdate((PositionUpdatePacket)IncomingPacket);
 					break;
 				default:
-					Spacecraft.LogError("Incoming packet does not match any known packet type!");
+					try {
+						throw new SpacecraftException("Incoming packet type of " + IncomingPacket.PacketID + " does not match any known type");
+					}
+					catch(SpacecraftException e) {
+						Spacecraft.LogError("Error while reading a packet", e);
+					}
 					break;
 			}
 		}

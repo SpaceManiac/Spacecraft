@@ -15,7 +15,7 @@ namespace spacecraft
 
 		public static void Main()
 		{
-			try {
+			try {				
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating.");
@@ -41,12 +41,7 @@ namespace spacecraft
 			}
 			catch (Exception e) {
 				// Something went wrong and wasn't caught
-				Console.WriteLine("===FATAL ERROR===");
-				Console.WriteLine(e.Message);
-				Console.WriteLine(e.Source);
-				Console.WriteLine();
-				Console.Write(e.StackTrace);
-				Console.Read();
+				Spacecraft.LogError("Fatal error while starting server", e);
 			}
 		}
 
@@ -99,7 +94,7 @@ namespace spacecraft
 
 		private static object errorfileMutex = new object();
 
-		public static void LogError(string text)
+		public static void LogError(string text, Exception e)
 		{
 			lock (errorfileMutex)
 			{
@@ -109,14 +104,11 @@ namespace spacecraft
 				sw.Write(" ====");
 				sw.WriteLine();
 				sw.WriteLine(text);
+				sw.WriteLine(e.ToString());
+				sw.WriteLine();
 				sw.Close();
-				Log("ERROR! Check error.log for details!");
+				Log("Error: " + text + ": See error.log for details");
 			}
-		}
-
-		public static void LogError(string format, params object[] args)
-		{
-			LogError(String.Format(format, args));
 		}
 
 		public static string StripColors(string s)
@@ -142,6 +134,13 @@ namespace spacecraft
 			for (int i = 0; i < data.Length; i++)
 				ret.Append(data[i].ToString("x2").ToLower());
 			return ret.ToString();
+		}
+	}
+	
+	public class SpacecraftException : Exception
+	{
+		public SpacecraftException(string message) : base(message)
+		{
 		}
 	}
 }

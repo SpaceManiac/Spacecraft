@@ -225,8 +225,7 @@ namespace spacecraft
 				}
 			}
 			catch(WebException e) {
-				Spacecraft.Log("Error while heartbeating.");
-				Spacecraft.LogError(e.Message);
+				Spacecraft.LogError("Unable to heartbeat", e);
 			}
 		}
 
