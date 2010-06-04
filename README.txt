@@ -17,3 +17,4 @@ Authors:
 
 Want to find out more? Check out the Spacecraft wiki on Github:
 http://wiki.github.com/SpaceManiac/Spacecraft/
+You'll also find a Getting Started Guide there.
