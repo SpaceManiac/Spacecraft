@@ -1,7 +1,9 @@
+bin/Debug/*.exe
+bin/Debug/*.pdb
 bin/Debug/admins.txt
 bin/Debug/server.log
+bin/Debug/error.log
 bin/Debug/externalurl.txt
 bin/Debug/*.fcm.*
 *.pidb
-bin/Debug/*.pdb
 *.userprefs
