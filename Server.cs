@@ -151,76 +151,82 @@ namespace spacecraft
 
 		private void Heartbeat()
 		{
-			if (!Config.GetBool("heartbeat", true))
-			{
-				return;
-			}
-
-			StringBuilder builder = new StringBuilder();
-
-			builder.Append("port=");
-			builder.Append(port.ToString());
-
-			builder.Append("&users=");
-			builder.Append(Players.Count);
-
-			builder.Append("&max=");
-			builder.Append(maxplayers);
-
-			builder.Append("&name=");
-			builder.Append(name);
-
-			builder.Append("&public=");
-			if (Config.GetBool("public", false)) {
-				builder.Append("true");
-			} else {
-				builder.Append("false");
-			}
-
-			builder.Append("&version=7");
-
-			builder.Append("&salt=");
-			builder.Append(salt.ToString());
-
-			string postcontent = builder.ToString();
-			byte[] post = Encoding.ASCII.GetBytes(postcontent);
-
-			HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://minecraft.net/heartbeat.jsp");
-			req.ContentType = "application/x-www-form-urlencoded";
-			req.Method = "POST";
-			req.ContentLength = post.Length;
-			Stream o = req.GetRequestStream();
-			o.Write(post, 0, post.Length);
-			o.Close();
-
-			WebResponse resp = req.GetResponse();
-			if (resp == null)
-			{
-				Spacecraft.Log("Error: unable to heartbeat!");
-				return;
-			}
-
-			StreamReader sr = new StreamReader(resp.GetResponseStream());
-			string data = sr.ReadToEnd().Trim();
-			if (!Initialized)
-			{
-				if (data.Substring(0, 7) != "http://") {
-					Spacecraft.Log("Error: unable to retreive external URL!");
-				} else {
-					int i = data.IndexOf('=');
-					serverhash = data.Substring(i + 1);
-
-					//Spacecraft.Log("Salt is " + salt);
-					Spacecraft.Log("To connect directly, surf to: ");
-					Spacecraft.Log(data);
-					Spacecraft.Log("(This is also in externalurl.txt)");
-
-					StreamWriter outfile = File.CreateText("externalurl.txt");
-					outfile.Write(data);
-					outfile.Close();
-
-					Initialized = true;
+			try {
+				if (!Config.GetBool("heartbeat", true))
+				{
+					return;
 				}
+	
+				StringBuilder builder = new StringBuilder();
+	
+				builder.Append("port=");
+				builder.Append(port.ToString());
+	
+				builder.Append("&users=");
+				builder.Append(Players.Count);
+	
+				builder.Append("&max=");
+				builder.Append(maxplayers);
+	
+				builder.Append("&name=");
+				builder.Append(name);
+	
+				builder.Append("&public=");
+				if (Config.GetBool("public", false)) {
+					builder.Append("true");
+				} else {
+					builder.Append("false");
+				}
+	
+				builder.Append("&version=7");
+	
+				builder.Append("&salt=");
+				builder.Append(salt.ToString());
+	
+				string postcontent = builder.ToString();
+				byte[] post = Encoding.ASCII.GetBytes(postcontent);
+	
+				HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://minecraft.net/heartbeat.jsp");
+				req.ContentType = "application/x-www-form-urlencoded";
+				req.Method = "POST";
+				req.ContentLength = post.Length;
+				Stream o = req.GetRequestStream();
+				o.Write(post, 0, post.Length);
+				o.Close();
+	
+				WebResponse resp = req.GetResponse();
+				if (resp == null)
+				{
+					Spacecraft.Log("Error: unable to heartbeat!");
+					return;
+				}
+	
+				StreamReader sr = new StreamReader(resp.GetResponseStream());
+				string data = sr.ReadToEnd().Trim();
+				if (!Initialized)
+				{
+					if (data.Substring(0, 7) != "http://") {
+						Spacecraft.Log("Error: unable to retreive external URL!");
+					} else {
+						int i = data.IndexOf('=');
+						serverhash = data.Substring(i + 1);
+	
+						//Spacecraft.Log("Salt is " + salt);
+						Spacecraft.Log("To connect directly, surf to: ");
+						Spacecraft.Log(data);
+						Spacecraft.Log("(This is also in externalurl.txt)");
+	
+						StreamWriter outfile = File.CreateText("externalurl.txt");
+						outfile.Write(data);
+						outfile.Close();
+	
+						Initialized = true;
+					}
+				}
+			}
+			catch(WebException e) {
+				Spacecraft.Log("Error while heartbeating.");
+				Spacecraft.LogError(e.Message);
 			}
 		}
 
