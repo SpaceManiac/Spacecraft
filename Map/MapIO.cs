@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 // Thanks to fragmer of fCraft for letting us use his map format and map loading code!
 // http://fcraft.net/
+// Adapted for Spacecraft
 
 namespace spacecraft
 {

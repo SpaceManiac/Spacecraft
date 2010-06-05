@@ -25,11 +25,11 @@ namespace spacecraft
 		public byte[] data { get; protected set; }
 		public int Length { get { return xdim * ydim * zdim; } }
 
-		public short xdim { get; protected set; }
-		public short ydim { get; protected set; }
-		public short zdim { get; protected set; }
-		public Position spawn { get; protected set; }
-		public byte spawnHeading { get; protected set; }
+		public short xdim;
+		public short ydim;
+		public short zdim;
+		public Position spawn;
+		public byte spawnHeading;
 
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
@@ -108,6 +108,20 @@ namespace spacecraft
 				compressor.Write(data, 0, data.Length);
 			}
 		}
+		
+		public void CopyBlocks(byte[] source, int offset) {
+            data = new byte[xdim * ydim * zdim];
+            Array.Copy(source, offset, data, 0, data.Length);
+        }
+        
+        public bool ValidateBlockTypes() {
+            for(int i = 0; i < data.Length; ++i) {
+                if(data[i] > (byte) Block.Maximum) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
 		// ==== Simulation ====
 

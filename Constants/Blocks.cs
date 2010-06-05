@@ -61,6 +61,8 @@ namespace spacecraft
 		Books = 47,
 		MossyCobblestone = 48,
 		Obsidian = 49,
+		
+		Maximum = Obsidian
 
 		/* indev only
 		I_Torch = 0x32,
