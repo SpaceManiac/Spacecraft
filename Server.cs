@@ -51,8 +51,16 @@ namespace spacecraft
 				try {
 					map = Map.Load(Map.levelName);
 				}
-				catch {
-					Spacecraft.Log("Could not load" + Map.levelName);
+				catch (Exception e) {
+					Spacecraft.LogError("Could not load " + Map.levelName, e);
+					map = null;
+				}
+			} else if(File.Exists("server_level.dat")) {
+				try {
+					map = Map.Load("server_level.dat");
+				}
+				catch (Exception e) {
+					Spacecraft.LogError("Could not load server_level.dat", e);
 					map = null;
 				}
 			}

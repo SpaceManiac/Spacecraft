@@ -8,7 +8,6 @@ using System.Net;
 
 namespace spacecraft
 {
-	[Serializable()]
 	public partial class Map
 	{
 		// continued in MapIO.cs
@@ -46,13 +45,13 @@ namespace spacecraft
 			ydim = 0;
 			zdim = 0;
 
-			DefaultDepth = (short) Config.GetInt("Depth", 64);
-			DefaultHeight = (short)Config.GetInt("Height", 64);
-			DefaultWidth = (short)Config.GetInt("Width", 64);
+			DefaultDepth = (short)Config.GetInt("depth", 64);
+			DefaultHeight = (short)Config.GetInt("height", 64);
+			DefaultWidth = (short)Config.GetInt("width", 64);
 
-			DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)255));
-			DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)255));
-			DefaultHeight = (short)Math.Max((short)0, Math.Min(DefaultHeight, (short)255));
+			DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)2048));
+			DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)2048));
+			DefaultHeight = (short)Math.Max((short)0, Math.Min(DefaultHeight, (short)2048));
 		}
 
 		public string[] GetLandmarkList()
@@ -79,9 +78,9 @@ namespace spacecraft
 			xdim = DefaultWidth;
 			ydim = DefaultHeight;
 			zdim = DefaultDepth;
-			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 64), (short)(16 * zdim));
+			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
 			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
-			data = new byte[Length];
+			data = new byte[xdim * ydim * zdim];
 			for (short x = 0; x < xdim; ++x) {
 				for (short z = 0; z < zdim; ++z) {
 					for (short y = 0; y < ydim / 2; ++y) {

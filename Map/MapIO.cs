@@ -30,8 +30,8 @@ namespace spacecraft
 			{
 				case ".fcm":
 					return LoadFCM(filename);
-				//case ".dat":
-				//  return DatLoading.Load(filename);
+				case ".dat":
+				    return DatLoading.Load(filename);
 				default:
 					throw new FileLoadException("Unknown map file format.");
 			}

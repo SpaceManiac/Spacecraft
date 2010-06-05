@@ -107,7 +107,7 @@ namespace spacecraft
 				Spacecraft.LogError("Conversion failed", ex);
 				return null;
 			}
-			map.Save("level.fcm");
+			map.Save(Map.levelName);
 			Spacecraft.Log("Conversion completed succesfully");
 			return map;
 		}
