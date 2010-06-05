@@ -107,6 +107,12 @@ namespace spacecraft
 				Spacecraft.LogError("Conversion failed", ex);
 				return null;
 			}
+			
+			// replace all still fluids with their normal equivalents
+			// vanilla server does optimizations that make most fluids still when nothing is happening nearby
+			map.ReplaceAll(Block.StillLava, Block.Lava, map.Length);
+			map.ReplaceAll(Block.StillWater, Block.StillLava, map.Length);
+			
 			map.Save(Map.levelName);
 			Spacecraft.Log("Conversion completed succesfully");
 			return map;
