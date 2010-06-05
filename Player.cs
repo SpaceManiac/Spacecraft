@@ -66,7 +66,10 @@ namespace spacecraft
 			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
 			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
 			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
-
+		}
+		
+		public void Start()
+		{
 			conn.Start();
 		}
 

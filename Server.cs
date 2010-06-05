@@ -140,6 +140,7 @@ namespace spacecraft
 				Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
 
 				Players.Add(Player);
+				Player.Start();
 
 				Thread.Sleep(10);
 			}
