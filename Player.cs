@@ -155,6 +155,9 @@ namespace spacecraft
 		{
 			this.name = username;
 			rank = RankOf(username);
+			if(rank == Rank.Banned) {
+				conn.SendKick("You're banned!");
+			}
 		}
 
 		void conn_PlayerSpawn()
