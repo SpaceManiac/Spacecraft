@@ -77,7 +77,6 @@ namespace spacecraft
 			int y = pos.y;
 			int z = pos.z;
 
-
 			switch(mode) {
 			case EscherMode.XPlus:
 				return new BlockPosition(y, ymax - x, z);
@@ -116,7 +115,6 @@ namespace spacecraft
 			case EscherMode.None:
 			default:
 				return EscherMode.YMinus;
-
 
 			}
 		}

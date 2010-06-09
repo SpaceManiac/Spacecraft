@@ -133,7 +133,6 @@ namespace spacecraft
 		}
 	}
 
-
 	public class SetBlockPacket : ServerPacket
 	{
 		public override byte PacketID { get { return 0x06; } }

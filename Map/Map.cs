@@ -109,18 +109,18 @@ namespace spacecraft
 		}
 		
 		public void CopyBlocks(byte[] source, int offset) {
-            data = new byte[xdim * ydim * zdim];
-            Array.Copy(source, offset, data, 0, data.Length);
-        }
-        
-        public bool ValidateBlockTypes() {
-            for(int i = 0; i < data.Length; ++i) {
-                if(data[i] > (byte) Block.Maximum) {
-                    return false;
-                }
-            }
-            return true;
-        }
+	data = new byte[xdim * ydim * zdim];
+	Array.Copy(source, offset, data, 0, data.Length);
+	}
+	
+	public bool ValidateBlockTypes() {
+	for(int i = 0; i < data.Length; ++i) {
+	if(data[i] > (byte) Block.Maximum) {
+	return false;
+	}
+	}
+	return true;
+	}
 
 		// ==== Simulation ====
 

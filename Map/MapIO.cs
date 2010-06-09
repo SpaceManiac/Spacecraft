@@ -31,7 +31,7 @@ namespace spacecraft
 				case ".fcm":
 					return LoadFCM(filename);
 				case ".dat":
-				    return DatLoading.Load(filename);
+	return DatLoading.Load(filename);
 				default:
 					throw new FileLoadException("Unknown map file format.");
 			}
@@ -194,7 +194,6 @@ namespace spacecraft
 		{
 			return dimension > 0 && dimension % 16 == 0 && dimension < 2048;
 		}
-
 
 		// ==== Saving ====
 
