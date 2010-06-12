@@ -8,13 +8,24 @@ exec tclsh -f "$0" ${1+"$@"}
 #  a. convert quadruple-spaces used for indentation into tab stops
 #  b. remove any whitespace at the ends of non-blank lines
 #  c. convert multiple blank lines in a row to just one
+# If the -l flag is used, this script will only list files requiring cleanup
+# and not perform the cleanup itself. If the -t flag is used, this script will
+# list TODO lines in code files.
 
-# command-line argument?
+
+# command-line arguments
 
 set listmode 0
-if {[lindex $argv 0] == "-l"} {
-	puts "Listing files only..."
-	set listmode 1
+set todomode 0
+
+foreach arg $argv {
+	if {$arg == "-l"} {
+		set listmode 1
+	} elseif {$arg == "-t"} {
+		set todomode 1
+	} else {
+		puts "Unknown flag $arg"
+	}
 }
 
 # get file list
@@ -49,6 +60,13 @@ proc putfile {filename contents {mode w}} {
 	close $f
 }
 
+proc nodotslash {filename} {
+	if {[string match "./*" $filename]} {
+		return [string range $filename 2 end]
+	}
+	return $filename
+}
+
 # cleanup time
 
 proc cleanup {contents} {
@@ -75,25 +93,60 @@ proc cleanup {contents} {
 	return $cleaned
 }
 
+proc todo {filename contents} {
+	global todos
+	
+	set linenum 1
+	foreach line [split $contents \n] {
+		if {[regexp {(//|/*|#)\s*TODO:?\s+(.+)$} $line match comment info]} {
+			lappend todos "$filename\($linenum): $info"
+		}
+		incr linenum
+	}
+}
+
 set cleanedfiles [list]
+set todos [list]
 
 foreach filename $files {
+	set filename [nodotslash $filename]
+	
 	set contents [grabfile $filename]
 	set cleaned [cleanup $contents]
 	if {$cleaned != $contents} {
 		lappend cleanedfiles $filename
-		if {$listmode} {
-			puts $filename
-		} else {
+		if {!$listmode} {
 			putfile $filename $cleaned
 		}
 	}
+	if {$todomode} {
+		todo $filename $contents
+	}
 }
 
-if {$listmode} {
-	puts "Files:    [llength $files]"
-	puts "To clean: [llength $cleanedfiles]"
+puts "Total files: [llength $files]"
+
+if {[llength $cleanedfiles] > 0} {
+	if {$listmode} {
+		puts "Files requiring cleanup:"
+	} else {
+		puts "Files cleaned:"
+	}
+	
+	foreach file $cleanedfiles {
+		puts "  $file"
+	}
 } else {
-	puts "Files:   [llength $files]"
-	puts "Cleaned: [llength $cleanedfiles]"
+	puts "No files required cleanup"
+}
+
+if {$todomode} {
+	if {[llength $todos] > 0} {
+		puts "Found [llength $todos] TODOs:"
+		foreach todo $todos {
+			puts "  $todo"
+		}
+	} else {
+		puts "Found no TODOs"
+	}
 }
