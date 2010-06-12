@@ -11,6 +11,7 @@ namespace spacecraft
 {
 	class Spacecraft
 	{
+        const bool DEBUG = true;
 		public static Random random;
 
 		public static void Main()
@@ -118,6 +119,16 @@ namespace spacecraft
 		{
 			LogError(String.Format(format, args));
 		}
+
+        public static void Debug(string format, params object[] args)
+        {
+            Debug(string.Format(format, args));
+        }
+
+        public static void Debug(string text)
+        {
+            System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
+        }
 
 		public static string StripColors(string s)
 		{

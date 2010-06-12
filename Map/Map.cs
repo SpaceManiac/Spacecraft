@@ -20,8 +20,12 @@ namespace spacecraft
 		public event BlockChangeHandler BlockChange;
 
 		public const uint levelFormatID = 0xFC000002;
-		private static short DefaultHeight, DefaultWidth, DefaultDepth;
+        /// <summary>
+        /// Max changse to the map per physics tick.
+        /// </summary>
+        public const int MaxPhysicsPerTick = 1000; 
 
+		private static short DefaultHeight, DefaultWidth, DefaultDepth;
 		public byte[] data { get; protected set; }
 		public int Length { get { return xdim * ydim * zdim; } }
 
@@ -34,6 +38,7 @@ namespace spacecraft
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
+        private Dictionary<BlockPosition, Block> PhysicsUpdates = new Dictionary<BlockPosition, Block>();
 		private uint physicsCount;
 		public bool PhysicsOn = true;
 		private object PhysicsMutex = new object();
@@ -110,51 +115,51 @@ namespace spacecraft
 		}
 
 		// ==== Simulation ====
-
+        System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 		public void Physics()
 		{
 			if (!PhysicsOn) return;
 			// run twice per second
 			physicsCount++;
 
-			List<PhysicsTask> FluidList = new List<PhysicsTask>();
-			List<PhysicsTask> SandList = new List<PhysicsTask>();
-			List<PhysicsTask> SpongeList = new List<PhysicsTask>();
-
+            PhysicsUpdates.Clear();
+            
 			lock(PhysicsMutex) {
 				short y_1 = (short)(ydim / 2 - 1);
 				short y_2 = (short)(ydim / 2 - 2);
 				short z2 = (short)(zdim - 1);
 				for (short x = 0; x < xdim; ++x) {
 					if(GetTile(x, y_1, 0) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x, y_1, 0, Block.Water));
+						PhysicsUpdates.Add(new BlockPosition(x, y_1, 0), Block.Water);
 					}
 					if(GetTile(x, y_1, z2) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x, y_1, z2, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(x, y_1, z2, Block.Water));
 					}
 					if(GetTile(x, y_2, 0) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x, y_2, 0, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(x, y_2, 0, Block.Water));
 					}
 					if(GetTile(x, y_2, z2) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x, y_2, z2, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(x, y_2, z2, Block.Water));
 					}
 				}
 				short x2 = (short)(xdim - 1);
 				for (short z = 1; z < zdim - 1; ++z) {
 					if(GetTile(0, y_1, z) == Block.Air) {
-						FluidList.Add(new PhysicsTask(0, y_1, z, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(0, y_1, z, Block.Water));
 					}
 					if(GetTile(x2, y_1, z) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x2, y_1, z, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(x2, y_1, z, Block.Water));
 					}
 					if(GetTile(0, y_2, z) == Block.Air) {
-						FluidList.Add(new PhysicsTask(0, y_2, z, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(0, y_2, z, Block.Water));
 					}
 					if(GetTile(x2, y_2, z) == Block.Air) {
-						FluidList.Add(new PhysicsTask(x2, y_2, z, Block.Water));
+						PhysicsUpdates.Add(new PhysicsTask(x2, y_2, z, Block.Water));
 					}
 				}
 
+                Stopwatch.Reset();
+                Stopwatch.Start();
 				for (short x = 0; x < xdim; ++x)
 				{
 					for (short y = 0; y < ydim; ++y)
@@ -162,7 +167,7 @@ namespace spacecraft
 						for (short z = 0; z < zdim; ++z)
 						{
 							Block tile = GetTile(x, y, z);
-							if (physicsCount % 10 == 0)
+							if (physicsCount % 2 == 0)
 							{
 								// grass
 								bool lit = true;
@@ -189,28 +194,29 @@ namespace spacecraft
 								if (tile != Block.Lava || physicsCount % 2 == 0)
 								{
 									Block under = GetTile(x, (short)(y - 1), z);
+                                    // Commented out bit was for volumetric water.
 									if (true)//!BlockInfo.IsFluid(under) && under != Block.Air)
 									{
 										if (GetTile((short)(x + 1), y, z) == Block.Air)
 										{
-											FluidList.Add(new PhysicsTask((short)(x + 1), y, z, tile));
+											PhysicsUpdates.Add(new PhysicsTask((short)(x + 1), y, z, tile));
 										}
 										if (GetTile((short)(x - 1), y, z) == Block.Air)
 										{
-											FluidList.Add(new PhysicsTask((short)(x - 1), y, z, tile));
+											PhysicsUpdates.Add(new PhysicsTask((short)(x - 1), y, z, tile));
 										}
 										if (GetTile(x, y, (short)(z + 1)) == Block.Air)
 										{
-											FluidList.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
+											PhysicsUpdates.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
 										}
 										if (GetTile(x, y, (short)(z - 1)) == Block.Air)
 										{
-											FluidList.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
+											PhysicsUpdates.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
 										}
 									}
 									if (GetTile(x, (short)(y - 1), z) == Block.Air)
 									{
-										FluidList.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
+										PhysicsUpdates.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
 									}
 								}
 							}
@@ -223,7 +229,18 @@ namespace spacecraft
 									{
 										for (short diffZ = -2; diffZ <= 2; diffZ++)
 										{
-											SpongeList.Add(new PhysicsTask((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ), Block.Air));
+                                            /*if (BlockInfo.IsFluid(GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ))) 
+                                                || GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)) == Block.Air )
+                                            {*/
+                                              //  PhysicsUpdates.Add(new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)), Block.Air);
+                                            //}
+
+                                            BlockPosition current = new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ));
+
+                                            if (PhysicsUpdates.ContainsKey(current) && BlockInfo.IsFluid((PhysicsUpdates[current])))
+                                            {
+                                                PhysicsUpdates[current] = Block.Air;
+                                            }
 										}
 									}
 								}
@@ -236,30 +253,31 @@ namespace spacecraft
 									--lowY;
 								}
 								if(lowY != y) {
-									SandList.Add(new PhysicsTask(x, y, z, Block.Air));
-									SandList.Add(new PhysicsTask(x, lowY, z, tile));
+									PhysicsUpdates.Add(new PhysicsTask(x, y, z, Block.Air));
+									PhysicsUpdates.Add(new PhysicsTask(x, lowY, z, tile));
 								}
 							}
 						} // z
 					} // y
 				} // x
-
+                
 				int flUpdates = 0;
-				foreach (PhysicsTask task in FluidList) {
-					if (!SpongeList.Contains(new PhysicsTask(task.x, task.y, task.z, Block.Air))) {
-						SetTile(task.x, task.y, task.z, task.tile);
-						if(++flUpdates >= 3000) break;
-					}
-				}
-				foreach (PhysicsTask task in SandList) {
-					SetTile(task.x, task.y, task.z, task.tile);
-				}
-				foreach (PhysicsTask task in SpongeList) {
-					if (BlockInfo.IsFluid(GetTile(task.x, task.y, task.z))) {
-						SetTile(task.x, task.y, task.z, task.tile);
-					}
+                PhysicsUpdates.Reverse();
+				foreach (PhysicsTask task in PhysicsUpdates) 
+                {
+                    // If it isn't the wanted tile already, and the tile hasn't changed since we made the list entry...
+                    if (GetTile(task.x, task.y, task.z) == task.From)
+                    {
+                        // Update it.
+                        SetTile(task.x, task.y, task.z, task.To);
+                        if (++flUpdates >= MaxPhysicsPerTick) 
+                            break; // ONOS! Too much physics. Abort!
+                    }
 				}
 			} // lock(physicsMutex)
+            Stopwatch.Stop();
+            Spacecraft.Debug("Tasks this step: {0}", PhysicsUpdates.Count);
+            Spacecraft.Debug("Time taken this step: {0}", Stopwatch.ElapsedMilliseconds);
 		}
 
 		public void ReplaceAll(Block From, Block To, int max)

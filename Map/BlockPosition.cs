@@ -20,10 +20,10 @@ public struct BlockPosition
 		z = Z;
 	}
 
-	public BlockPosition(int x, int y, int z)
+	/*public BlockPosition(int x, int y, int z)
 	{
 		this = new BlockPosition((short)x, (short)y, (short)z);
-	}
+	}*/
 
 
 	static public bool operator ==(BlockPosition A, BlockPosition B)
