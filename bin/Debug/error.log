@@ -1,0 +1,53 @@
+==== 2010/06/12 20:50:48 ====
+Could not load level.fcm
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at spacecraft.PhysicsTask..ctor(Int16 X, Int16 Y, Int16 Z, Block To) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\PhysicsTask.cs:line 14
+   at spacecraft.Map.ReadBlocks(FileStream fs) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 194
+   at spacecraft.Map.LoadFCM(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 50
+   at spacecraft.Map.Load(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 32
+   at spacecraft.Server.Start() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 52
+
+==== 2010/06/12 20:51:14 ====
+Could not load level.fcm
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at spacecraft.PhysicsTask..ctor(Int16 X, Int16 Y, Int16 Z, Block To) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\PhysicsTask.cs:line 14
+   at spacecraft.Map.ReadBlocks(FileStream fs) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 194
+   at spacecraft.Map.LoadFCM(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 50
+   at spacecraft.Map.Load(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 32
+   at spacecraft.Server.Start() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 52
+
+==== 2010/06/12 20:51:27 ====
+Could not load level.fcm
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at spacecraft.PhysicsTask..ctor(Int16 X, Int16 Y, Int16 Z, Block To) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\PhysicsTask.cs:line 14
+   at spacecraft.Map.ReadBlocks(FileStream fs) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 194
+   at spacecraft.Map.LoadFCM(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 50
+   at spacecraft.Map.Load(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 32
+   at spacecraft.Server.Start() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 52
+
+==== 2010/06/12 20:53:19 ====
+Fatal error while starting server
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at spacecraft.PhysicsTask..ctor(Int16 X, Int16 Y, Int16 Z, Block To) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\PhysicsTask.cs:line 14
+   at spacecraft.Map.ReadBlocks(FileStream fs) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 194
+   at spacecraft.Map.LoadFCM(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 50
+   at spacecraft.Map.Load(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 32
+   at spacecraft.Server.Start() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 51
+   at spacecraft.Spacecraft.Main() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Spacecraft.cs:line 37
+
+==== 2010/06/12 20:53:22 ====
+Fatal error while starting server
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at spacecraft.PhysicsTask..ctor(Int16 X, Int16 Y, Int16 Z, Block To) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\PhysicsTask.cs:line 14
+   at spacecraft.Map.ReadBlocks(FileStream fs) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 194
+   at spacecraft.Map.LoadFCM(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 50
+   at spacecraft.Map.Load(String filename) in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Map\MapIO.cs:line 32
+   at spacecraft.Server.Start() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 51
+   at spacecraft.Spacecraft.Main() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Spacecraft.cs:line 37
+
+==== 2010/06/12 21:02:39 ====
+Unable to heartbeat
+System.Net.WebException: The underlying connection was closed: A connection that was expected to be kept alive was closed by the server.
+   at System.Net.HttpWebRequest.GetResponse()
+   at spacecraft.Server.Heartbeat() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 194
+

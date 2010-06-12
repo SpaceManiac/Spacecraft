@@ -48,21 +48,9 @@ namespace spacecraft
 		{
 			// Initialize the map, using the saved one if it exists.
 			if (File.Exists(Map.levelName)) {
-				try {
 					map = Map.Load(Map.levelName);
-				}
-				catch (Exception e) {
-					Spacecraft.LogError("Could not load " + Map.levelName, e);
-					map = null;
-				}
 			} else if(File.Exists("server_level.dat")) {
-				try {
 					map = Map.Load("server_level.dat");
-				}
-				catch (Exception e) {
-					Spacecraft.LogError("Could not load server_level.dat", e);
-					map = null;
-				}
 			}
 
 			if (map == null) {

@@ -60,11 +60,11 @@ namespace spacecraft
 				Spacecraft.Log("Map.LoadFCM: Unexpected end of file - possible corruption!");
 				return null;
 			}
-			catch (Exception ex)
+			/*catch (Exception ex)
 			{
 				Spacecraft.Log("Map.Load: Error trying to read from \"" + filename + "\": " + ex.Message);
 				return null;
-			}
+			}*/
 			finally
 			{
 				if (fs != null)
@@ -181,7 +181,33 @@ namespace spacecraft
 			GZipStream decompressor = new GZipStream(fs, CompressionMode.Decompress);
 			decompressor.Read(data, 0, blockCount);
 			decompressor.Flush();
-		}
+
+            for (short x = 0; x < xdim; x++)
+			{
+                for (short y = 0; y < ydim; y++)
+                {
+                    for (short z = 0; z < zdim; z++)
+                    {
+                        Block block = (Block) GetTile(x,y,z);
+                        if (BlockInfo.RequiresPhysics(block))
+                        {
+                            if (block == Block.Dirt)
+                            {
+                                if ((Block)GetTile(x, (short)(y + 1), z) != Block.Dirt)
+                                { // This is dirt, and is definitly not underground.
+                                    PhysicsBlocks.Add(new PhysicsTask(x, y, z, block));
+                                }
+                            }
+                            else
+                            {
+                                PhysicsBlocks.Add(new PhysicsTask(x, y, z, block));
+                            }
+                        }
+                    }
+                }
+			}
+
+        }
 
 		private static string ReadLengthPrefixedString(BinaryReader reader)
 		{

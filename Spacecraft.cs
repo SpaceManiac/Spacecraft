@@ -40,8 +40,10 @@ namespace spacecraft
 				Spacecraft.Log("");
 				Environment.Exit(0);
 			}
-			catch (Exception e) {
+            catch (Exception e) {
 				// Something went wrong and wasn't caught
+                if (DEBUG)
+                    throw;
 				Spacecraft.LogError("Fatal error while starting server", e);
 			}
 		}

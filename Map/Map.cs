@@ -38,6 +38,8 @@ namespace spacecraft
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
         private Dictionary<BlockPosition, Block> PhysicsUpdates = new Dictionary<BlockPosition, Block>();
+        private List<PhysicsTask> PhysicsBlocks = new List<PhysicsTask>();
+
 		private uint physicsCount;
 		public bool PhysicsOn = true;
 		private object PhysicsMutex = new object();
@@ -112,20 +114,24 @@ namespace spacecraft
 				compressor.Write(data, 0, data.Length);
 			}
 		}
-		
-		public void CopyBlocks(byte[] source, int offset) {
-	data = new byte[xdim * ydim * zdim];
-	Array.Copy(source, offset, data, 0, data.Length);
-	}
-	
-	public bool ValidateBlockTypes() {
-	for(int i = 0; i < data.Length; ++i) {
-	if(data[i] > (byte) Block.Maximum) {
-	return false;
-	}
-	}
-	return true;
-	}
+
+        public void CopyBlocks(byte[] source, int offset)
+        {
+            data = new byte[xdim * ydim * zdim];
+            Array.Copy(source, offset, data, 0, data.Length);
+        }
+
+        public bool ValidateBlockTypes()
+        {
+            for (int i = 0; i < data.Length; ++i)
+            {
+                if (data[i] > (byte)Block.Maximum)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
 		// ==== Simulation ====
         System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
@@ -138,7 +144,8 @@ namespace spacecraft
             PhysicsUpdates.Clear();
             
 			lock(PhysicsMutex) {
-				short y_1 = (short)(ydim / 2 - 1);
+			
+                /*short y_1 = (short)(ydim / 2 - 1);
 				short y_2 = (short)(ydim / 2 - 2);
 				short z2 = (short)(zdim - 1);
 				for (short x = 0; x < xdim; ++x) {
@@ -242,9 +249,7 @@ namespace spacecraft
 									{
 										for (short diffZ = -2; diffZ <= 2; diffZ++)
 										{
-                                            /*if (BlockInfo.IsFluid(GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ))) 
-                                                || GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)) == Block.Air )
-                                            {*/
+                                            
                                               //  AddPhysicsUpdate(new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)), Block.Air);
                                             //}
 
@@ -274,15 +279,122 @@ namespace spacecraft
 					} // y
 				} // x
                 
-				int flUpdates = 0;
-				foreach (KeyValuePair<BlockPosition, Block> KV in PhysicsUpdates) 
+
+				*/
+               
+                    foreach (var key in PhysicsBlocks)
+                    {
+                        switch (key.To)
+                        {
+                            case Block.Water:
+                                for (int x = -1; x <= 1; x++)
+                                {
+                                    for (int y = -1; y <= 0; y++)
+                                    {
+                                        for (int z = -1; z <= 1; z++)
+                                        {
+                                            short newX = (short)(x + key.x);
+                                            short newY = (short)(y + key.y);
+                                            short newZ = (short)(z + key.z);
+
+                                            if (GetTile(newX, newY, newZ) == Block.Lava)
+                                            {
+                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Rock);
+                                            }
+                                            else if (GetTile(newX, newY, newZ) == Block.Water)
+                                            {
+                                            }
+                                            else if (!BlockInfo.IsSolid(GetTile(newX, newY, newZ)))
+                                            {
+                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Water);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+
+                            case Block.Lava:
+                                for (int x = -1; x <= 1; x++)
+                                {
+                                    for (int y = -1; y <= 0; y++)
+                                    {
+                                        for (int z = -1; z <= 1; z++)
+                                        {
+                                            short newX = (short)(x + key.x);
+                                            short newY = (short)(y + key.y);
+                                            short newZ = (short)(z + key.z);
+
+                                            if (GetTile(newX, newY, newZ) == Block.Water)
+                                            {
+                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Rock);
+                                            }
+                                            else if (GetTile(newX, newY, newZ) == Block.Lava)
+                                            {
+                                            }
+                                            else if (!BlockInfo.IsSolid(GetTile(newX, newY, newZ)))
+                                            {
+                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Lava);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+
+                            case Block.Sand: // If the tile immediatly under the sand is not solid, move the sand down one.
+                                if (!BlockInfo.IsSolid(GetTile(key.x, (short)(key.y - 1), key.z)))
+                                {
+                                    AddPhysicsUpdate(new BlockPosition(key.x, key.y, key.z), Block.Air);
+                                    AddPhysicsUpdate(new BlockPosition(key.x, (short)(key.y - 1), key.z), Block.Sand);
+                                }
+                                break;
+
+                            case Block.Sponge: // For each of the tiles within sponge radius, remove any water.
+                                for (int x = -BlockInfo.SpongeRadius; x < BlockInfo.SpongeRadius; x++)
+                                {
+                                    for (int y = -BlockInfo.SpongeRadius; y < BlockInfo.SpongeRadius; y++)
+                                    {
+                                        for (int z = -BlockInfo.SpongeRadius; z < BlockInfo.SpongeRadius; z++)
+                                        {
+                                            short newX = (short)(x + key.x);
+                                            short newY = (short)(y + key.y);
+                                            short newZ = (short)(z + key.z);
+
+                                            if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
+                                            {
+                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Air);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+
+                            case Block.Grass:
+                                if (BlockInfo.IsSolid(GetTile(key.x, (short)(key.y + 1), key.z)))
+                                {
+                                    AddPhysicsUpdate(new BlockPosition(key.x, key.y, key.z), Block.Dirt);
+                                }
+                                break;
+                            case Block.Dirt:
+                                if (!BlockInfo.IsSolid(GetTile(key.x, (short)(key.y + 1), key.z)))
+                                {
+                                    AddPhysicsUpdate(new BlockPosition(key.x, key.y, key.z), Block.Grass);
+                                }
+                                break;
+
+
+                            default:
+                                break;
+                        }
+                    }
+                int flUpdates = 0;
+                foreach (KeyValuePair<BlockPosition, Block> KV in PhysicsUpdates)
                 {
                     // If it isn't the wanted tile already, and the tile hasn't changed since we made the list entry...                        // Update it.
                     SetTile(KV.Key.x, KV.Key.y, KV.Key.z, KV.Value);
-                    if (++flUpdates >= MaxPhysicsPerTick) 
+                    if (++flUpdates >= MaxPhysicsPerTick)
                         break; // ONOS! Too much physics. Abort!
-                    }
-				}
+                }
+            }
 			 // lock(physicsMutex)
             Stopwatch.Stop();
             Spacecraft.Debug("Tasks this step: {0}", PhysicsUpdates.Count);
@@ -323,10 +435,31 @@ namespace spacecraft
 			ReplaceAll(Block.StillLava, Block.Air, max);
 		}
 
-		public void SetTile(short x, short y, short z, Block tile)
+
+        public void SetTile(short x, short y, short z, Block tile)
+        {
+            SetTile(x, y, z, tile, false);
+        }
+
+		public void SetTile(short x, short y, short z, Block tile, bool overide)
 		{
+            Block previous = GetTile(x, y, z);
+            if (previous == tile && !overide)
+                return;
+
+            PhysicsTask task = new PhysicsTask(x,y,z,previous);
+            if (PhysicsBlocks.Contains(task))
+            {
+                PhysicsBlocks.Remove(task);
+            }
+
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 			data[BlockIndex(x, y, z)] = (byte)tile;
+            
+            if (BlockInfo.RequiresPhysics(tile))
+            {
+                PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
+            }
 			if(BlockChange != null)
 				BlockChange(this, new BlockPosition(x, y, z), tile);
 		}
