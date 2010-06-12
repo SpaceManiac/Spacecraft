@@ -25,7 +25,6 @@ public struct BlockPosition
 		this = new BlockPosition((short)x, (short)y, (short)z);
 	}*/
 
-
 	static public bool operator ==(BlockPosition A, BlockPosition B)
 	{
 		return A.Equals(B);

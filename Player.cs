@@ -66,7 +66,10 @@ namespace spacecraft
 			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
 			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
 			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
-
+		}
+		
+		public void Start()
+		{
 			conn.Start();
 		}
 
@@ -152,6 +155,9 @@ namespace spacecraft
 		{
 			this.name = username;
 			rank = RankOf(username);
+			if(rank == Rank.Banned) {
+				conn.SendKick("You're banned!");
+			}
 		}
 
 		void conn_PlayerSpawn()

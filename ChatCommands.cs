@@ -117,7 +117,7 @@ namespace spacecraft
 		{
 			public override Rank RankNeeded
 			{
-				get { return Rank.Banned; }
+				get { return Rank.Guest; }
 			}
 
 			public override string HelpMsg
@@ -153,7 +153,7 @@ namespace spacecraft
 		{
 			public override Rank RankNeeded
 			{
-				get { return Rank.Banned; }
+				get { return Rank.Guest; }
 			}
 
 			public override string HelpMsg

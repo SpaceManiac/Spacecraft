@@ -127,7 +127,6 @@ namespace spacecraft
 			Type = array[1 + 3 * NetworkShort.Size + 1];
 		}
 
-
 		override public byte[] ToByteArray()
 		{
 			Builder<Byte> b = new Builder<byte>();

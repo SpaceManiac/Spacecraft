@@ -1,15 +1,17 @@
-/*
 // Copyright 2009, 2010 Matvei Stefarov <me@matvei.org>
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 
 // Thanks to fragmer of fCraft for letting us use his map format and map loading code!
 // http://fcraft.net/
+// Adapted for Spacecraft
 
 namespace spacecraft
 {
-	public static class DatLoading {
+	public static class DatLoading
+	{
 		public static Map Load(string fileName) {
 			Spacecraft.Log("Converting " + fileName);
 			byte[] temp = new byte[8];
@@ -35,7 +37,7 @@ namespace spacecraft
 						// bypassing the header crap
 						int pointer = i + 6;
 						Array.Copy( data, pointer, temp, 0, sizeof( short ) );
-						pointer += Server.htons( BitConverter.ToInt16( temp, 0 ) );
+						pointer += IPAddress.HostToNetworkOrder( BitConverter.ToInt16( temp, 0 ) );
 						pointer += 13;
 
 						int headerEnd = 0;
@@ -56,23 +58,23 @@ namespace spacecraft
 
 							pointer += 1;
 							Array.Copy( data, pointer, temp, 0, sizeof( short ) );
-							short skip = Server.htons( BitConverter.ToInt16( temp, 0 ) );
+							short skip = IPAddress.HostToNetworkOrder( BitConverter.ToInt16( temp, 0 ) );
 							pointer += 2;
 
 							// look for relevant variables
 							Array.Copy( data, headerEnd + offset - 4, temp, 0, sizeof( int ) );
 							if( MemCmp( data, pointer, "width" ) ) {
-								map.widthX = (ushort)Server.htons( BitConverter.ToInt32( temp, 0 ) );
+								map.xdim = (short)IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) );
 							} else if( MemCmp( data, pointer, "depth" ) ) {
-								map.height = (ushort)Server.htons( BitConverter.ToInt32( temp, 0 ) );
+								map.ydim = (short)IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) );
 							} else if( MemCmp( data, pointer, "height" ) ) {
-								map.widthY = (ushort)Server.htons( BitConverter.ToInt32( temp, 0 ) );
+								map.zdim = (short)IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) );
 							} else if( MemCmp( data, pointer, "xSpawn" ) ) {
-								map.spawn.x = (short)(Server.htons( BitConverter.ToInt32( temp, 0 ) )*32+16);
+								map.spawn.x = (short)(IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) )*32+16);
 							} else if( MemCmp( data, pointer, "ySpawn" ) ) {
-								map.spawn.h = (short)(Server.htons( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16);
+								map.spawn.y = (short)(IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16);
 							} else if( MemCmp( data, pointer, "zSpawn" ) ) {
-								map.spawn.y = (short)(Server.htons( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16);
+								map.spawn.z = (short)(IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16);
 							}
 
 							pointer += skip;
@@ -102,12 +104,17 @@ namespace spacecraft
 					}
 				}
 			} catch( Exception ex ) {
-				world.log.Log( "Conversion failed: {0}", LogType.Error, ex.Message );
-				world.log.Log( ex.StackTrace, LogType.Debug );
+				Spacecraft.LogError("Conversion failed", ex);
 				return null;
 			}
-			map.Save();
-			world.log.Log( "Conversion completed succesfully succesful.", LogType.SystemActivity, fileName );
+			
+			// replace all still fluids with their normal equivalents
+			// vanilla server does optimizations that make most fluids still when nothing is happening nearby
+			map.ReplaceAll(Block.StillLava, Block.Lava, map.Length);
+			map.ReplaceAll(Block.StillWater, Block.Water, map.Length);
+			
+			map.Save(Map.levelName);
+			Spacecraft.Log("Conversion completed succesfully");
 			return map;
 		}
 
@@ -119,4 +126,3 @@ namespace spacecraft
 		}
 	}
 }
-*/

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 // Thanks to fragmer of fCraft for letting us use his map format and map loading code!
 // http://fcraft.net/
+// Adapted for Spacecraft
 
 namespace spacecraft
 {
@@ -29,8 +30,8 @@ namespace spacecraft
 			{
 				case ".fcm":
 					return LoadFCM(filename);
-				//case ".dat":
-				//  return DatLoading.Load(filename);
+				case ".dat":
+	return DatLoading.Load(filename);
 				default:
 					throw new FileLoadException("Unknown map file format.");
 			}
@@ -193,7 +194,6 @@ namespace spacecraft
 		{
 			return dimension > 0 && dimension % 16 == 0 && dimension < 2048;
 		}
-
 
 		// ==== Saving ====
 

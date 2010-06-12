@@ -59,7 +59,7 @@ namespace spacecraft
 			{
 				_contents[i] = FILLER_CHAR;
 			}
-			raw.CopyTo(_contents, 0);
+			Array.Copy(raw, _contents, Math.Min(raw.Length, Size));
 		}
 
 		public static implicit operator NetworkString(string s)
@@ -87,7 +87,7 @@ namespace spacecraft
 			{
 				_contents[i] = FILLER_CHAR;
 			}
-			bar.CopyTo(_contents, 0);
+			Array.Copy(bar, _contents, Math.Min(bar.Length, Size));
 		}
 
 		public static implicit operator NetworkByteArray(string s)

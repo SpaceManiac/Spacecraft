@@ -8,7 +8,6 @@ using System.Net;
 
 namespace spacecraft
 {
-	[Serializable()]
 	public partial class Map
 	{
 		// continued in MapIO.cs
@@ -29,11 +28,11 @@ namespace spacecraft
 		public byte[] data { get; protected set; }
 		public int Length { get { return xdim * ydim * zdim; } }
 
-		public short xdim { get; protected set; }
-		public short ydim { get; protected set; }
-		public short zdim { get; protected set; }
-		public Position spawn { get; protected set; }
-		public byte spawnHeading { get; protected set; }
+		public short xdim;
+		public short ydim;
+		public short zdim;
+		public Position spawn;
+		public byte spawnHeading;
 
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
@@ -51,13 +50,13 @@ namespace spacecraft
 			ydim = 0;
 			zdim = 0;
 
-			DefaultDepth = (short) Config.GetInt("Depth", 64);
-			DefaultHeight = (short)Config.GetInt("Height", 64);
-			DefaultWidth = (short)Config.GetInt("Width", 64);
+			DefaultDepth = (short)Config.GetInt("depth", 64);
+			DefaultHeight = (short)Config.GetInt("height", 64);
+			DefaultWidth = (short)Config.GetInt("width", 64);
 
-			DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)255));
-			DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)255));
-			DefaultHeight = (short)Math.Max((short)0, Math.Min(DefaultHeight, (short)255));
+			DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)2048));
+			DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)2048));
+			DefaultHeight = (short)Math.Max((short)0, Math.Min(DefaultHeight, (short)2048));
 		}
 
 		public string[] GetLandmarkList()
@@ -84,9 +83,9 @@ namespace spacecraft
 			xdim = DefaultWidth;
 			ydim = DefaultHeight;
 			zdim = DefaultDepth;
-			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 64), (short)(16 * zdim));
+			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
 			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
-			data = new byte[Length];
+			data = new byte[xdim * ydim * zdim];
 			for (short x = 0; x < xdim; ++x) {
 				for (short z = 0; z < zdim; ++z) {
 					for (short y = 0; y < ydim / 2; ++y) {
@@ -113,6 +112,20 @@ namespace spacecraft
 				compressor.Write(data, 0, data.Length);
 			}
 		}
+		
+		public void CopyBlocks(byte[] source, int offset) {
+	data = new byte[xdim * ydim * zdim];
+	Array.Copy(source, offset, data, 0, data.Length);
+	}
+	
+	public bool ValidateBlockTypes() {
+	for(int i = 0; i < data.Length; ++i) {
+	if(data[i] > (byte) Block.Maximum) {
+	return false;
+	}
+	}
+	return true;
+	}
 
 		// ==== Simulation ====
         System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
@@ -130,31 +143,31 @@ namespace spacecraft
 				short z2 = (short)(zdim - 1);
 				for (short x = 0; x < xdim; ++x) {
 					if(GetTile(x, y_1, 0) == Block.Air) {
-						PhysicsUpdates.Add(new BlockPosition(x, y_1, 0), Block.Water);
+						AddPhysicsUpdate(new BlockPosition(x, y_1, 0), Block.Water);
 					}
 					if(GetTile(x, y_1, z2) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(x, y_1, z2, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(x, y_1, z2), Block.Water);
 					}
 					if(GetTile(x, y_2, 0) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(x, y_2, 0, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(x, y_2, 0), Block.Water);
 					}
 					if(GetTile(x, y_2, z2) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(x, y_2, z2, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(x, y_2, z2), Block.Water);
 					}
 				}
 				short x2 = (short)(xdim - 1);
 				for (short z = 1; z < zdim - 1; ++z) {
 					if(GetTile(0, y_1, z) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(0, y_1, z, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(0, y_1, z), Block.Water);
 					}
 					if(GetTile(x2, y_1, z) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(x2, y_1, z, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(x2, y_1, z), Block.Water);
 					}
 					if(GetTile(0, y_2, z) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(0, y_2, z, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(0, y_2, z), Block.Water);
 					}
 					if(GetTile(x2, y_2, z) == Block.Air) {
-						PhysicsUpdates.Add(new PhysicsTask(x2, y_2, z, Block.Water));
+						AddPhysicsUpdate(new BlockPosition(x2, y_2, z), Block.Water);
 					}
 				}
 
@@ -199,24 +212,24 @@ namespace spacecraft
 									{
 										if (GetTile((short)(x + 1), y, z) == Block.Air)
 										{
-											PhysicsUpdates.Add(new PhysicsTask((short)(x + 1), y, z, tile));
+											AddPhysicsUpdate(new BlockPosition((short)(x + 1), y, z), tile);
 										}
 										if (GetTile((short)(x - 1), y, z) == Block.Air)
 										{
-											PhysicsUpdates.Add(new PhysicsTask((short)(x - 1), y, z, tile));
+											AddPhysicsUpdate(new BlockPosition((short)(x - 1), y, z), tile);
 										}
 										if (GetTile(x, y, (short)(z + 1)) == Block.Air)
 										{
-											PhysicsUpdates.Add(new PhysicsTask(x, y, (short)(z + 1), tile));
+											AddPhysicsUpdate(new BlockPosition(x, y, (short)(z + 1)), tile);
 										}
 										if (GetTile(x, y, (short)(z - 1)) == Block.Air)
 										{
-											PhysicsUpdates.Add(new PhysicsTask(x, y, (short)(z - 1), tile));
+											AddPhysicsUpdate(new BlockPosition(x, y, (short)(z - 1)), tile);
 										}
 									}
 									if (GetTile(x, (short)(y - 1), z) == Block.Air)
 									{
-										PhysicsUpdates.Add(new PhysicsTask(x, (short)(y - 1), z, tile));
+										AddPhysicsUpdate(new BlockPosition(x, (short)(y - 1), z), tile);
 									}
 								}
 							}
@@ -232,7 +245,7 @@ namespace spacecraft
                                             /*if (BlockInfo.IsFluid(GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ))) 
                                                 || GetTile((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)) == Block.Air )
                                             {*/
-                                              //  PhysicsUpdates.Add(new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)), Block.Air);
+                                              //  AddPhysicsUpdate(new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ)), Block.Air);
                                             //}
 
                                             BlockPosition current = new BlockPosition((short)(x + diffX), (short)(y + diffY), (short)(z + diffZ));
@@ -253,8 +266,8 @@ namespace spacecraft
 									--lowY;
 								}
 								if(lowY != y) {
-									PhysicsUpdates.Add(new PhysicsTask(x, y, z, Block.Air));
-									PhysicsUpdates.Add(new PhysicsTask(x, lowY, z, tile));
+									AddPhysicsUpdate(new BlockPosition(x, y, z), Block.Air);
+									AddPhysicsUpdate(new BlockPosition(x, lowY, z), tile);
 								}
 							}
 						} // z
@@ -262,23 +275,27 @@ namespace spacecraft
 				} // x
                 
 				int flUpdates = 0;
-                PhysicsUpdates.Reverse();
-				foreach (PhysicsTask task in PhysicsUpdates) 
+				foreach (KeyValuePair<BlockPosition, Block> KV in PhysicsUpdates) 
                 {
-                    // If it isn't the wanted tile already, and the tile hasn't changed since we made the list entry...
-                    if (GetTile(task.x, task.y, task.z) == task.From)
-                    {
-                        // Update it.
-                        SetTile(task.x, task.y, task.z, task.To);
-                        if (++flUpdates >= MaxPhysicsPerTick) 
-                            break; // ONOS! Too much physics. Abort!
+                    // If it isn't the wanted tile already, and the tile hasn't changed since we made the list entry...                        // Update it.
+                    SetTile(KV.Key.x, KV.Key.y, KV.Key.z, KV.Value);
+                    if (++flUpdates >= MaxPhysicsPerTick) 
+                        break; // ONOS! Too much physics. Abort!
                     }
 				}
-			} // lock(physicsMutex)
+			 // lock(physicsMutex)
             Stopwatch.Stop();
             Spacecraft.Debug("Tasks this step: {0}", PhysicsUpdates.Count);
             Spacecraft.Debug("Time taken this step: {0}", Stopwatch.ElapsedMilliseconds);
 		}
+
+        void AddPhysicsUpdate(BlockPosition pos, Block tile)
+        {
+            if (PhysicsUpdates.ContainsKey(pos))
+                PhysicsUpdates.Remove(pos);
+            PhysicsUpdates.Add(pos, tile);
+        }
+
 
 		public void ReplaceAll(Block From, Block To, int max)
 		{

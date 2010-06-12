@@ -14,6 +14,9 @@ namespace spacecraft
 
 	public static class EscherMath
 	{
+        // TODO: Fix all this to cast properly, etc. We only need to do that when we actually implement EscherMode.
+
+        /*
 		public static Pair<byte[], BlockPosition> MapDataTo(Map map, EscherMode mode)
 		{
 			byte[] newmap = new byte[map.data.Length];
@@ -48,15 +51,15 @@ namespace spacecraft
 
 			switch(mode) {
 			case EscherMode.XPlus:
-				return new BlockPosition(ymax - y, x, z);
+				return new BlockPosition((short)(ymax - y), x, z);
 			case EscherMode.XMinus:
-				return new BlockPosition(y, xmax - x, z);
+                return new BlockPosition(y, (short)(xmax - x), z);
 			case EscherMode.YMinus:
-				return new BlockPosition(z, ymax - y, x);
+                return new BlockPosition(z, (short)(ymax - y), x);
 			case EscherMode.ZPlus:
 				return new BlockPosition(y, z, x);
 			case EscherMode.ZMinus:
-				return new BlockPosition(x, zmax - z, y);
+                return new BlockPosition(x, (short)(zmax - z), y);
 			case EscherMode.None:
 			default:
 				return pos;
@@ -76,7 +79,6 @@ namespace spacecraft
 			int x = pos.x;
 			int y = pos.y;
 			int z = pos.z;
-
 
 			switch(mode) {
 			case EscherMode.XPlus:
@@ -117,8 +119,7 @@ namespace spacecraft
 			default:
 				return EscherMode.YMinus;
 
-
 			}
 		}
-	}
+	*/}
 }
