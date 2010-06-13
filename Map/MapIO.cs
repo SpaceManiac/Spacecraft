@@ -193,7 +193,7 @@ namespace spacecraft
                         {
                             if (block == Block.Dirt)
                             {
-                                if ((Block)GetTile(x, (short)(y + 1), z) != Block.Dirt)
+                                if (!BlockInfo.IsSolid((Block)GetTile(x, (short)(y + 1), z)))
                                 { // This is dirt, and is definitly not underground.
                                     PhysicsBlocks.Add(new PhysicsTask(x, y, z, block));
                                 }

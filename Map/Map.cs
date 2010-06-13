@@ -281,7 +281,11 @@ namespace spacecraft
                 
 
 				*/
-               
+                lock (PhysicsBlocks)
+                {
+
+
+                    PhysicsBlocks.Sort();
                     foreach (var key in PhysicsBlocks)
                     {
                         switch (key.To)
@@ -348,18 +352,18 @@ namespace spacecraft
                                 }
                                 break;
 
-                            case Block.Sponge: // For each of the tiles within sponge radius, remove any water.
-                                for (int x = -BlockInfo.SpongeRadius; x < BlockInfo.SpongeRadius; x++)
+                            case Block.Sponge: // For each of the tiles within sponge radius, remove any fluid.
+                                for (int x = -BlockInfo.SpongeRadius; x <= BlockInfo.SpongeRadius; x++)
                                 {
-                                    for (int y = -BlockInfo.SpongeRadius; y < BlockInfo.SpongeRadius; y++)
+                                    for (int y = -BlockInfo.SpongeRadius; y <= BlockInfo.SpongeRadius; y++)
                                     {
-                                        for (int z = -BlockInfo.SpongeRadius; z < BlockInfo.SpongeRadius; z++)
+                                        for (int z = -BlockInfo.SpongeRadius; z <= BlockInfo.SpongeRadius; z++)
                                         {
                                             short newX = (short)(x + key.x);
                                             short newY = (short)(y + key.y);
                                             short newZ = (short)(z + key.z);
 
-                                            if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
+                                            if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)) || PhysicsUpdates.ContainsKey(new BlockPosition(newX,newY,newZ)))
                                             {
                                                 AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Air);
                                             }
@@ -386,6 +390,7 @@ namespace spacecraft
                                 break;
                         }
                     }
+                }
                 int flUpdates = 0;
                 foreach (KeyValuePair<BlockPosition, Block> KV in PhysicsUpdates)
                 {
@@ -450,7 +455,10 @@ namespace spacecraft
             PhysicsTask task = new PhysicsTask(x,y,z,previous);
             if (PhysicsBlocks.Contains(task))
             {
-                PhysicsBlocks.Remove(task);
+                lock (PhysicsBlocks)
+                {
+                    PhysicsBlocks.Remove(task);    
+                }
             }
 
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
@@ -458,7 +466,10 @@ namespace spacecraft
             
             if (BlockInfo.RequiresPhysics(tile))
             {
-                PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
+                lock (PhysicsBlocks)
+                {
+                    PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
+                }
             }
 			if(BlockChange != null)
 				BlockChange(this, new BlockPosition(x, y, z), tile);

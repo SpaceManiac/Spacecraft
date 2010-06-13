@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace spacecraft
 {
@@ -28,6 +29,21 @@ namespace spacecraft
             { return 0; }
             else
             { return -1; }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append(To.ToString());
+            b.Append(" ");
+            b.Append("(");
+            b.Append(x.ToString());
+            b.Append(",");
+            b.Append(y.ToString());
+            b.Append(",");
+            b.Append(z.ToString());
+            b.Append(")");
+            return b.ToString();
         }
     }
 
