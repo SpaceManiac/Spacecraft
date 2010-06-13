@@ -297,20 +297,23 @@ namespace spacecraft
                                     {
                                         for (int z = -1; z <= 1; z++)
                                         {
-                                            short newX = (short)(x + key.x);
-                                            short newY = (short)(y + key.y);
-                                            short newZ = (short)(z + key.z);
+                                            if (Math.Abs(x+y+z)==1)
+                                            {
+                                                short newX = (short)(x + key.x);
+                                                short newY = (short)(y + key.y);
+                                                short newZ = (short)(z + key.z);
 
-                                            if (GetTile(newX, newY, newZ) == Block.Lava)
-                                            {
-                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Rock);
-                                            }
-                                            else if (GetTile(newX, newY, newZ) == Block.Water)
-                                            {
-                                            }
-                                            else if (!BlockInfo.IsSolid(GetTile(newX, newY, newZ)))
-                                            {
-                                                AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Water);
+                                                if (GetTile(newX, newY, newZ) == Block.Lava)
+                                                {
+                                                    AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Rock);
+                                                }
+                                                else if (GetTile(newX, newY, newZ) == Block.Water)
+                                                {
+                                                }
+                                                else if (!BlockInfo.IsSolid(GetTile(newX, newY, newZ)))
+                                                {
+                                                    AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Water);
+                                                }
                                             }
                                         }
                                     }
@@ -362,8 +365,9 @@ namespace spacecraft
                                             short newX = (short)(x + key.x);
                                             short newY = (short)(y + key.y);
                                             short newZ = (short)(z + key.z);
+                                            BlockPosition pos = new BlockPosition(newX, newY, newZ);
 
-                                            if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)) || PhysicsUpdates.ContainsKey(new BlockPosition(newX,newY,newZ)))
+                                            if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)) || (PhysicsUpdates.ContainsKey(pos)) && BlockInfo.IsFluid(PhysicsUpdates[pos]))
                                             {
                                                 AddPhysicsUpdate(new BlockPosition(newX, newY, newZ), Block.Air);
                                             }
@@ -453,24 +457,37 @@ namespace spacecraft
                 return;
 
             PhysicsTask task = new PhysicsTask(x,y,z,previous);
+            
             if (PhysicsBlocks.Contains(task))
             {
                 lock (PhysicsBlocks)
                 {
-                    PhysicsBlocks.Remove(task);    
+                    PhysicsBlocks.Remove(task);
                 }
             }
-
-			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-			data[BlockIndex(x, y, z)] = (byte)tile;
-            
             if (BlockInfo.RequiresPhysics(tile))
             {
                 lock (PhysicsBlocks)
                 {
-                    PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
+                PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
                 }
             }
+
+            if (GetTile(x, (short)(y - 1), z) == Block.Dirt || GetTile(x, (short)(y - 1), z) == Block.Grass) // We've revealed a 
+            {
+                PhysicsTask down = new PhysicsTask(x,(short)(y-1),z, tile);
+                lock (PhysicsBlocks)
+                {
+                    if (!PhysicsBlocks.Contains(down))
+                        PhysicsBlocks.Add(down);
+                }
+            }
+
+
+			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
+			data[BlockIndex(x, y, z)] = (byte)tile;
+            
+           
 			if(BlockChange != null)
 				BlockChange(this, new BlockPosition(x, y, z), tile);
 		}

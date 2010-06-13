@@ -51,3 +51,9 @@ System.Net.WebException: The underlying connection was closed: A connection that
    at System.Net.HttpWebRequest.GetResponse()
    at spacecraft.Server.Heartbeat() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 194
 
+==== 2010/06/13 19:17:00 ====
+Unable to heartbeat
+System.Net.WebException: The underlying connection was closed: A connection that was expected to be kept alive was closed by the server.
+   at System.Net.HttpWebRequest.GetResponse()
+   at spacecraft.Server.Heartbeat() in C:\Documents and Settings\Ewan\Desktop\Spacecraft\Server.cs:line 194
+
