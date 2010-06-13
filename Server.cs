@@ -127,6 +127,9 @@ namespace spacecraft
 				Player.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
 				Player.Disconnect += new Player.PlayerDisconnectHandler(Player_Disconnect);
 
+                Player.Spawn += new Player.PlayerSpawnHandler(UpdatePlayersList);
+                Player.Disconnect += new Player.PlayerDisconnectHandler(UpdatePlayersList);
+
 				Players.Add(Player);
 				Player.Start();
 
@@ -303,5 +306,26 @@ namespace spacecraft
 			Spacecraft.Log("Spacecraft is shutting down...");
 			map.Save(Map.levelName);
 		}
+
+        // Added an external list of players, Atkins' request.
+        private static object playersfile = new object();
+        
+        public void UpdatePlayersList(Player player)
+        {
+            // refresh players.txt so that it contains a list of current players
+            lock (playersfile)
+            {
+                StreamWriter sw = new StreamWriter("players.txt", false);
+                foreach (var P in Players)
+                {
+                    sw.WriteLine(P.name);
+                }
+                sw.Write(System.Environment.NewLine);
+                sw.Close();
+            }
+        }
+
+
+
 	}
 }
