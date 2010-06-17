@@ -89,12 +89,13 @@ namespace spacecraft
 			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
 			data = new byte[xdim * ydim * zdim];
 			for (short x = 0; x < xdim; ++x) {
+                Spacecraft.Log("X:" + x + " / " + xdim);
 				for (short z = 0; z < zdim; ++z) {
 					for (short y = 0; y < ydim / 2; ++y) {
 						if (y == ydim / 2 - 1) {
-							SetTile(x, y, z, Block.Grass);
+							SetTile(x, y, z, Block.Grass, true);
 						} else {
-							SetTile(x, y, z, Block.Dirt);
+							SetTile(x, y, z, Block.Dirt, true);
 						}
 					}
 				}
@@ -452,37 +453,38 @@ namespace spacecraft
 
 		public void SetTile(short x, short y, short z, Block tile, bool overide)
 		{
-            Block previous = GetTile(x, y, z);
-            if (previous == tile && !overide)
-                return;
-
-            PhysicsTask task = new PhysicsTask(x,y,z,previous);
-            
-            if (PhysicsBlocks.Contains(task))
+            if (!overide) // Override should be used to override all physics checking. 
             {
-                lock (PhysicsBlocks)
+                Block previous = GetTile(x, y, z);
+
+
+                PhysicsTask task = new PhysicsTask(x, y, z, previous);
+
+                if (PhysicsBlocks.Contains(task))
                 {
-                    PhysicsBlocks.Remove(task);
+                    lock (PhysicsBlocks)
+                    {
+                        PhysicsBlocks.Remove(task);
+                    }
+                }
+                if (BlockInfo.RequiresPhysics(tile))
+                {
+                    lock (PhysicsBlocks)
+                    {
+                        PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
+                    }
+                }
+
+                if (GetTile(x, (short)(y - 1), z) == Block.Dirt || GetTile(x, (short)(y - 1), z) == Block.Grass) // We've revealed a 
+                {
+                    PhysicsTask down = new PhysicsTask(x, (short)(y - 1), z, tile);
+                    lock (PhysicsBlocks)
+                    {
+                        if (!PhysicsBlocks.Contains(down))
+                            PhysicsBlocks.Add(down);
+                    }
                 }
             }
-            if (BlockInfo.RequiresPhysics(tile))
-            {
-                lock (PhysicsBlocks)
-                {
-                PhysicsBlocks.Add(new PhysicsTask(x, y, z, tile));
-                }
-            }
-
-            if (GetTile(x, (short)(y - 1), z) == Block.Dirt || GetTile(x, (short)(y - 1), z) == Block.Grass) // We've revealed a 
-            {
-                PhysicsTask down = new PhysicsTask(x,(short)(y-1),z, tile);
-                lock (PhysicsBlocks)
-                {
-                    if (!PhysicsBlocks.Contains(down))
-                        PhysicsBlocks.Add(down);
-                }
-            }
-
 
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 			data[BlockIndex(x, y, z)] = (byte)tile;

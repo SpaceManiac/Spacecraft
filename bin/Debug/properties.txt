@@ -6,7 +6,3 @@ server-name = Minecraft Server
 motd = Powered by &aSpacecraft
 max-players = 16
 verify-names = false
-
-width = 255
-depth = 255
-height = 255

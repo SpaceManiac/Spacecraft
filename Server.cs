@@ -21,11 +21,13 @@ namespace spacecraft
 		private bool Initialized = false;
 
 		private TcpListener Listener;
+        private HttpListener HTTPListener;
 
 		public List<Player> Players { get; private set; }
 		public Map map { get; protected set; }
 		public int salt { get; protected set; }
 		public int port { get; protected set; }
+        public int HTTPport { get; protected set; }
 		public int maxplayers { get; protected set; }
 		public string name { get; protected set; }
 		public string motd { get; protected set; }
@@ -39,6 +41,7 @@ namespace spacecraft
 			salt = Spacecraft.random.Next(100000, 999999);
 
 			port = Config.GetInt("port", 25565);
+            HTTPport = Config.GetInt("http-port", port+1);
 			maxplayers = Config.GetInt("max-players", 16);
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
@@ -67,6 +70,11 @@ namespace spacecraft
 
 				Listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
 				Listener.Start();
+
+                HTTPListener = new HttpListener();
+                HTTPListener.Prefixes.Add("http://*:" + HTTPport + "/");
+                HTTPListener.Start();
+
 				Spacecraft.Log("Listening on port " + port.ToString());
 				Spacecraft.Log("Server name is " + name);
 				Spacecraft.Log("Server MOTD is " + motd);
@@ -78,6 +86,9 @@ namespace spacecraft
 
 				Thread T2 = new Thread(TimerThread);
 				T2.Start();
+
+                Thread T3 = new Thread(HTTPMonitorThread);
+                T3.Start();
 
 				OnExit.WaitOne();
 				Running = false;
@@ -136,6 +147,21 @@ namespace spacecraft
 				Thread.Sleep(10);
 			}
 		}
+
+        String response = "WE GET SIGNAL!";
+
+        public void HTTPMonitorThread()
+        {
+            while (Running)
+            {
+                HttpListenerContext Client = HTTPListener.GetContext();
+                HttpListenerResponse Response = Client.Response;
+                byte[] bytes = ASCIIEncoding.ASCII.GetBytes(response);
+
+                Response.OutputStream.Write(bytes, 0, bytes.Length);
+                Response.Close();
+            }
+        }
 
 		public Player GetPlayer(string name)
 		{
