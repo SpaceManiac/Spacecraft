@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Map\MapPhysics.cs" />
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="ChatCommands.cs" />
     <Compile Include="Utils\Config.cs" />

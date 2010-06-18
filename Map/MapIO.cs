@@ -182,31 +182,6 @@ namespace spacecraft
 			decompressor.Read(data, 0, blockCount);
 			decompressor.Flush();
 
-            for (short x = 0; x < xdim; x++)
-			{
-                for (short y = 0; y < ydim; y++)
-                {
-                    for (short z = 0; z < zdim; z++)
-                    {
-                        Block block = (Block) GetTile(x,y,z);
-                        if (BlockInfo.RequiresPhysics(block))
-                        {
-                            if (block == Block.Dirt)
-                            {
-                                if (!BlockInfo.IsSolid((Block)GetTile(x, (short)(y + 1), z)))
-                                { // This is dirt, and is definitly not underground.
-                                    PhysicsBlocks.Add(new PhysicsTask(x, y, z, block));
-                                }
-                            }
-                            else
-                            {
-                                PhysicsBlocks.Add(new PhysicsTask(x, y, z, block));
-                            }
-                        }
-                    }
-                }
-			}
-
         }
 
 		private static string ReadLengthPrefixedString(BinaryReader reader)

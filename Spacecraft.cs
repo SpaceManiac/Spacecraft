@@ -11,7 +11,7 @@ namespace spacecraft
 {
 	class Spacecraft
 	{
-        const bool DEBUG = true;
+        public const bool DEBUG = true;
 		public static Random random;
 
 		public static void Main()

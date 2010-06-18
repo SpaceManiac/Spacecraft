@@ -119,7 +119,7 @@ namespace spacecraft
 					lastHeartbeat = clock.Elapsed.TotalSeconds;
 				}
 				if(clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
-					map.Physics();
+					map.DoPhysics();
 					lastPhysics = clock.Elapsed.TotalSeconds;
 				}
 				Thread.Sleep(10);
