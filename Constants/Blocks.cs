@@ -70,11 +70,10 @@ namespace spacecraft
 		I_InfWater = 0x34 */
 	}
 
-
 	public static class BlockInfo
 	{
 		public static Dictionary<string, Block> names;
-        public const int SpongeRadius = 2;
+	public const int SpongeRadius = 2;
 
 		public static bool IsFluid(Block block)
 		{
@@ -102,22 +101,21 @@ namespace spacecraft
 			return (block != Block.Air && !IsFluid(block) && !IsDecoration(block));
 		}
 
-        static Block[] PhysicsBlocks = new Block[] 
-        {
-            Block.Water,
-            Block.Lava,
-            Block.Sand,
-            Block.Sponge,
-            //Block.Dirt, 
-            //Block.Grass,
-        };
-        static List<Block> PhysicsList = new List<Block>(PhysicsBlocks);
+	static Block[] PhysicsBlocks = new Block[] 
+	{
+	Block.Water,
+	Block.Lava,
+	Block.Sand,
+	Block.Sponge,
+	//Block.Dirt, 
+	//Block.Grass,
+	};
+	static List<Block> PhysicsList = new List<Block>(PhysicsBlocks);
 
-        public static bool RequiresPhysics(Block B)
-        {
-            return PhysicsList.Contains(B);
-        }
-
+	public static bool RequiresPhysics(Block B)
+	{
+	return PhysicsList.Contains(B);
+	}
 
 		static BlockInfo()
 		{
@@ -168,17 +166,17 @@ namespace spacecraft
 			return names.ContainsKey(key);
 		}
 
-        public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
+	public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
 
-        static int BlockSort(Block A, Block B)
-        {
-            if (A == B)
-                return 0;
-            else if (A > B)
-                return 1;
-            else if (A < B)
-                return -1;
-            throw new ArgumentException();
-        }
+	static int BlockSort(Block A, Block B)
+	{
+	if (A == B)
+	return 0;
+	else if (A > B)
+	return 1;
+	else if (A < B)
+	return -1;
+	throw new ArgumentException();
+	}
 	}
 }

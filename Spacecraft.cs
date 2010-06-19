@@ -11,7 +11,7 @@ namespace spacecraft
 {
 	class Spacecraft
 	{
-        public const bool DEBUG = true;
+	public const bool DEBUG = true;
 		public static Random random;
 
 		public static void Main()
@@ -40,7 +40,7 @@ namespace spacecraft
 				Spacecraft.Log("");
 				Environment.Exit(0);
 			}
-            catch (Exception e) {
+	catch (Exception e) {
 				// Something went wrong and wasn't caught
 				Spacecraft.LogError("Fatal error while starting server", e);
 			}
@@ -113,15 +113,15 @@ namespace spacecraft
 			LogError(String.Format(format, args));
 		}
 
-        public static void Debug(string format, params object[] args)
-        {
-            Debug(string.Format(format, args));
-        }
+	public static void Debug(string format, params object[] args)
+	{
+	Debug(string.Format(format, args));
+	}
 
-        public static void Debug(string text)
-        {
-            System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
-        }
+	public static void Debug(string text)
+	{
+	System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
+	}
 
 		public static string StripColors(string s)
 		{

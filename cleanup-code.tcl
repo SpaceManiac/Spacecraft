@@ -12,7 +12,6 @@ exec tclsh -f "$0" ${1+"$@"}
 # and not perform the cleanup itself. If the -t flag is used, this script will
 # list TODO lines in code files.
 
-
 # command-line arguments
 
 set listmode 0

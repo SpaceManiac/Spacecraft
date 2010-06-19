@@ -182,7 +182,7 @@ namespace spacecraft
 			decompressor.Read(data, 0, blockCount);
 			decompressor.Flush();
 
-        }
+	}
 
 		private static string ReadLengthPrefixedString(BinaryReader reader)
 		{
