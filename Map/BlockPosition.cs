@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 /* struct Position
- * contains a set of x, y, z map coordiantes (not world coordinates)
+ * contains a set of xDiff, yDiff, zDiff map coordiantes (not world coordinates)
  */
 
 public struct BlockPosition
@@ -19,11 +19,6 @@ public struct BlockPosition
 		y = Y;
 		z = Z;
 	}
-
-	/*public BlockPosition(int x, int y, int z)
-	{
-		this = new BlockPosition((short)x, (short)y, (short)z);
-	}*/
 
 	static public bool operator ==(BlockPosition A, BlockPosition B)
 	{

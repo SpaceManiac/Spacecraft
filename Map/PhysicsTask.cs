@@ -12,7 +12,7 @@ namespace spacecraft
 		public PhysicsTask(short X, short Y, short Z, Block To)
 		{
 			x = X; y = Y; z = Z; this.To = To;
-	//From = Server.theServ.map.GetTile(x, y, z);
+	//From = Server.theServ.map.GetTile(xDiff, yDiff, zDiff);
 		}
 	public override int GetHashCode()
 	{

@@ -21,19 +21,19 @@ namespace spacecraft
 			time += (1.0 / 30);
 			if (time < 1)
 			{
-				x += 6;
+				xDiff += 6;
 			}
 			else if (time < 2)
 			{
-				z += 6;
+				zDiff += 6;
 			}
 			else if (time < 3)
 			{
-				x -= 6;
+				xDiff -= 6;
 			}
 			else if (time < 4)
 			{
-				z -= 6;
+				zDiff -= 6;
 			}
 			else
 			{

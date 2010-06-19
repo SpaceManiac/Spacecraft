@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 /* struct Position
- * contains a set of x, y, z world coordinates (not map coordinates)
+ * contains a set of xDiff, yDiff, zDiff world coordinates (not map coordinates)
  */
 namespace spacecraft
 {

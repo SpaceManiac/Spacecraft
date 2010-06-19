@@ -86,7 +86,7 @@ namespace spacecraft
 					//return false;
 				}
 
-				// odd order is intentional: fCraft uses x,y,height to mean x,z,y
+				// odd order is intentional: fCraft uses xDiff,yDiff,height to mean xDiff,zDiff,yDiff
 
 				xdim = (short)reader.ReadUInt16();
 				if (!Map.IsValidDimension(xdim))
