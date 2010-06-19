@@ -32,6 +32,8 @@ namespace spacecraft
 		public string name { get; protected set; }
 		public string motd { get; protected set; }
 		public string serverhash { get; protected set; }
+	
+		public ConsolePlayer console { get; protected set; }
 
 		public Server()
 		{
@@ -89,20 +91,29 @@ namespace spacecraft
 
 				Thread T3 = new Thread(HTTPMonitorThread);
 				T3.Start();
+				
+				console = new ConsolePlayer();
+				console.Message += new Player.PlayerMsgHandler(Player_Message);
+				console.Start();
 
 				OnExit.WaitOne();
 				Running = false;
 			}
 			catch (SocketException e) {
-				Console.WriteLine("SocketException: {0}", e);
+				Spacecraft.LogError("uncaught SocketException", e);
 			}
 			finally
 			{
 				// Stop listening for new clients.
 				Listener.Stop();
 			}
-
-			Shutdown();
+			
+			try {
+				Shutdown();
+			}
+			catch (Exception e) {
+				Spacecraft.LogError("error while shutting down", e);
+			}
 		}
 
 		private void TimerThread()
@@ -168,6 +179,11 @@ namespace spacecraft
 		public Player GetPlayer(string name)
 		{
 			name = name.ToLower();
+			
+			if(name == "[console]") {
+				return console;
+			}
+			
 			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
 			List<Player> temp = new List<Player>(Players);
 			foreach(Player P in temp) {

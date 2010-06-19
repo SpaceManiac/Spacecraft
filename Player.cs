@@ -197,8 +197,12 @@ namespace spacecraft
 				BlockChange(new BlockPosition(X, Y, Z), type);
 		}
 
-		void conn_ReceivedMessage(string msg)
+		void conn_ReceivedMessage(string message)
 		{
+			HandleMessage(message);
+		}
+		
+		protected void HandleMessage(string msg) {
 			if (msg[0] == '@') {
 				// private messages
 				int i = msg.IndexOf(' ');

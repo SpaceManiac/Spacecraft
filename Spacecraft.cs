@@ -42,7 +42,7 @@ namespace spacecraft
 			}
 			catch (Exception e) {
 				// Something went wrong and wasn't caught
-				Spacecraft.LogError("Fatal error while starting server", e);
+				Spacecraft.LogError("fatal uncaught exception", e);
 			}
 		}
 
