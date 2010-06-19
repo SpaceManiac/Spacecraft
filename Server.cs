@@ -167,7 +167,8 @@ namespace spacecraft
 		{
 			name = name.ToLower();
 			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
-			foreach(Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach(Player P in temp) {
 				if(P.name.ToLower() == name) {
 					return P;
 				}
@@ -259,8 +260,8 @@ namespace spacecraft
 		{
 			byte ID = Player.playerID;
 			Players.Remove(Player);
-			foreach (Player P in Players)
-			{
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.PlayerDisconnects(ID);
 			}
 			MessageAll(Color.Yellow + Player.name + " has left");
@@ -268,8 +269,8 @@ namespace spacecraft
 
 		void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
 		{
-			foreach (Player P in Players)
-			{
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.BlockSet(pos, BlockType);
 			}
 		}
@@ -281,7 +282,8 @@ namespace spacecraft
 
 		void Player_Move(Player sender, Position dest, byte heading, byte pitch)
 		{
-			foreach(Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				if(P != sender) {
 					P.PlayerMoves(sender, dest, heading, pitch);
 				}
@@ -295,7 +297,8 @@ namespace spacecraft
 
 		void Player_Spawn(Player sender)
 		{
-			foreach (Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.PlayerJoins(sender);
 				sender.PlayerJoins(P);
 			}
@@ -306,7 +309,8 @@ namespace spacecraft
 
 		public void MessageAll(string message)
 		{
-			foreach (Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.PrintMessage(message);
 			}
 			Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
@@ -314,14 +318,16 @@ namespace spacecraft
 
 		public void MovePlayer(Player player, Position dest, byte heading, byte pitch)
 		{
-			foreach (Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.PlayerMoves(player, dest, heading, pitch);
 			}
 		}
 
 		public void ChangeBlock(BlockPosition pos, Block blockType)
 		{
-			foreach (Player P in Players) {
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
 				P.BlockSet(pos, blockType);
 			}
 			map.SetTile(pos.x, pos.y, pos.z, blockType);
@@ -333,23 +339,22 @@ namespace spacecraft
 			map.Save(Map.levelName);
 		}
 
-	// Added an external list of players, Atkins' request.
-	private static object playersfile = new object();
-	
-	public void UpdatePlayersList(Player player)
-	{
-	// refresh players.txt so that it contains a list of current players
-	lock (playersfile)
-	{
-	StreamWriter sw = new StreamWriter("players.txt", false);
-	foreach (var P in Players)
-	{
-	sw.WriteLine(P.name);
-	}
-	sw.Write(System.Environment.NewLine);
-	sw.Close();
-	}
-	}
-
+		// Added an external list of players, Atkins' request.
+		private static object playersfile = new object();
+		
+		public void UpdatePlayersList(Player player)
+		{
+			// refresh players.txt so that it contains a list of current players
+			lock (playersfile)
+			{
+				StreamWriter sw = new StreamWriter("players.txt", false);
+				List<Player> temp = new List<Player>(Players);
+				foreach (var P in temp) {
+					sw.WriteLine(P.name);
+				}
+				sw.Write(System.Environment.NewLine);
+				sw.Close();
+			}
+		}
 	}
 }
