@@ -42,8 +42,6 @@ namespace spacecraft
 			}
             catch (Exception e) {
 				// Something went wrong and wasn't caught
-                if (DEBUG)
-                    throw;
 				Spacecraft.LogError("Fatal error while starting server", e);
 			}
 		}
@@ -73,10 +71,6 @@ namespace spacecraft
 
 		public static void Log(string text)
 		{
-			if (!File.Exists("server.log")) {
-				File.Create("server.log");
-			}
-
 			lock (logfileMutex) {
 				StreamWriter sw = new StreamWriter("server.log", true);
 				if (text == "") {

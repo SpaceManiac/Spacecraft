@@ -108,8 +108,8 @@ namespace spacecraft
             Block.Lava,
             Block.Sand,
             Block.Sponge,
-            Block.Dirt, 
-            Block.Grass,
+            //Block.Dirt, 
+            //Block.Grass,
         };
         static List<Block> PhysicsList = new List<Block>(PhysicsBlocks);
 

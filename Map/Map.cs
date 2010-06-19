@@ -36,8 +36,7 @@ namespace spacecraft
 
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
-
-       
+        
 		public Map()
 		{
 			physicsCount = 0;
@@ -49,6 +48,11 @@ namespace spacecraft
 			DefaultDepth = (short)Config.GetInt("depth", 64);
 			DefaultHeight = (short)Config.GetInt("height", 64);
 			DefaultWidth = (short)Config.GetInt("width", 64);
+			
+			if(!IsValidDimension(DefaultDepth) || !IsValidDimension(DefaultHeight) || !IsValidDimension(DefaultWidth)) {
+				Spacecraft.Log("Specified default map dimensions are invalid, defaulting to 256x256x256");
+				DefaultDepth = DefaultHeight = DefaultWidth = 256;
+			}
 
 			DefaultDepth = (short)Math.Max((short)0, Math.Min(DefaultDepth, (short)2048));
 			DefaultWidth = (short)Math.Max((short)0, Math.Min(DefaultWidth, (short)2048));
@@ -83,7 +87,9 @@ namespace spacecraft
 			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
 			data = new byte[xdim * ydim * zdim];
 			for (short x = 0; x < xdim; ++x) {
-                Spacecraft.Log("X:" + x + " / " + xdim);
+                if(x == (short)(xdim / 2)) {
+                	Spacecraft.Log("Generation 50% complete");
+                }
 				for (short z = 0; z < zdim; ++z) {
 					for (short y = 0; y < ydim / 2; ++y) {
 						if (y == ydim / 2 - 1) {
@@ -94,6 +100,7 @@ namespace spacecraft
 					}
 				}
 			}
+			Spacecraft.Log("Generation complete");
 		}
 
 		// zips a copy of the block array
