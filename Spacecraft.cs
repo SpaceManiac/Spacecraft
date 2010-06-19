@@ -40,7 +40,7 @@ namespace spacecraft
 				Spacecraft.Log("");
 				Environment.Exit(0);
 			}
-	catch (Exception e) {
+			catch (Exception e) {
 				// Something went wrong and wasn't caught
 				Spacecraft.LogError("Fatal error while starting server", e);
 			}
@@ -93,6 +93,10 @@ namespace spacecraft
 
 		public static void LogError(string text, Exception e)
 		{
+			if(e == null) {
+				Log("Error: " + text);
+				return;
+			}
 			lock (errorfileMutex)
 			{
 				StreamWriter sw = new StreamWriter("error.log", true);
@@ -108,20 +112,15 @@ namespace spacecraft
 			}
 		}
 
-		public static void LogError(string format, params object[] args)
+		public static void Debug(string format, params object[] args)
 		{
-			LogError(String.Format(format, args));
+			Debug(string.Format(format, args));
 		}
-
-	public static void Debug(string format, params object[] args)
-	{
-	Debug(string.Format(format, args));
-	}
-
-	public static void Debug(string text)
-	{
-	System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
-	}
+	
+		public static void Debug(string text)
+		{
+			System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
+		}
 
 		public static string StripColors(string s)
 		{

@@ -85,7 +85,7 @@ namespace spacecraft
 		/// Should be called to inform the player that they've been kicked.
 		/// </summary>
 		/// <param name="reason">The reason</param>
-		public void Kick(string reason)
+		public virtual void Kick(string reason)
 		{
 			Server.theServ.MessageAll(Color.Yellow + name + " was kicked (" + reason + ")");
 			conn.SendKick(reason);
@@ -100,17 +100,17 @@ namespace spacecraft
 		/// Used to show messages to the player in the chat box, for chat messages, and the like.
 		/// </summary>
 		/// <param name="msg"></param>
-		public void PrintMessage(string msg)
+		public virtual void PrintMessage(string msg)
 		{
 			conn.DisplayMessage(msg);
 		}
 
-		public void PlayerJoins(Player Player)
+		public virtual void PlayerJoins(Player Player)
 		{
 			conn.HandlePlayerSpawn(Player, Player == this);
 		}
 
-		public void PlayerMoves(Player Player, Position dest, byte heading, byte pitch)
+		public virtual void PlayerMoves(Player Player, Position dest, byte heading, byte pitch)
 		{
 			byte ID = Player.playerID;
 			if (Player == this)
@@ -126,12 +126,12 @@ namespace spacecraft
 			PlayerDisconnects(P.playerID);
 		}
 
-		public void PlayerDisconnects(byte ID)
+		public virtual void PlayerDisconnects(byte ID)
 		{
 			conn.SendPlayerDisconnect(ID);
 		}
 
-		public void BlockSet(BlockPosition pos, Block type)
+		public virtual void BlockSet(BlockPosition pos, Block type)
 		{
 			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)type);
 		}
