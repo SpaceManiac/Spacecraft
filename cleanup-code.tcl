@@ -73,7 +73,7 @@ proc cleanup {contents} {
 	
 	foreach line [split $contents \n] {
 		# convert quadruple-spaces at the line's start
-		regsub -all {^\s*    } $line \t line
+		while {[regsub -all {^(\t*)    } $line \\1\t line]} {}
 		
 		if {![regexp {^\t*$} $line]} {
 			# if not whitespace-only, remove whitespace at the end
