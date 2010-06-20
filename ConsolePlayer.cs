@@ -24,6 +24,7 @@ namespace spacecraft
 		public new void Start()
 		{
 			Thread T = new Thread(ReadConsoleThread);
+            T.Name = "ConsoleRead";
 			T.Start();
 		}
 		

@@ -30,6 +30,8 @@ namespace spacecraft
         /// </summary>
         private List<BlockPosition> ItemsToBeRemoved = new List<BlockPosition>();
 
+        private int[,] Heights;
+
         System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 
         private void AddActiveBlock(BlockPosition pos)
@@ -43,19 +45,40 @@ namespace spacecraft
         private void InitPhysics()
         {
             ActiveBlocks.Clear();
-            for (short x = 0; x < xdim; ++x)
+            Heights = new int[xdim, zdim];
+            bool CheckingHeight = true;
+
+            for (short x = 0; x < xdim; x++)
             {
-                for (short y = 0; y < ydim; ++y)
+                Stopwatch.Reset();
+                Stopwatch.Start();
+
+                for (short z = 0; z < zdim; z++)
                 {
-                    for (short z = 0; z < zdim; ++z)
+                    CheckingHeight = true;
+                    for (short y = (short)(ydim-1); y > 0; y--)
                     {
-                        if (BlockInfo.RequiresPhysics(GetTile(x, y, z)))
+                        Block tile = GetTile(x, y, z);
+                        if (CheckingHeight)
                         {
-                            AddActiveBlock(new BlockPosition(x, y, z));
+                            RecalculateHeight(x, y, z, BlockInfo.IsSolid(tile));
+                            CheckingHeight = !BlockInfo.IsSolid(tile);
+                        }
+
+                        if (BlockInfo.RequiresPhysics(tile))
+                        {
+                            ActiveBlocks.Add(new BlockPosition(x, y, z));
                         }
                     }
                 }
+
+                Stopwatch.Stop();
+                System.Diagnostics.Debug.WriteLine(Stopwatch.ElapsedMilliseconds);
             }
+
+
+
+            Spacecraft.Log("Physics initialised!");
         }
 
         public void AlertPhysicsAround(BlockPosition pos)
@@ -92,18 +115,13 @@ namespace spacecraft
             }
 
             ++physicsCount;
-            if (Spacecraft.DEBUG) // Debug timer stuff. Not strictly necessary, but useful.
-            {
-                Stopwatch.Reset();
-                Stopwatch.Start();
-            }
 
             lock (ActiveBlocks)
             {
                 ItemsToBeRemoved.Clear();
                 PhysicsUpdates.Clear();
 
-                foreach(var Item in ActiveBlocks)
+                foreach (var Item in ActiveBlocks)
                 {
                     BlockPosition pos = Item;
                     Block Tile = GetTile(pos);
@@ -134,12 +152,8 @@ namespace spacecraft
                 SetTile(task.x, task.y, task.z, task.To);
             }
 
-            if (Spacecraft.DEBUG)
-            {
-                Stopwatch.Stop();
-                System.Diagnostics.Debug.WriteLine("Physics:" + Stopwatch.ElapsedMilliseconds);
-            }
-       }
+
+        }
 
         /// <summary>
         /// Handle the physics of a specific block, checking surroundings, etc.
@@ -227,13 +241,13 @@ namespace spacecraft
                                 short newY = (short)(yDiff + Y);
                                 short newZ = (short)(zDiff + Z);
 
-                                PhysicsTask task = new PhysicsTask(newX,newY,newZ,Block.Undefined); // Used to retrieve hash code, actual block type is arbitary.
+                                PhysicsTask task = new PhysicsTask(newX, newY, newZ, Block.Undefined); // Used to retrieve hash code, actual block type is arbitary.
 
                                 if (PhysicsUpdates.ContainsKey(task.GetHashCode()))
                                 {
                                     if (BlockInfo.IsFluid(PhysicsUpdates[task.GetHashCode()].To))
                                     {
-                                        AddPhysicsUpdate(new PhysicsTask(newX,newY,newZ,Block.Air));
+                                        AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
                                     }
                                 }
 
@@ -247,12 +261,25 @@ namespace spacecraft
                     break;
 
                 case Block.Sand:
-                    if (!BlockInfo.IsSolid(GetTile(X,(short)(Y-1),Z)))
+                    if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
                     {
                         AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Sand));
                         AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
                     }
 
+                    break;
+
+                case Block.Grass:
+                    if (Heights[X, Z] > Y)
+                    {
+                        AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Dirt));
+                    }
+                    break;
+                case Block.Dirt:
+                    if (Heights[X, Z] == Y)
+                    {
+                        AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Grass));
+                    }
                     break;
 
                 default:
@@ -265,6 +292,44 @@ namespace spacecraft
             if (PhysicsUpdates.ContainsKey(task.GetHashCode()))
                 PhysicsUpdates.Remove(task.GetHashCode());
             PhysicsUpdates.Add(task.GetHashCode(), task);
+        }
+
+        /// <summary>
+        /// Recalculates the heightmap, with the given position is solid/not. Returns whether a change was made.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="solid">Whether the block is solid.</param>
+        /// <returnn>Whether a change was made.</returns>        
+        void RecalculateHeight(short x, short y, short z, bool solid)
+        {
+            if (Heights == null)
+            {
+                Heights = new int[xdim, zdim];
+            }
+            
+            if (solid)
+            {
+                Heights[x, z] = Math.Max(Heights[x, z], y);
+            }
+            else
+            {
+                if (Heights[x, z] <= y)
+                {
+                    Heights[x, z] = 0;
+                    for (short Y = (short)(ydim-1); Y > 0; Y--)
+                    {
+                        if (BlockInfo.IsSolid(GetTile(x, Y, z)))
+                        {
+                            Heights[x, z] = Y;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            return;
         }
     }
 }

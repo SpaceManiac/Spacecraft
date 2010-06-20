@@ -101,21 +101,21 @@ namespace spacecraft
 			return (block != Block.Air && !IsFluid(block) && !IsDecoration(block));
 		}
 
-	static Block[] PhysicsBlocks = new Block[] 
-	{
-	Block.Water,
-	Block.Lava,
-	Block.Sand,
-	Block.Sponge,
-	//Block.Dirt, 
-	//Block.Grass,
-	};
+        static Block[] PhysicsBlocks = new Block[] 
+	    {
+	        Block.Water,
+	        Block.Lava,
+	        Block.Sand,
+	        Block.Sponge,
+	        Block.Dirt, 
+	        Block.Grass,
+	    };
 	static List<Block> PhysicsList = new List<Block>(PhysicsBlocks);
-
-	public static bool RequiresPhysics(Block B)
-	{
-	return PhysicsList.Contains(B);
-	}
+        // So we can do .Contains.
+    public static bool RequiresPhysics(Block B)
+    {
+        return PhysicsList.Contains(B);
+    }
 
 		static BlockInfo()
 		{
