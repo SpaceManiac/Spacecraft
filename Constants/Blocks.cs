@@ -100,21 +100,11 @@ namespace spacecraft
 		{
 			return (block != Block.Air && !IsFluid(block) && !IsDecoration(block));
 		}
-
-        static Block[] PhysicsBlocks = new Block[] 
-	    {
-	        Block.Water,
-	        Block.Lava,
-	        Block.Sand,
-	        Block.Sponge,
-	        Block.Dirt, 
-	        Block.Grass,
-	    };
-		static List<Block> PhysicsList = new List<Block>(PhysicsBlocks);
-	        // So we can do .Contains.
+		
 	    public static bool RequiresPhysics(Block B)
 	    {
-	        return PhysicsList.Contains(B);
+	        return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge ||
+	        		B == Block.Dirt || B == Block.Grass);
 	    }
 
 		static BlockInfo()
@@ -166,17 +156,17 @@ namespace spacecraft
 			return names.ContainsKey(key);
 		}
 
-	public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
-
-	static int BlockSort(Block A, Block B)
-	{
-	if (A == B)
-	return 0;
-	else if (A > B)
-	return 1;
-	else if (A < B)
-	return -1;
-	throw new ArgumentException();
-	}
+		public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
+	
+		static int BlockSort(Block A, Block B)
+		{
+			if (A == B)
+			return 0;
+			else if (A > B)
+			return 1;
+			else if (A < B)
+			return -1;
+			throw new ArgumentException();
+		}
 	}
 }

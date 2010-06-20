@@ -190,34 +190,16 @@ namespace spacecraft
 
         public void SetTile(short x, short y, short z, Block tile, bool overide)
         {
-            Stop.Reset();
-            Stop.Start();
-            if (!overide) // Override should be used to override all physics checking. 
-            {
-                if (BlockInfo.RequiresPhysics(tile))
-                {
-                    lock (ActiveBlocks)
-                    {
-                        ActiveBlocks.Add(new BlockPosition(x, y, z));
-                    }
-                }
-
-                RecalculateHeight(x, y, z, BlockInfo.IsSolid(tile));
-
-            }
-
             if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
+            
+        	BlockPosition pos = new BlockPosition(x, y, z);
+            AlertPhysicsAround(pos);
+            RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
+
             data[BlockIndex(x, y, z)] = (byte)tile;
 
-
             if (BlockChange != null)
-                BlockChange(this, new BlockPosition(x, y, z), tile);
-
-            Stop.Stop();
-            if (!overide)
-            {
-                System.Diagnostics.Debug.WriteLine("SetTile took " + Stop.ElapsedMilliseconds + "ms");
-            }
+                BlockChange(this, pos, tile);
         }
 
         public Block GetTile(BlockPosition pos)
@@ -227,7 +209,8 @@ namespace spacecraft
 
         public Block GetTile(short x, short y, short z)
         {
-            if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) throw new IndexOutOfRangeException(x.ToString() + "," + y.ToString() + "," + z.ToString() + " invalid");
+        	if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return Block.Adminium;
+            //if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) throw new IndexOutOfRangeException(x.ToString() + "," + y.ToString() + "," + z.ToString() + " invalid");
             return (Block)data[BlockIndex(x, y, z)];
         }
 

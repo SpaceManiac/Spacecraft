@@ -20,7 +20,7 @@ namespace spacecraft
         /// <summary>
         /// A set of all of the coodinates that contain a physics-active block and must be checked.
         /// </summary>
-        private HashSet<BlockPosition> ActiveBlocks = new HashSet<BlockPosition>();
+        private List<BlockPosition> ActiveBlocks = new List<BlockPosition>();
         /// <summary>
         /// A set of the tile changes we must perform this tick.
         /// </summary>
@@ -47,42 +47,34 @@ namespace spacecraft
             ActiveBlocks.Clear();
             Heights = new int[xdim, zdim];
             bool CheckingHeight = true;
-
-            for (short x = 0; x < xdim; x++)
-            {
-                Stopwatch.Reset();
-                Stopwatch.Start();
-
-                for (short z = 0; z < zdim; z++)
-                {
-                    CheckingHeight = true;
-                    for (short y = (short)(ydim-1); y > 0; y--)
-                    {
-                        Block tile = GetTile(x, y, z);
-                        if (CheckingHeight)
-                        {
-                            RecalculateHeight(x, y, z, BlockInfo.IsSolid(tile));
-                            CheckingHeight = !BlockInfo.IsSolid(tile);
-                        }
-
-                        if (BlockInfo.RequiresPhysics(tile))
+            
+            Stopwatch.Reset();
+            Stopwatch.Start();
+            for (short x = 0; x < xdim; ++x) {
+                for (short z = 0; z < zdim; ++z) {
+                	CheckingHeight = true;
+                	
+                    for (short y = 0; y < ydim; ++y) {
+                    	Block b = GetTile(x, y, z);
+                    	if (CheckingHeight && BlockInfo.IsOpaque(b)) {
+                    		Heights[x, z] = y;
+                    		CheckingHeight = false;
+                    	}
+                        if (BlockInfo.RequiresPhysics(b))
                         {
                             ActiveBlocks.Add(new BlockPosition(x, y, z));
                         }
                     }
                 }
-
-                Stopwatch.Stop();
-                System.Diagnostics.Debug.WriteLine(Stopwatch.ElapsedMilliseconds);
             }
 
-
-
-            Spacecraft.Log("Physics initialised!");
+			Stopwatch.Stop();
+            Spacecraft.Log("Physics initialised in " + ((Stopwatch.ElapsedMilliseconds/100)/10.0).ToString() + " seconds!");
         }
 
         public void AlertPhysicsAround(BlockPosition pos)
         {
+        	//Spacecraft.Log("hi! :D");
             for (short x = -1; x <= 1; ++x)
             {
                 for (short y = -1; y <= 1; ++y)
@@ -92,7 +84,7 @@ namespace spacecraft
                         short newX = (short)(pos.x + x);
                         short newY = (short)(pos.y + y);
                         short newZ = (short)(pos.z + z);
-                        if (Math.Abs(x) + Math.Abs(y) + Math.Abs(z) == 1)
+                        if (Math.Abs(x) + Math.Abs(y) + Math.Abs(z) <= 1)
                         {
                             AddActiveBlock(new BlockPosition(newX, newY, newZ));
                         }
@@ -109,8 +101,7 @@ namespace spacecraft
             if (!PhysicsOn)
                 return;
 
-            if (physicsCount == 0)
-            {
+            if (physicsCount == 0) {
                 InitPhysics();
             }
 
@@ -121,38 +112,25 @@ namespace spacecraft
                 ItemsToBeRemoved.Clear();
                 PhysicsUpdates.Clear();
 
-                foreach (var Item in ActiveBlocks)
-                {
-                    BlockPosition pos = Item;
+                foreach (BlockPosition pos in new List<BlockPosition>(ActiveBlocks)) {
                     Block Tile = GetTile(pos);
 
                     // Check to see whether this location still needs to be on the list of physics-active blocks.
-                    if (!BlockInfo.RequiresPhysics(Tile))
-                    {
-                        // If it isn't, add to the list that it needs to be removed.
-                        ItemsToBeRemoved.Add(Item);
-                    }
-                    else
-                    {
+                    if (!BlockInfo.RequiresPhysics(Tile)) {
+                        ActiveBlocks.Remove(pos);
+                    } else {
                         HandlePhysics(pos.x, pos.y, pos.z, Tile);
                     }
                 }
-            }
-
-
-            // Remove iterms that need to be removed. 
-            foreach (var key in ItemsToBeRemoved)
-            {
-                ActiveBlocks.Remove(key);
+                ActiveBlocks.Clear();
             }
 
             // Process physics updates. 
-            foreach (var task in PhysicsUpdates.Values)
+            foreach (PhysicsTask task in PhysicsUpdates.Values)
             {
+            	AlertPhysicsAround(new BlockPosition(task.x, task.y, task.z));
                 SetTile(task.x, task.y, task.z, task.To);
             }
-
-
         }
 
         /// <summary>
@@ -326,10 +304,8 @@ namespace spacecraft
                             break;
                         }
                     }
-
                 }
             }
-            return;
         }
     }
 }

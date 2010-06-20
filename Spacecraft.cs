@@ -20,7 +20,7 @@ namespace spacecraft
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating.");
-					File.Create("admins.txt");
+					File.Create("admins.txt").Close();
 				}
 
 				// allow an explicit seed
