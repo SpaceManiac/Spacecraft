@@ -82,10 +82,14 @@ namespace spacecraft
 
 		static public void WrapMessage(Player sendto, string message, string prefix)
 		{
-			prefix = prefix.Substring(0, 4);
+			if(prefix.Length > 4)
+				prefix = prefix.Substring(0, 4);
+			
 			while (message.Length > 60)
 			{
 				int i = message.LastIndexOf(' ', 60, 60);
+				if(i == -1) i = 60;
+				
 				sendto.PrintMessage(prefix + message.Substring(0, i));
 				message = message.Substring(i);
 			}
