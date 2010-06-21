@@ -110,6 +110,11 @@ namespace spacecraft
 			conn.SendOperator(RankInfo.IsOperator(newRank));
 			SetRankOf(name, newRank);
 			rank = newRank;
+			PrintMessage(Color.PrivateMsg + "You are now a " + RankInfo.RankColor(rank));
+			PrintMessage(Color.PrivateMsg + " (note: any building commands have been reset)";
+			placing = false;
+			painting = false;
+			placeType = Block.Undefined;
 		}	
 
 		public virtual void PlayerJoins(Player Player)
@@ -176,6 +181,9 @@ namespace spacecraft
 		{
 			if(name == null)
 				throw new Exception("tonoes?");
+				
+			PrintMessage(Color.PrivateMsg + "Welcome, " + name + "! You're a " + RankInfo.RankColor(rank) + rank.ToString());
+			
 			if (Spawn != null)
 				Spawn(this);
 		}
