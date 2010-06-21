@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using System.IO;
 
 namespace spacecraft
 {
@@ -148,9 +149,14 @@ namespace spacecraft
 			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)type);
 		}
 
+		/* ================================================================================
+		 * Rank Stuff
+		 * ================================================================================
+		 */
+
 		public static Rank RankOf(string name)
 		{
-			name = name.ToLower();
+			name = name.Trim().ToLower();
 			if (PlayerRanks.ContainsKey(name)) {
 				return PlayerRanks[name];
 			} else {
@@ -159,8 +165,57 @@ namespace spacecraft
 		}
 		
 		public static void SetRankOf(string name, Rank rank) {
-			name = name.ToLower();
+			name = name.Trim().ToLower();
 			PlayerRanks[name] = rank;
+		}
+		
+		public static void LoadRanks() {
+			PlayerRanks.Clear();
+			StreamReader Reader = new StreamReader("admins.txt");
+			string[] Lines = Reader.ReadToEnd().Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+			Reader.Close();
+
+			foreach (string line in Lines) {
+				string[] parts = line.Split('=');
+
+				string rankStr = parts[0].Trim();
+				rankStr = rankStr.Substring(0, 1).ToUpper() + rankStr.Substring(1, parts[0].Length - 1);
+				Rank rank = (Rank) Enum.Parse(typeof(Rank), rankStr);
+
+				string[] people = parts[1].Split(',');
+				foreach(string name in people) {
+					SetRankOf(name, rank);
+				}
+			}
+			
+			// re-save so things get combined if needed.
+			SaveRanks();
+		}
+		
+		public static void SaveRanks() {
+			Dictionary<Rank, List<string>> names = new Dictionary<Rank, List<string>>();
+		 
+			foreach (Rank r in Enum.GetValues(typeof(Rank))) {
+				names[r] = new List<string>();
+			}
+			
+			foreach (KeyValuePair<string, Rank> kvp in PlayerRanks) {
+				names[kvp.Value].Add(kvp.Key);
+			}
+			
+			StreamWriter Writer = new StreamWriter("admins.txt");
+			
+			foreach(KeyValuePair<Rank, List<string>> kvp in names) {
+				if(kvp.Key == Rank.Guest) continue;
+				if(kvp.Value.Count > 0) {
+					Writer.Write(kvp.Key.ToString());
+					Writer.Write("=");
+					Writer.Write(String.Join(",", kvp.Value.ToArray()));
+					Writer.WriteLine();
+				}
+			}
+			
+			Writer.Close();
 		}
 
 		/* ================================================================================
