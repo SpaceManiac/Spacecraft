@@ -111,7 +111,7 @@ namespace spacecraft
 			SetRankOf(name, newRank);
 			rank = newRank;
 			PrintMessage(Color.PrivateMsg + "You are now a " + RankInfo.RankColor(rank));
-			PrintMessage(Color.PrivateMsg + " (note: any building commands have been reset)";
+			PrintMessage(Color.PrivateMsg + " (note: any building commands have been reset)");
 			placing = false;
 			painting = false;
 			placeType = Block.Undefined;

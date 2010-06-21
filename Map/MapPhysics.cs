@@ -113,7 +113,7 @@ namespace spacecraft
 				PhysicsUpdates.Clear();
 				
 				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count);
-				Array.Copy(ActiveBlocks, temp, temp.Capacity);
+				temp.AddRange(ActiveBlocks);
 				ActiveBlocks.Clear();
 
 				foreach (BlockPosition pos in temp) {
