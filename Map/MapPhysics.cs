@@ -85,7 +85,7 @@ namespace spacecraft
 						short newX = (short)(pos.x + x);
 						short newY = (short)(pos.y + y);
 						short newZ = (short)(pos.z + z);
-						if (Math.Abs(x) + Math.Abs(y) + Math.Abs(z) <= 1)
+						if (Math.Abs(x) + Math.Abs(y) + Math.Abs(z) <= 1 && BlockInfo.RequiresPhysics(GetTile(newX, newY,newZ)))
 						{
 							AddActiveBlock(new BlockPosition(newX, newY, newZ));
 						}
