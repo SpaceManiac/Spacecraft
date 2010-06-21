@@ -111,8 +111,12 @@ namespace spacecraft
 			lock (PhysicsMutex) {
 				ItemsToBeRemoved.Clear();
 				PhysicsUpdates.Clear();
+				
+				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count);
+				Array.Copy(ActiveBlocks, temp, temp.Capacity);
+				ActiveBlocks.Clear();
 
-				foreach (BlockPosition pos in new List<BlockPosition>(ActiveBlocks)) {
+				foreach (BlockPosition pos in temp) {
 					Block Tile = GetTile(pos);
 
 					// Only process the block if it needs it
@@ -121,7 +125,6 @@ namespace spacecraft
 						HandlePhysics(pos.x, pos.y, pos.z, Tile);
 					}
 				}
-				ActiveBlocks.Clear();
 
 				// Process physics updates. 
 				foreach (PhysicsTask task in PhysicsUpdates.Values)
