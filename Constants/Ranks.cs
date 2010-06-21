@@ -24,6 +24,10 @@ namespace spacecraft {
 				return Color.Black;
 			}
 		}
+		
+		public static bool IsOperator(Rank rank) {
+			return (rank >= Rank.Mod);
+		}
 
 		static RankInfo()
 		{

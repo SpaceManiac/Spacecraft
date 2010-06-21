@@ -104,6 +104,13 @@ namespace spacecraft
 		{
 			conn.DisplayMessage(msg);
 		}
+		
+		public void UpdateRank(Rank newRank)
+		{
+			conn.SendOperator(RankInfo.IsOperator(newRank));
+			SetRankOf(name, newRank);
+			rank = newRank;
+		}	
 
 		public virtual void PlayerJoins(Player Player)
 		{
@@ -144,6 +151,11 @@ namespace spacecraft
 			} else {
 				return Rank.Guest;
 			}
+		}
+		
+		public static void SetRankOf(string name, Rank rank) {
+			name = name.ToLower();
+			PlayerRanks[name] = rank;
 		}
 
 		/* ================================================================================
