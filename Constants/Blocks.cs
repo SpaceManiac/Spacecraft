@@ -101,11 +101,11 @@ namespace spacecraft
 			return (block != Block.Air && !IsFluid(block) && !IsDecoration(block));
 		}
 		
-	    public static bool RequiresPhysics(Block B)
-	    {
-	        return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge ||
-	        		B == Block.Dirt || B == Block.Grass);
-	    }
+		public static bool RequiresPhysics(Block B)
+		{
+			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge ||
+					B == Block.Dirt || B == Block.Grass);
+		}
 
 		static BlockInfo()
 		{

@@ -46,11 +46,11 @@ namespace spacecraft
 
 		public void Start() {
 			Thread T = new Thread(ReadThread);
-            T.Name = _client.GetHashCode().ToString() + " Read";
+			T.Name = _client.GetHashCode().ToString() + " Read";
 			T.Start();
 
 			Thread T2 = new Thread(WriteThread);
-            T2.Name = _client.GetHashCode().ToString() + " Write";
+			T2.Name = _client.GetHashCode().ToString() + " Write";
 			T2.Start();
 		}
 

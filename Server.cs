@@ -84,16 +84,16 @@ namespace spacecraft
 				Running = true;
 
 				Thread T = new Thread(AcceptClientThread);
-                T.Name = "ClientAccept Thread";
+				T.Name = "ClientAccept Thread";
 				T.Start();
-                
+				
 
 				Thread T2 = new Thread(TimerThread);
-                T2.Name = "Timer thread.";
+				T2.Name = "Timer thread.";
 				T2.Start();
 
 				Thread T3 = new Thread(HTTPMonitorThread);
-                T3.Name = "HTTP Daemon thread";
+				T3.Name = "HTTP Daemon thread";
 				T3.Start();
 				
 				console = new ConsolePlayer();
