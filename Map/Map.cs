@@ -192,8 +192,6 @@ namespace spacecraft
 			} // lock(PhysicsMutex)
 		}
 
-		System.Diagnostics.Stopwatch Stop = new System.Diagnostics.Stopwatch();
-
 		public void SetTile(short x, short y, short z, Block tile)
 		{
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;

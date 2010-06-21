@@ -298,8 +298,6 @@ namespace spacecraft
 				Heights = new int[xdim, zdim];
 			}
 			
-			int h = Heights[x, z];
-			
 			if (opaque)
 			{
 				Heights[x, z] = Math.Max(Heights[x, z], y);

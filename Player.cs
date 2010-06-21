@@ -125,10 +125,7 @@ namespace spacecraft
 
 		public virtual void PlayerMoves(Player Player, Position dest, byte heading, byte pitch)
 		{
-			byte ID = Player.playerID;
-			if (Player == this)
-			{
-				ID = 255;
+			if (Player == this) {
 				pos = dest;
 			}
 
