@@ -139,6 +139,8 @@ namespace spacecraft
 			try
 			{
 				int metaSize = (int)reader.ReadUInt16();
+				
+				landmarks.Clear();
 
 				for (int i = 0; i < metaSize; i++)
 				{
@@ -146,7 +148,7 @@ namespace spacecraft
 					string value = ReadLengthPrefixedString(reader);
 					switch (key)
 					{
-						case "@landmark:":
+						case "@landmark":
 							int p = value.IndexOf("=");
 							string name = value.Substring(0, p);
 							int p2 = value.IndexOf(",", p + 1);
@@ -176,12 +178,11 @@ namespace spacecraft
 							meta.Add(key, value);
 							break;
 					}
-					Spacecraft.Log("Map.ReadMetadata: {0} = {1} ", key, value);
 				}
 			}
 			catch (FormatException ex)
 			{
-				Spacecraft.Log("Map.ReadHeader: Cannot parse one or more of the metadata entries: {0}", ex.Message);
+				Spacecraft.LogError("Map.ReadHeader: Cannot parse one or more of the metadata entries", ex);
 			}
 		}
 
