@@ -903,7 +903,7 @@ namespace spacecraft
 						P.Kick("You were banned by " + sender.name);
 					}
 					
-					sender.Message(Color.CommandResult + name + " banned");
+					sender.PrintMessage(Color.CommandResult + name + " banned");
 					Spacecraft.Log(sender.name + " banned " + name);
 					
 					Player.SaveRanks();
@@ -948,7 +948,7 @@ namespace spacecraft
 						P.UpdateRank(Rank.Guest);
 					}
 					
-					sender.Message(Color.CommandResult + name + " set to rank Mod");
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
 					Spacecraft.Log(sender.name + " set " + name + " to rank Guest");
 					
 					Player.SaveRanks();
@@ -992,7 +992,7 @@ namespace spacecraft
 						P.UpdateRank(Rank.Builder);
 					}
 					
-					sender.Message(Color.CommandResult + name + " set to rank Mod");
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
 					Spacecraft.Log(sender.name + " set " + name + " to rank Builder");
 					
 					Player.SaveRanks();
@@ -1036,7 +1036,7 @@ namespace spacecraft
 						P.UpdateRank(Rank.Mod);
 					}
 					
-					sender.Message(Color.CommandResult + name + " set to rank Mod");
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
 					Spacecraft.Log(sender.name + " set " + name + " to rank Mod");
 					
 					Player.SaveRanks();
