@@ -47,10 +47,11 @@ namespace spacecraft
 			Commands.Add("setspawn", new ChatCommands.SetSpawn());
 			Commands.Add("mod", new ChatCommands.RankMod());
 
-            RulesText = File.ReadAllText("rules.txt").Trim();
-            if (RulesText != "")
-                Commands.Add("rules", new ChatCommands.Rules());
-
+			if(File.Exists("rules.txt")) {
+	            RulesText = File.ReadAllText("rules.txt").TrimEnd();
+	            if (RulesText != "")
+	                Commands.Add("rules", new ChatCommands.Rules());
+	        }
 		}
 
 		/// <summary>
