@@ -294,6 +294,11 @@ namespace spacecraft
 
 		private bool IsHashCorrect(string name, string hash)
 		{
+			// Minecraft is ridiculous!
+			while(hash.Length < 32) {
+				hash = "0" + hash;
+			}
+			
 			string salt = Server.theServ.salt.ToString();
 			string combined = salt + name;
 			string properHash = Spacecraft.MD5sum(combined);
