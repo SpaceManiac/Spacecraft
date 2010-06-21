@@ -1,6 +1,6 @@
 #!/bin/sh
 # Start tclsh if run as a shell script \
-exec tclsh -f "$0" ${1+"$@"}
+exec tclsh "$0" ${1+"$@"}
 
 # cleanup-code.tcl
 # This script will walk through each .cs and each .tcl file in the working

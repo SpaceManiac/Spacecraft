@@ -1,6 +1,6 @@
 #!/bin/sh
 # Start tclsh if run as a shell script \
-exec tclsh -f "$0" ${1+"$@"}
+exec tclsh "$0" ${1+"$@"}
 
 # generate-commands-list.tcl
 # This script will read from ChatCommands.cs and generate a command list in
