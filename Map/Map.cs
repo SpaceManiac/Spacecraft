@@ -101,11 +101,11 @@ namespace spacecraft
                     {
                         if (y == ydim / 2 - 1)
                         {
-                            SetTile(x, y, z, Block.Grass, true);
+                            SetTile_Fast(x, y, z, Block.Grass);
                         }
                         else
                         {
-                            SetTile(x, y, z, Block.Dirt, true);
+                            SetTile_Fast(x, y, z, Block.Dirt);
                         }
                     }
                 }
@@ -181,25 +181,26 @@ namespace spacecraft
             ReplaceAll(Block.StillLava, Block.Air, max);
         }
 
-        public void SetTile(short x, short y, short z, Block tile)
-        {
-            SetTile(x, y, z, tile, false);
-        }
-
         System.Diagnostics.Stopwatch Stop = new System.Diagnostics.Stopwatch();
 
-        public void SetTile(short x, short y, short z, Block tile, bool overide)
+        public void SetTile(short x, short y, short z, Block tile)
         {
             if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
             
+            RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
+            
         	BlockPosition pos = new BlockPosition(x, y, z);
             AlertPhysicsAround(pos);
-            RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
 
             data[BlockIndex(x, y, z)] = (byte)tile;
 
             if (BlockChange != null)
                 BlockChange(this, pos, tile);
+        }
+
+        private void SetTile_Fast(short x, short y, short z, Block tile)
+        {
+            data[BlockIndex(x, y, z)] = (byte)tile;
         }
 
         public Block GetTile(BlockPosition pos)

@@ -196,7 +196,7 @@ namespace spacecraft
 
 				P.ChunkData = new NetworkByteArray(Chunk);
 				P.ChunkLength = (short) remaining;
-				P.PercentComplete = (byte) (100 * (bytesSent / compressedData.Length));
+				P.PercentComplete = (byte) (100 * ((double)bytesSent / compressedData.Length));
 
 				SendPacket(P);
 			}

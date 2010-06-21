@@ -53,8 +53,9 @@ namespace spacecraft
             for (short x = 0; x < xdim; ++x) {
                 for (short z = 0; z < zdim; ++z) {
                 	CheckingHeight = true;
+                	Heights[x, z] = 0;
                 	
-                    for (short y = 0; y < ydim; ++y) {
+                    for (short y = (short)(ydim - 1); y >= 0; --y) {
                     	Block b = GetTile(x, y, z);
                     	if (CheckingHeight && BlockInfo.IsOpaque(b)) {
                     		Heights[x, z] = y;
@@ -128,6 +129,7 @@ namespace spacecraft
             // Process physics updates. 
             foreach (PhysicsTask task in PhysicsUpdates.Values)
             {
+            	if(GetTile(task.x, task.y, task.z) == task.To) continue;
             	AlertPhysicsAround(new BlockPosition(task.x, task.y, task.z));
                 SetTile(task.x, task.y, task.z, task.To);
             }
@@ -273,21 +275,22 @@ namespace spacecraft
         }
 
         /// <summary>
-        /// Recalculates the heightmap, with the given position is solid/not. Returns whether a change was made.
+        /// Recalculates the heightmap, with the given position is solid/not.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="solid">Whether the block is solid.</param>
-        /// <returnn>Whether a change was made.</returns>        
-        void RecalculateHeight(short x, short y, short z, bool solid)
+        void RecalculateHeight(short x, short y, short z, bool opaque)
         {
             if (Heights == null)
             {
                 Heights = new int[xdim, zdim];
             }
             
-            if (solid)
+            int h = Heights[x, z];
+            
+            if (opaque)
             {
                 Heights[x, z] = Math.Max(Heights[x, z], y);
             }
@@ -296,9 +299,9 @@ namespace spacecraft
                 if (Heights[x, z] <= y)
                 {
                     Heights[x, z] = 0;
-                    for (short Y = (short)(ydim-1); Y > 0; Y--)
+                    for (short Y = (short)(y-1); Y >= 0; Y--)
                     {
-                        if (BlockInfo.IsSolid(GetTile(x, Y, z)))
+                        if (BlockInfo.IsOpaque(GetTile(x, Y, z)))
                         {
                             Heights[x, z] = Y;
                             break;
