@@ -193,8 +193,7 @@ namespace spacecraft
 			GZipStream decompressor = new GZipStream(fs, CompressionMode.Decompress);
 			decompressor.Read(data, 0, blockCount);
 			decompressor.Flush();
-
-	}
+		}
 
 		private static string ReadLengthPrefixedString(BinaryReader reader)
 		{
@@ -213,33 +212,36 @@ namespace spacecraft
 		public bool Save(string fileName)
 		{
 			string tempFileName = fileName + "." + (Spacecraft.random.Next().ToString());
-
-			using (FileStream fs = File.Create(tempFileName))
-			{
-				try
+			try {
+				using (FileStream fs = File.Create(tempFileName))
 				{
-					WriteHeader(fs);
-					WriteMetadata(fs);
-					GetCompressedCopy(fs, false);
-				}
-				catch (IOException ex)
-				{
-					Spacecraft.Log("Map.Save: Unable to open file \"{0}\" for writing: {1}",
-								   tempFileName, ex.Message);
-					if (File.Exists(tempFileName))
+					try
 					{
-						File.Delete(tempFileName);
+						WriteHeader(fs);
+						WriteMetadata(fs);
+						GetCompressedCopy(fs, false);
 					}
-					return false;
+					catch (IOException ex)
+					{
+						Spacecraft.LogError("unable to open file \"" + tempFileName + "\" for writing: {1}", ex);
+						if (File.Exists(tempFileName)) {
+							File.Delete(tempFileName);
+						}
+						return false;
+					}
 				}
+				if (File.Exists(fileName))
+				{
+					File.Delete(fileName);
+				}
+	
+				File.Move(tempFileName, fileName);
+				File.Delete(tempFileName);
 			}
-			if (File.Exists(fileName))
-			{
-				File.Delete(fileName);
+			catch(Exception ex) {
+				Spacecraft.LogError("unknown error while saving map", ex);
+				return false;
 			}
-
-			File.Move(tempFileName, fileName);
-			File.Delete(tempFileName);
 			return true;
 		}
 

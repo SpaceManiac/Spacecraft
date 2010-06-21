@@ -38,7 +38,6 @@ namespace spacecraft
 				serv.Start();
 
 				Log("Bye!");
-				Log("");
 				Environment.Exit(0);
 			}
 			catch (Exception e) {
@@ -76,7 +75,6 @@ namespace spacecraft
 				StreamWriter sw = new StreamWriter("server.log", true);
 				if (text == "") {
 					sw.WriteLine();
-					Console.WriteLine();
 				} else {
 					sw.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
 					Console.WriteLine("{0}\t{1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), text);
