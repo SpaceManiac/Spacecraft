@@ -115,10 +115,9 @@ namespace spacecraft
 				foreach (BlockPosition pos in new List<BlockPosition>(ActiveBlocks)) {
 					Block Tile = GetTile(pos);
 
-					// Check to see whether this location still needs to be on the list of physics-active blocks.
-					if (!BlockInfo.RequiresPhysics(Tile)) {
-						ActiveBlocks.Remove(pos);
-					} else {
+					// Only process the block if it needs it
+					// No need to specifically remove it since we clear at the end anyways
+					if (BlockInfo.RequiresPhysics(Tile)) {
 						HandlePhysics(pos.x, pos.y, pos.z, Tile);
 					}
 				}
