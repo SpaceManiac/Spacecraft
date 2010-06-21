@@ -895,7 +895,7 @@ namespace spacecraft
 					} else {
 						// they're online, so we inform them
 						// this calls SetRankOf as well
-						sender.UpdateRank(Rank.Guest);
+						P.UpdateRank(Rank.Guest);
 					}
 					
 					// TODO: Player.SaveRanks();
@@ -936,7 +936,7 @@ namespace spacecraft
 					} else {
 						// they're online, so we inform them
 						// this calls SetRankOf as well
-						sender.UpdateRank(Rank.Builder);
+						P.UpdateRank(Rank.Builder);
 					}
 					
 					// TODO: Player.SaveRanks();
@@ -977,7 +977,7 @@ namespace spacecraft
 					} else {
 						// they're online, so we inform them
 						// this calls SetRankOf as well
-						sender.UpdateRank(Rank.Mod);
+						P.UpdateRank(Rank.Mod);
 					}
 					
 					// TODO: Player.SaveRanks();
