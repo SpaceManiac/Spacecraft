@@ -898,6 +898,8 @@ namespace spacecraft
 						P.UpdateRank(Rank.Guest);
 					}
 					
+					Spacecraft.Log(sender.name + " set " + name + " to rank Guest");
+					
 					// TODO: Player.SaveRanks();
 				}
 			}
@@ -939,6 +941,8 @@ namespace spacecraft
 						P.UpdateRank(Rank.Builder);
 					}
 					
+					Spacecraft.Log(sender.name + " set " + name + " to rank Builder");
+					
 					// TODO: Player.SaveRanks();
 				}
 			}
@@ -979,6 +983,8 @@ namespace spacecraft
 						// this calls SetRankOf as well
 						P.UpdateRank(Rank.Mod);
 					}
+					
+					Spacecraft.Log(sender.name + " set " + name + " to rank Mod");
 					
 					// TODO: Player.SaveRanks();
 				}
