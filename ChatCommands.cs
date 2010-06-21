@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
@@ -6,6 +7,7 @@ namespace spacecraft
 {
 	public class ChatCommandHandling
 	{
+        public static string RulesText;
 		static Dictionary<String, ChatCommands.ChatCommandBase> Commands;
 
 		static ChatCommandHandling()
@@ -39,6 +41,11 @@ namespace spacecraft
 			Commands.Add("convert", new ChatCommands.Convert());
 			Commands.Add("save", new ChatCommands.Save());
 			Commands.Add("paint", new ChatCommands.Paint());
+
+            RulesText = File.ReadAllText("rules.txt").Trim();
+            if (RulesText != "")
+                Commands.Add("rules", new ChatCommands.Rules());
+
 		}
 
 		/// <summary>
@@ -824,5 +831,24 @@ namespace spacecraft
 				sender.PrintMessage("Paint mode:" + sender.painting.ToString());
 			}
 		}
+
+        public class Rules : ChatCommandBase
+        {
+            public override Rank RankNeeded
+            {
+                get { return Rank.Guest; }
+            }
+
+            public override string HelpMsg
+            {
+                get { return "Show the server rules."; }
+            }
+
+            public override void Run(Player sender, string cmd, string arg)
+            {
+                ChatCommandHandling.WrapMessage(sender, ChatCommandHandling.RulesText);
+            }
+        }
+
 	}
 }

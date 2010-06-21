@@ -61,7 +61,8 @@ namespace spacecraft
 		Books = 47,
 		MossyCobblestone = 48,
 		Obsidian = 49,
-		
+		Test = 44,
+
 		Maximum = Obsidian
 
 		/* indev only
