@@ -4,7 +4,7 @@ using System.IO;
 
 namespace spacecraft
 {
-	public class Config
+	public static class Config
 	{
 		private static Dictionary<string, string> _Config;
 
@@ -73,8 +73,7 @@ namespace spacecraft
 			if (val == null)
 				return def;
 			else
-				val = val.ToLower();
-			return (val != null && val == "1" || val == "yes" || val == "true" || val == "on");
+				return StrIsTrue(val);
 		}
 
 		public static int GetInt(string key, int def)
@@ -89,6 +88,18 @@ namespace spacecraft
 		public static bool Contains(string key)
 		{
 			return _Config.ContainsKey(key);
+		}
+		
+		// helpers
+		public static bool StrIsTrue(string val)
+		{
+			val = val.ToLower().Trim();
+			return (val == "1" || val == "yes" || val == "true" || val == "on");
+		}
+		
+		public static string OnOffStr(bool val)
+		{
+			return (val ? "On" : "Off");
 		}
 	}
 }

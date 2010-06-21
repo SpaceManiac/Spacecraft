@@ -67,29 +67,35 @@ namespace spacecraft
 						sender.PrintMessage(Color.CommandError + "That command's not implemented!");
 					}
 				} else {
-					sender.PrintMessage(Color.CommandError + "You don't have permission to do that.");
+					sender.PrintMessage(Color.CommandError + "You don't have permission to use that command.");
 				}
 			} else {
 				sender.PrintMessage(Color.CommandError + "Unknown command " + cmd);
 			}
 		}
 
-		static public void WrapMessage(Player sendto, string message)
+		static public void WrapMessage(Player sendto, string message, string prefix)
 		{
+			prefix = prefix.Substring(0, 4);
 			while (message.Length > 60)
 			{
 				int i = message.LastIndexOf(' ', 60, 60);
-				sendto.PrintMessage(Color.CommandResult + message.Substring(0, i));
+				sendto.PrintMessage(prefix + message.Substring(0, i));
 				message = message.Substring(i);
 			}
-			sendto.PrintMessage(Color.CommandResult + message);
+			sendto.PrintMessage(prefix + message);
+		}
+
+		static public void WrapMessage(Player sendto, string message)
+		{
+			WrapMessage(sendto, message, Color.CommandResult);
 		}
 
 		static public string GetHelp(string cmd)
 		{
 			if (Commands.ContainsKey(cmd))
 			{
-				return Commands[cmd].HelpMsg;
+				return Commands[cmd].HelpMsg + " (" + Commands[cmd].RankNeeded.ToString + ")";
 			}
 			else
 			{
@@ -129,7 +135,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/help: displays help information"; }
+				get { return "Get general help, a list of commands, or help on a specific command"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -137,20 +143,17 @@ namespace spacecraft
 				if (args == "")
 				{
 					sender.PrintMessage(Color.CommandResult + "You are a " + RankInfo.RankColor(sender.rank) + sender.rank.ToString());
-					string commands = "You can use:" + ChatCommandHandling.GetCommandList(sender.rank);
+					string commands = "You can use: " + ChatCommandHandling.GetCommandList(sender.rank);
 					ChatCommandHandling.WrapMessage(sender, commands);
 				}
 				else
 				{
 					if (args[0] == '/') args = args.Substring(1);
 					string help = ChatCommandHandling.GetHelp(args);
-					if (help == "")
-					{
+					if (help == "") {
 						sender.PrintMessage(Color.CommandError + "No help text on /" + args);
-					}
-					else
-					{
-						sender.PrintMessage(Color.CommandResult + help);
+					} else {
+						ChatCommandHandling.WrapMessage(sender, help);
 					}
 				}
 			}
@@ -165,7 +168,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/me: third-person roleplay-like actions"; }
+				get { return "Third-person roleplay-like actions ( * Bob uses magic!)"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -196,7 +199,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/bring: teleports a player to you (mod+)"; }
+				get { return "Teleport a player to you."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -212,7 +215,7 @@ namespace spacecraft
 						sender.PrintMessage(Color.CommandError + "No such player " + args);
 					} else {
 						Server.theServ.MovePlayer(p, sender.pos, sender.heading, sender.pitch);
-						Spacecraft.Log(sender.name + " brought " + args);
+						Spacecraft.Log(sender.name + " brought " + p.name);
 					}
 				}
 			}
@@ -227,12 +230,12 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/exit: shuts down the server (admin)"; }
+				get { return "Gracefully shut down the server"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
 			{
-				Spacecraft.Log(sender.name + " shut down the server");
+				Spacecraft.Log(sender.name + " shut down the server (/exit command)");
 				//Server.theServ.SendAll(Player.PacketKick("Server is shutting down!"));
 				Server.OnExit.Set();
 			}
@@ -247,7 +250,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/setspawn: sets the global spawn point (admin)"; }
+				get { return "Set the map's global spawn point"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -267,7 +270,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/place: place special blocks (mod+)"; }
+				get { return "Place certain special blocks."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -311,7 +314,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/teleport, /tp: teleport to a player (builder+)"; }
+				get { return "Teleport to a player."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -346,7 +349,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/kick, /k: kick a player (mod+)"; }
+				get { return "Kick a player."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -381,7 +384,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/broadcast, /say: broadcast a message in yellow text (mod+)"; }
+				get { return "Broadcast a message in yellow text."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -407,7 +410,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/dehydrate: remove all liquids in case of flood (mod+)"; }
+				get { return "Remove all active water and lava from the map."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -426,11 +429,12 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/mob: spawn an AI mob (mod+)"; }
+				get { return "Spawn an AI mob (unimplemented)."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
 			{
+				throw new NotImplementedException();
 				//Server.theServ.SpawnMob(sender._player, args);
 			}
 		}
@@ -444,11 +448,12 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/resend: resend the map for testing purposes (brokenish)"; }
+				get { return "Resend the map for testing purposes (unimplemented)."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
 			{
+				throw new NotImplementedException();
 				//sender.ResendMap();
 			}
 		}
@@ -462,7 +467,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/rerank: reload ranks from the rank (mod+)"; }
+				get { return "Refresh the rank database"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -482,7 +487,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/clear: clears the chat log"; }
+				get { return "Clear the chat log of the user"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -503,7 +508,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/config: manages raw server options"; }
+				get { return "View raw server configuration (possibly edit, later)."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -542,7 +547,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/go: teleports you to a landmark"; }
+				get { return "Teleport to a landmark."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -580,7 +585,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/mark: creates a landmark"; }
+				get { return "Create a landmark."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -617,7 +622,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/rmmark: removes a landmark"; }
+				get { return "Remove a landmark."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -653,7 +658,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/whois: get information on a user"; }
+				get { return "Get information on a user."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -682,18 +687,15 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/physics [true|false]: Enables/disables physics."; }
+				get { return "Get or change physics status."; }
 			}
 
 			public override void Run(Player sender, string cmd, string arg)
 			{
-				if (arg != "")
-				{
-					Server.theServ.map.PhysicsOn = (arg == "true");
-					Server.theServ.MessageAll(Color.Announce + "Physics running - " + Server.theServ.map.PhysicsOn.ToString());
-				}
-				else
-				{
+				if (arg != "") {
+					Server.theServ.map.PhysicsOn = Config.StrIsTrue(arg);
+					Server.theServ.MessageAll(Color.Announce + "Physics running is now " + Server.theServ.map.PhysicsOn.ToString());
+				} else {
 					sender.PrintMessage(Color.CommandResult + "Physics running is " + Server.theServ.map.PhysicsOn.ToString());
 				}
 			}
@@ -750,7 +752,7 @@ namespace spacecraft
 
 			public override string HelpMsg
 			{
-				get { return "/convert [block] [repl]: Replace [block] with [repl]"; }
+				get { return "Replace one block with another within a radius (/convert original new)"; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
@@ -828,7 +830,7 @@ namespace spacecraft
 			public override void Run(Player sender, string cmd, string arg)
 			{
 				sender.painting = !sender.painting;
-				sender.PrintMessage("Paint mode:" + sender.painting.ToString());
+				sender.PrintMessage(Color.CommandResult + "Paint mode: " + sender.painting.ToString());
 			}
 		}
 

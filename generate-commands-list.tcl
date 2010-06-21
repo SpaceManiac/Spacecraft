@@ -10,7 +10,7 @@ exec tclsh "$0" ${1+"$@"}
 # configuration
 
 set inputFilename "ChatCommands.cs"
-set outputFilename "commands-list.markdown"
+set outputFilename "Docs/Commands.textile"
 
 # read in
 
