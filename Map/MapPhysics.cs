@@ -108,8 +108,7 @@ namespace spacecraft
 
 			++physicsCount;
 
-			lock (ActiveBlocks)
-			{
+			lock (PhysicsMutex) {
 				ItemsToBeRemoved.Clear();
 				PhysicsUpdates.Clear();
 
@@ -124,14 +123,14 @@ namespace spacecraft
 					}
 				}
 				ActiveBlocks.Clear();
-			}
 
-			// Process physics updates. 
-			foreach (PhysicsTask task in PhysicsUpdates.Values)
-			{
-				if(GetTile(task.x, task.y, task.z) == task.To) continue;
-				AlertPhysicsAround(new BlockPosition(task.x, task.y, task.z));
-				SetTile(task.x, task.y, task.z, task.To);
+				// Process physics updates. 
+				foreach (PhysicsTask task in PhysicsUpdates.Values)
+				{
+					if(GetTile(task.x, task.y, task.z) == task.To) continue;
+					AlertPhysicsAround(new BlockPosition(task.x, task.y, task.z));
+					SetTile(task.x, task.y, task.z, task.To);
+				}
 			}
 		}
 
@@ -166,7 +165,7 @@ namespace spacecraft
 									{
 										AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Rock));
 									}
-									else if (GetTile(newX, newY, newZ) == Block.Water)
+									else if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
 									{
 										// Do nothing.
 									}
@@ -196,7 +195,7 @@ namespace spacecraft
 									short newY = (short)(y + Y);
 									short newZ = (short)(z + Z);
 
-									if (GetTile(newX, newY, newZ) == Block.Lava)
+									if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
 									{
 										// Do nothing.
 									}
@@ -244,6 +243,15 @@ namespace spacecraft
 					if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
 					{
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Sand));
+						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
+					}
+
+					break;
+
+				case Block.Gravel:
+					if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
+					{
+						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Gravel));
 						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
 					}
 

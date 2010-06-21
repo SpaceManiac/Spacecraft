@@ -16,7 +16,8 @@ namespace spacecraft
 
 		public static void Main()
 		{
-			try {				
+			try {
+				Log("");		
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating.");
@@ -33,11 +34,11 @@ namespace spacecraft
 				LoadRanks();
 
 				Server serv = new Server();
-
+				
 				serv.Start();
 
-				Spacecraft.Log("Bye!");
-				Spacecraft.Log("");
+				Log("Bye!");
+				Log("");
 				Environment.Exit(0);
 			}
 			catch (Exception e) {

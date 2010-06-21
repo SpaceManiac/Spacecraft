@@ -174,11 +174,22 @@ namespace spacecraft
 
 		public void Dehydrate()
 		{
-			int max = xdim * ydim * zdim;
-			ReplaceAll(Block.Water, Block.Air, max);
-			ReplaceAll(Block.Lava, Block.Air, max);
-			ReplaceAll(Block.StillWater, Block.Air, max);
-			ReplaceAll(Block.StillLava, Block.Air, max);
+			lock (PhysicsMutex)
+			{
+				for (short x = 0; x < xdim; x++)
+				{
+					for (short y = 0; y < ydim; y++)
+					{
+						for (short z = 0; z < zdim; z++)
+						{
+							if (GetTile(x, y, z) == Block.Water || GetTile(x, y, z) == Block.Lava)
+							{
+								SetTile(x, y, z, Block.Air);
+							}
+						}
+					}
+				}
+			} // lock(PhysicsMutex)
 		}
 
 		System.Diagnostics.Stopwatch Stop = new System.Diagnostics.Stopwatch();
