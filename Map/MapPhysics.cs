@@ -309,10 +309,12 @@ namespace spacecraft
 			
 			if (opaque)
 			{
-				if(GetTile(x, (short)Heights[x, z], z) == Block.Grass) {
-					SetTile_NoRecalc(x, (short) Heights[x, z], z, Block.Dirt);
+				if(Heights[x, z] < y) {
+					if(GetTile(x, (short)Heights[x, z], z) == Block.Grass) {
+						SetTile_NoRecalc(x, (short) Heights[x, z], z, Block.Dirt);
+					}
+					Heights[x, z] = y;
 				}
-				Heights[x, z] = Math.Max(Heights[x, z], y);
 			}
 			else
 			{
