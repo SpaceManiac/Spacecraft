@@ -1,7 +1,4 @@
-
-Spacecraft supports several commands. See [[User Ranks]] for more information on ranks.
-
-(Note: this is not always up-to-date, but is generated directly from the in-game help)
+Spacecraft supports several commands for building and management. See [[User Ranks]] for more information on ranks.
 
 h1. Guest Commands
 * /clear - Clear the chat log of the user

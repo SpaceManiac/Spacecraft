@@ -22,7 +22,7 @@ set gen [list]
 set canGen [list cmd conf]
 
 foreach arg $argv {
-	if {lsearch $canGen [string range $arg 1 end]} {
+	if {[lsearch $canGen [string range $arg 1 end]]} {
 		set genAll 0
 		lappend gen [string range $arg 1 end]
 	} else {
@@ -47,8 +47,7 @@ proc gen_cmd {} {
 	close $infile
 
 	# get command list
-
-	puts "reading command list"
+	
 	array set commands {}
 
 	set i [string first "Commands.Add(" $input]
@@ -67,8 +66,6 @@ proc gen_cmd {} {
 		
 		set i [string first "Commands.Add(" $input [expr {$i + 1}]]
 	}
-
-	puts "commands: [join [lsort [array names commands]] ", "]"
 
 	# get help and level for each command
 
@@ -102,7 +99,7 @@ proc gen_cmd {} {
 	# write out
 
 	set outfile [open [file join $outputFolder Commands.textile] w]
-	puts $outfile "Spacecraft supports several commands for building and management. See [[User Ranks]] for more information on ranks."
+	puts $outfile "Spacecraft supports several commands for building and management. See \[\[User Ranks]] for more information on ranks."
 	puts $outfile ""
 
 	foreach level {Guest Builder Mod Admin} {
@@ -132,5 +129,5 @@ proc gen_conf {} {
 # perform the generation ---------------
 
 foreach item $gen {
-	gen_$gen
+	gen_$item
 }
