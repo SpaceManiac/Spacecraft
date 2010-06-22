@@ -7,7 +7,7 @@ namespace spacecraft
 {
 	public class ChatCommandHandling
 	{
-        public static string RulesText;
+		public static string RulesText;
 		static Dictionary<String, ChatCommands.ChatCommandBase> Commands;
 
 		static ChatCommandHandling()
@@ -50,10 +50,10 @@ namespace spacecraft
 			Commands.Add("mod", new ChatCommands.RankMod());
 
 			if(File.Exists("rules.txt")) {
-	            RulesText = File.ReadAllText("rules.txt").TrimEnd();
-	            if (RulesText != "")
-	                Commands.Add("rules", new ChatCommands.Rules());
-	        }
+				RulesText = File.ReadAllText("rules.txt").TrimEnd();
+				if (RulesText != "")
+					Commands.Add("rules", new ChatCommands.Rules());
+			}
 		}
 
 		/// <summary>
@@ -846,25 +846,25 @@ namespace spacecraft
 			}
 		}
 
-        public class Rules : ChatCommandBase
-        {
-            public override Rank RankNeeded
-            {
-                get { return Rank.Guest; }
-            }
+		public class Rules : ChatCommandBase
+		{
+			public override Rank RankNeeded
+			{
+				get { return Rank.Guest; }
+			}
 
-            public override string HelpMsg
-            {
-                get { return "Show the server rules."; }
-            }
+			public override string HelpMsg
+			{
+				get { return "Show the server rules."; }
+			}
 
-            public override void Run(Player sender, string cmd, string arg)
-            {
-                ChatCommandHandling.WrapMessage(sender, ChatCommandHandling.RulesText);
-            }
-        }
-        
-        public class RankBanned : ChatCommandBase
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				ChatCommandHandling.WrapMessage(sender, ChatCommandHandling.RulesText);
+			}
+		}
+		
+		public class RankBanned : ChatCommandBase
 		{
 			public override Rank RankNeeded {
 				get { return Rank.Mod; }
@@ -910,7 +910,7 @@ namespace spacecraft
 				}
 			}
 		}
-        
+		
 
 		public class RankGuest : ChatCommandBase
 		{

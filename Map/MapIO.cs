@@ -282,7 +282,6 @@ namespace spacecraft
 				data.Append(heading);
 				WriteLengthPrefixedString(writer, data.ToString());
 
-
 				// This isn't actually written, so I'm commenting it out for now.
 				/*
 				StringBuilder HeightString = new StringBuilder();
