@@ -203,9 +203,9 @@ namespace spacecraft
 			}
 			
 			BlockPosition pos = new BlockPosition(x, y, z);
-			AlertPhysicsAround(pos);
 
 			data[BlockIndex(x, y, z)] = (byte)tile;
+			AlertPhysicsAround(pos);
 
 			if (BlockChange != null)
 				BlockChange(this, pos, tile);
