@@ -8,8 +8,8 @@ namespace spacecraft
 {
 	public class Player
 	{
-
 		public static Dictionary<String, Rank> PlayerRanks = new Dictionary<String, Rank>();
+		public static List<byte> InUseIDs = new List<byte>();
 
 		public delegate void PlayerSpawnHandler(Player sender);
 		/// <summary>
@@ -54,12 +54,21 @@ namespace spacecraft
 		public Block placeType;
 		public bool painting;
 
-		public Player(TcpClient client, byte ID)
+		public Player(TcpClient client)
 		{
 			pos = Server.theServ.map.spawn;
 			conn = new Connection(client);
 
-			playerID = ID;
+			playerID = 0;
+			for(byte i = 1; i <= 255; ++i) {
+				if(!InUseIDs.Contains(i)) {
+					playerID = i;
+					break;
+				}
+			}
+			if(playerID == 0) {
+				throw new SpacecraftException("Bah, all out of player IDs");
+			}
 
 			conn.PlayerMove += new Connection.PlayerMoveHandler(conn_PlayerMove);
 			conn.PlayerSpawn += new Connection.PlayerSpawnHandler(conn_PlayerSpawn);
@@ -67,6 +76,10 @@ namespace spacecraft
 			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
 			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
 			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
+		}
+		
+		~Player() {
+			InUseIDs.Remove(playerID);
 		}
 		
 		public void Start()

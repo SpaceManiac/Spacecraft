@@ -145,7 +145,7 @@ namespace spacecraft
 		{
 			while(Running) {
 				TcpClient Client = Listener.AcceptTcpClient();
-				Player Player = new Player(Client, (byte) Players.Count);
+				Player Player = new Player(Client);
 
 				Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
 				Player.Message += new Player.PlayerMsgHandler(Player_Message);
