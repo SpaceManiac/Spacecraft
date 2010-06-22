@@ -75,12 +75,12 @@ namespace spacecraft
 
 		public void AlertPhysicsAround(BlockPosition pos)
 		{
-			//Spacecraft.Log("hi! :D");
-			for (short x = -1; x <= 1; ++x)
+			
+			for (short x = -3; x <= 3; ++x)
 			{
-				for (short y = -1; y <= 1; ++y)
+				for (short y = -3; y <= 3; ++y)
 				{
-					for (short z = -1; z <= 1; ++z)
+					for (short z = -3; z <= 3; ++z)
 					{
 						short newX = (short)(pos.x + x);
 						short newY = (short)(pos.y + y);
@@ -111,8 +111,12 @@ namespace spacecraft
 			lock (PhysicsMutex) {
 				ItemsToBeRemoved.Clear();
 				PhysicsUpdates.Clear();
+				
+				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count);
+				temp.AddRange(ActiveBlocks);
+				ActiveBlocks.Clear();
 
-				foreach (BlockPosition pos in new List<BlockPosition>(ActiveBlocks)) {
+				foreach (BlockPosition pos in temp) {
 					Block Tile = GetTile(pos);
 
 					// Only process the block if it needs it
@@ -121,7 +125,6 @@ namespace spacecraft
 						HandlePhysics(pos.x, pos.y, pos.z, Tile);
 					}
 				}
-				ActiveBlocks.Clear();
 
 				// Process physics updates. 
 				foreach (PhysicsTask task in PhysicsUpdates.Values)
@@ -159,6 +162,14 @@ namespace spacecraft
 									short newX = (short)(x + X);
 									short newY = (short)(y + Y);
 									short newZ = (short)(z + Z);
+								
+									int Hash = PhysicsTask.HashOf(newX, newY, newZ);
+									
+									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Air) {
+										// Been claimed by a sponge
+										// See issue #7, bullet point 3
+										continue;
+									}
 
 									if (GetTile(newX, newY, newZ) == Block.Lava)
 									{
@@ -193,6 +204,14 @@ namespace spacecraft
 									short newX = (short)(x + X);
 									short newY = (short)(y + Y);
 									short newZ = (short)(z + Z);
+								
+									int Hash = PhysicsTask.HashOf(newX, newY, newZ);
+									
+									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Air) {
+										// Been claimed by a sponge
+										// See issue #7, bullet point 3
+										continue;
+									}
 
 									if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
 									{
@@ -218,24 +237,33 @@ namespace spacecraft
 								short newX = (short)(xDiff + X);
 								short newY = (short)(yDiff + Y);
 								short newZ = (short)(zDiff + Z);
+								
+								int Hash = PhysicsTask.HashOf(newX, newY, newZ);
 
-								PhysicsTask task = new PhysicsTask(newX, newY, newZ, Block.Undefined); // Used to retrieve hash code, actual block type is arbitary.
-
-								if (PhysicsUpdates.ContainsKey(task.GetHashCode()))
+								if (PhysicsUpdates.ContainsKey(Hash) && (BlockInfo.IsFluid(PhysicsUpdates[Hash].To)))
 								{
-									if (BlockInfo.IsFluid(PhysicsUpdates[task.GetHashCode()].To))
-									{
-										AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
-									}
+									// eliminate the existing fluid update
+									// see issue #7, bullet point 1
+									AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
 								}
-
-								if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
+								else if (BlockInfo.IsFluid(GetTile(newX, newY, newZ)))
 								{
+									// remove standing liquids
+									// see issue #7, bullet point 2
+									AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
+								}
+								else if (GetTile(newX, newY, newZ) == Block.Air)
+								{
+									// "claim" the air space so fluids will not expand here
+									// see issue #7, bullet point 3
 									AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
 								}
 							}
 						}
 					}
+					
+					// So the sponge stays active even if water doesn't directly touch it
+					AddActiveBlock(new BlockPosition(X, Y, Z));
 					break;
 
 				case Block.Sand:
@@ -254,19 +282,6 @@ namespace spacecraft
 						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
 					}
 
-					break;
-
-				case Block.Grass:
-					if (Heights[X, Z] > Y)
-					{
-						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Dirt));
-					}
-					break;
-				case Block.Dirt:
-					if (Heights[X, Z] == Y)
-					{
-						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Grass));
-					}
 					break;
 
 				default:
@@ -295,11 +310,14 @@ namespace spacecraft
 				Heights = new int[xdim, zdim];
 			}
 			
-			int h = Heights[x, z];
-			
 			if (opaque)
 			{
-				Heights[x, z] = Math.Max(Heights[x, z], y);
+				if(Heights[x, z] < y) {
+					if(GetTile(x, (short)Heights[x, z], z) == Block.Grass) {
+						SetTile_NoRecalc(x, (short) Heights[x, z], z, Block.Dirt);
+					}
+					Heights[x, z] = y;
+				}
 			}
 			else
 			{
@@ -308,9 +326,13 @@ namespace spacecraft
 					Heights[x, z] = 0;
 					for (short Y = (short)(y-1); Y >= 0; Y--)
 					{
-						if (BlockInfo.IsOpaque(GetTile(x, Y, z)))
+						Block t = GetTile(x, Y, z);
+						if (BlockInfo.IsOpaque(t))
 						{
 							Heights[x, z] = Y;
+							if(t == Block.Dirt) {
+								SetTile_NoRecalc(x, Y, z, Block.Grass);
+							}
 							break;
 						}
 					}

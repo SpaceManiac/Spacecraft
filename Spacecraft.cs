@@ -31,7 +31,7 @@ namespace spacecraft
 				} else {
 					random = new Random();
 				}
-				LoadRanks();
+				Player.LoadRanks();
 
 				Server serv = new Server();
 				
@@ -43,27 +43,6 @@ namespace spacecraft
 			catch (Exception e) {
 				// Something went wrong and wasn't caught
 				Spacecraft.LogError("fatal uncaught exception", e);
-			}
-		}
-
-		public static void LoadRanks()
-		{
-			Player.PlayerRanks.Clear();
-			StreamReader Reader = new StreamReader("admins.txt");
-			string[] Lines = Reader.ReadToEnd().Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-			Reader.Close();
-
-			foreach (string line in Lines) {
-				string[] parts = line.Split('=');
-
-				string rankStr = parts[0].Trim();
-				rankStr = rankStr.Substring(0, 1).ToUpper() + rankStr.Substring(1, parts[0].Length - 1);
-				Rank rank = (Rank) Enum.Parse(typeof(Rank), rankStr);
-
-				string[] people = parts[1].Split(',');
-				foreach(string name in people) {
-					Player.PlayerRanks[name.Trim().ToLower()] = rank;
-				}
 			}
 		}
 

@@ -7,45 +7,53 @@ namespace spacecraft
 {
 	public class ChatCommandHandling
 	{
-        public static string RulesText;
+		public static string RulesText;
 		static Dictionary<String, ChatCommands.ChatCommandBase> Commands;
 
 		static ChatCommandHandling()
 		{
 			Commands = new Dictionary<String, ChatCommands.ChatCommandBase>();
-
-			Commands.Add("me", new ChatCommands.ThirdPerson());
-			Commands.Add("help", new ChatCommands.Help());
-			Commands.Add("teleport", new ChatCommands.Teleport());
-			Commands.Add("tp", new ChatCommands.Teleport());
-			Commands.Add("bring", new ChatCommands.Bring());
-			Commands.Add("exit", new ChatCommands.Exit());
-			Commands.Add("setspawn", new ChatCommands.SetSpawn());
-			Commands.Add("place", new ChatCommands.Place());
-			Commands.Add("kick", new ChatCommands.Kick());
-			Commands.Add("k", new ChatCommands.Kick());
-			Commands.Add("broadcast", new ChatCommands.Broadcast());
-			Commands.Add("say", new ChatCommands.Broadcast());
-			Commands.Add("dehydrate", new ChatCommands.Dehydrate());
-			Commands.Add("mob", new ChatCommands.SpawnMob());
-			Commands.Add("resend", new ChatCommands.ResendMap());
-			Commands.Add("rerank", new ChatCommands.ReloadRanks());
+			
 			Commands.Add("clear", new ChatCommands.ClearChat());
 			Commands.Add("go", new ChatCommands.LandmarkGoto());
+			Commands.Add("help", new ChatCommands.Help());
+			Commands.Add("me", new ChatCommands.ThirdPerson());
+			
 			Commands.Add("mark", new ChatCommands.LandmarkAdd());
-			Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
-			Commands.Add("config", new ChatCommands.Configure());
-			Commands.Add("whois", new ChatCommands.WhoIs());
-			Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
-			Commands.Add("physics", new ChatCommands.Physics());
-			Commands.Add("convert", new ChatCommands.Convert());
-			Commands.Add("save", new ChatCommands.Save());
 			Commands.Add("paint", new ChatCommands.Paint());
+			Commands.Add("teleport", new ChatCommands.Teleport());
+			Commands.Add("tp", new ChatCommands.Teleport());
+			Commands.Add("whois", new ChatCommands.WhoIs());
+			
+			Commands.Add("ban", new ChatCommands.RankBanned());
+			Commands.Add("bring", new ChatCommands.Bring());
+			Commands.Add("broadcast", new ChatCommands.Broadcast());
+			Commands.Add("builder", new ChatCommands.RankBuilder());
+			Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
+			Commands.Add("dehydrate", new ChatCommands.Dehydrate());
+			Commands.Add("guest", new ChatCommands.RankGuest());
+			Commands.Add("kick", new ChatCommands.Kick());
+			Commands.Add("mob", new ChatCommands.SpawnMob());
+			Commands.Add("physics", new ChatCommands.Physics());
+			Commands.Add("place", new ChatCommands.Place());
+			Commands.Add("rerank", new ChatCommands.ReloadRanks());
+			Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
+			Commands.Add("say", new ChatCommands.Broadcast());
+			Commands.Add("unban", new ChatCommands.RankGuest());
+			
+			Commands.Add("config", new ChatCommands.Configure());
+			Commands.Add("convert", new ChatCommands.Convert());
+			Commands.Add("exit", new ChatCommands.Exit());
+			Commands.Add("resend", new ChatCommands.ResendMap());
+			Commands.Add("save", new ChatCommands.Save());
+			Commands.Add("setspawn", new ChatCommands.SetSpawn());
+			Commands.Add("mod", new ChatCommands.RankMod());
 
-            RulesText = File.ReadAllText("rules.txt").Trim();
-            if (RulesText != "")
-                Commands.Add("rules", new ChatCommands.Rules());
-
+			if(File.Exists("rules.txt")) {
+				RulesText = File.ReadAllText("rules.txt").TrimEnd();
+				if (RulesText != "")
+					Commands.Add("rules", new ChatCommands.Rules());
+			}
 		}
 
 		/// <summary>
@@ -76,10 +84,14 @@ namespace spacecraft
 
 		static public void WrapMessage(Player sendto, string message, string prefix)
 		{
-			prefix = prefix.Substring(0, 4);
+			if(prefix.Length > 4)
+				prefix = prefix.Substring(0, 4);
+			
 			while (message.Length > 60)
 			{
 				int i = message.LastIndexOf(' ', 60, 60);
+				if(i == -1) i = 60;
+				
 				sendto.PrintMessage(prefix + message.Substring(0, i));
 				message = message.Substring(i);
 			}
@@ -95,7 +107,7 @@ namespace spacecraft
 		{
 			if (Commands.ContainsKey(cmd))
 			{
-				return Commands[cmd].HelpMsg + " (" + Commands[cmd].RankNeeded.ToString + ")";
+				return Commands[cmd].HelpMsg + " (" + Commands[cmd].RankNeeded.ToString() + ")";
 			}
 			else
 			{
@@ -472,7 +484,7 @@ namespace spacecraft
 
 			public override void Run(Player sender, string cmd, string args)
 			{
-				Spacecraft.LoadRanks();
+				Player.LoadRanks();
 				Spacecraft.Log(sender.name + " reloaded the ranks");
 				sender.PrintMessage(Color.CommandResult + "Ranks reloaded");
 			}
@@ -834,23 +846,202 @@ namespace spacecraft
 			}
 		}
 
-        public class Rules : ChatCommandBase
-        {
-            public override Rank RankNeeded
-            {
-                get { return Rank.Guest; }
-            }
+		public class Rules : ChatCommandBase
+		{
+			public override Rank RankNeeded
+			{
+				get { return Rank.Guest; }
+			}
 
-            public override string HelpMsg
-            {
-                get { return "Show the server rules."; }
-            }
+			public override string HelpMsg
+			{
+				get { return "Show the server rules."; }
+			}
 
-            public override void Run(Player sender, string cmd, string arg)
-            {
-                ChatCommandHandling.WrapMessage(sender, ChatCommandHandling.RulesText);
-            }
-        }
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				ChatCommandHandling.WrapMessage(sender, ChatCommandHandling.RulesText);
+			}
+		}
+		
+		public class RankBanned : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Mod; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Ban a user of lesser rank."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				if(arg == "") {
+					sender.PrintMessage(Color.CommandError + "No player specified");
+				} else {
+					string name = arg.Trim();
+					Player P = Server.theServ.GetPlayer(arg);
+					if(P != null) {
+						name = P.name;
+					}
+					
+					Rank current = Player.RankOf(name);
+					if(current >= sender.rank) {
+						sender.PrintMessage(Color.CommandError + "You can't change the rank of someone of an equal or greater rank!");
+						return;
+					}
+					
+					if(P == null) {
+						// just set their rank
+						Player.SetRankOf(name, Rank.Banned);
+					} else {
+						// they're online, so we inform them
+						// this calls SetRankOf as well
+						P.UpdateRank(Rank.Banned);
+						
+						// and of course they're now banned
+						P.Kick("You were banned by " + sender.name);
+					}
+					
+					sender.PrintMessage(Color.CommandResult + name + " banned");
+					Spacecraft.Log(sender.name + " banned " + name);
+					
+					Player.SaveRanks();
+				}
+			}
+		}
+		
 
+		public class RankGuest : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Mod; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Set a user of lesser rank to Guest."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				if(arg == "") {
+					sender.PrintMessage(Color.CommandError + "No player specified");
+				} else {
+					string name = arg.Trim();
+					Player P = Server.theServ.GetPlayer(arg);
+					if(P != null) {
+						name = P.name;
+					}
+					
+					Rank current = Player.RankOf(name);
+					if(current >= sender.rank) {
+						sender.PrintMessage(Color.CommandError + "You can't change the rank of someone of an equal or greater rank!");
+						return;
+					}
+					
+					if(P == null) {
+						// just set their rank
+						Player.SetRankOf(name, Rank.Guest);
+					} else {
+						// they're online, so we inform them
+						// this calls SetRankOf as well
+						P.UpdateRank(Rank.Guest);
+					}
+					
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
+					Spacecraft.Log(sender.name + " set " + name + " to rank Guest");
+					
+					Player.SaveRanks();
+				}
+			}
+		}
+		
+		public class RankBuilder : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Mod; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Set a user of lesser rank to Builder."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				if(arg == "") {
+					sender.PrintMessage(Color.CommandError + "No player specified");
+				} else {
+					string name = arg.Trim();
+					Player P = Server.theServ.GetPlayer(arg);
+					if(P != null) {
+						name = P.name;
+					}
+					
+					Rank current = Player.RankOf(name);
+					if(current >= sender.rank) {
+						sender.PrintMessage(Color.CommandError + "You can't change the rank of someone of an equal or greater rank!");
+						return;
+					}
+					
+					if(P == null) {
+						// just set their rank
+						Player.SetRankOf(name, Rank.Builder);
+					} else {
+						// they're online, so we inform them
+						// this calls SetRankOf as well
+						P.UpdateRank(Rank.Builder);
+					}
+					
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
+					Spacecraft.Log(sender.name + " set " + name + " to rank Builder");
+					
+					Player.SaveRanks();
+				}
+			}
+		}
+		
+		public class RankMod : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Admin; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Set a user of lesser rank to Mod."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				if(arg == "") {
+					sender.PrintMessage(Color.CommandError + "No player specified");
+				} else {
+					string name = arg.Trim();
+					Player P = Server.theServ.GetPlayer(arg);
+					if(P != null) {
+						name = P.name;
+					}
+					
+					Rank current = Player.RankOf(name);
+					if(current >= sender.rank) {
+						sender.PrintMessage(Color.CommandError + "You can't change the rank of someone of an equal or greater rank!");
+						return;
+					}
+					
+					if(P == null) {
+						// just set their rank
+						Player.SetRankOf(name, Rank.Mod);
+					} else {
+						// they're online, so we inform them
+						// this calls SetRankOf as well
+						P.UpdateRank(Rank.Mod);
+					}
+					
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
+					Spacecraft.Log(sender.name + " set " + name + " to rank Mod");
+					
+					Player.SaveRanks();
+				}
+			}
+		}
 	}
 }

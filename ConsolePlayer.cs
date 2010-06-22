@@ -11,7 +11,7 @@ namespace spacecraft
 	
 	public class ConsolePlayer : Player
 	{
-		public ConsolePlayer() : base(null, 255)
+		public ConsolePlayer() : base(null)
 		{
 			rank = Rank.Admin;
 			name = "[console]";

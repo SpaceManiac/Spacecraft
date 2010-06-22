@@ -148,15 +148,18 @@ namespace spacecraft
 		   	}
 
 		   	Joined = true;
+		   	
+		   	string username = IncomingPacket.Username.ToString().Trim();
 
 			if (ReceivedUsername != null)
-				ReceivedUsername(IncomingPacket.Username.ToString());
+				ReceivedUsername(username);
 
 			// Send response packet.
 			ServerIdentPacket Ident = new ServerIdentPacket();
 
 			Ident.MOTD = Server.theServ.motd;
 			Ident.Name = Server.theServ.name;
+			Ident.Type = (byte)(RankInfo.IsOperator(Player.RankOf(username)) ? 0x64 : 0x00);
 			Ident.Version = PROTOCOL_VERSION;
 
 			TransmitPacket(Ident);
@@ -291,6 +294,11 @@ namespace spacecraft
 
 		private bool IsHashCorrect(string name, string hash)
 		{
+			// Minecraft is ridiculous!
+			while(hash.Length < 32) {
+				hash = "0" + hash;
+			}
+			
 			string salt = Server.theServ.salt.ToString();
 			string combined = salt + name;
 			string properHash = Spacecraft.MD5sum(combined);
@@ -312,6 +320,13 @@ namespace spacecraft
 			P.Y = y;
 			P.Z = z;
 			P.Type = type;
+			SendPacket(P);
+		}
+		
+		public void SendOperator(bool isOperator)
+		{
+			RankUpdatePacket P = new RankUpdatePacket();
+			P.UserType = (byte)(isOperator ? 0x64 : 0x00);
 			SendPacket(P);
 		}
 

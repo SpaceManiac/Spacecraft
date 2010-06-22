@@ -192,13 +192,28 @@ namespace spacecraft
 			} // lock(PhysicsMutex)
 		}
 
-		System.Diagnostics.Stopwatch Stop = new System.Diagnostics.Stopwatch();
-
 		public void SetTile(short x, short y, short z, Block tile)
 		{
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 			
 			RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
+			
+			if(Heights[x, z] == y && tile == Block.Dirt) {
+				tile = Block.Grass;
+			}
+			
+			BlockPosition pos = new BlockPosition(x, y, z);
+			AlertPhysicsAround(pos);
+
+			data[BlockIndex(x, y, z)] = (byte)tile;
+
+			if (BlockChange != null)
+				BlockChange(this, pos, tile);
+		}
+
+		private void SetTile_NoRecalc(short x, short y, short z, Block tile)
+		{
+			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 			
 			BlockPosition pos = new BlockPosition(x, y, z);
 			AlertPhysicsAround(pos);

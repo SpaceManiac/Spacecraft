@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using System.IO;
 
 namespace spacecraft
 {
 	public class Player
 	{
-
 		public static Dictionary<String, Rank> PlayerRanks = new Dictionary<String, Rank>();
+		public static List<byte> InUseIDs = new List<byte>();
 
 		public delegate void PlayerSpawnHandler(Player sender);
 		/// <summary>
@@ -53,12 +54,21 @@ namespace spacecraft
 		public Block placeType;
 		public bool painting;
 
-		public Player(TcpClient client, byte ID)
+		public Player(TcpClient client)
 		{
 			pos = Server.theServ.map.spawn;
 			conn = new Connection(client);
 
-			playerID = ID;
+			playerID = 0;
+			for(byte i = 1; i <= 255; ++i) {
+				if(!InUseIDs.Contains(i)) {
+					playerID = i;
+					break;
+				}
+			}
+			if(playerID == 0) {
+				throw new SpacecraftException("Bah, all out of player IDs");
+			}
 
 			conn.PlayerMove += new Connection.PlayerMoveHandler(conn_PlayerMove);
 			conn.PlayerSpawn += new Connection.PlayerSpawnHandler(conn_PlayerSpawn);
@@ -66,6 +76,10 @@ namespace spacecraft
 			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
 			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
 			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
+		}
+		
+		~Player() {
+			InUseIDs.Remove(playerID);
 		}
 		
 		public void Start()
@@ -104,6 +118,18 @@ namespace spacecraft
 		{
 			conn.DisplayMessage(msg);
 		}
+		
+		public void UpdateRank(Rank newRank)
+		{
+			conn.SendOperator(RankInfo.IsOperator(newRank));
+			SetRankOf(name, newRank);
+			rank = newRank;
+			PrintMessage(Color.PrivateMsg + "You are now a " + RankInfo.RankColor(rank));
+			PrintMessage(Color.PrivateMsg + " (note: any building commands have been reset)");
+			placing = false;
+			painting = false;
+			placeType = Block.Undefined;
+		}	
 
 		public virtual void PlayerJoins(Player Player)
 		{
@@ -112,10 +138,7 @@ namespace spacecraft
 
 		public virtual void PlayerMoves(Player Player, Position dest, byte heading, byte pitch)
 		{
-			byte ID = Player.playerID;
-			if (Player == this)
-			{
-				ID = 255;
+			if (Player == this) {
 				pos = dest;
 			}
 
@@ -136,14 +159,73 @@ namespace spacecraft
 			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)type);
 		}
 
+		/* ================================================================================
+		 * Rank Stuff
+		 * ================================================================================
+		 */
+
 		public static Rank RankOf(string name)
 		{
-			name = name.ToLower();
+			name = name.Trim().ToLower();
 			if (PlayerRanks.ContainsKey(name)) {
 				return PlayerRanks[name];
 			} else {
 				return Rank.Guest;
 			}
+		}
+		
+		public static void SetRankOf(string name, Rank rank) {
+			name = name.Trim().ToLower();
+			PlayerRanks[name] = rank;
+		}
+		
+		public static void LoadRanks() {
+			PlayerRanks.Clear();
+			StreamReader Reader = new StreamReader("admins.txt");
+			string[] Lines = Reader.ReadToEnd().Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+			Reader.Close();
+
+			foreach (string line in Lines) {
+				string[] parts = line.Split('=');
+
+				string rankStr = parts[0].Trim();
+				rankStr = rankStr.Substring(0, 1).ToUpper() + rankStr.Substring(1, parts[0].Length - 1);
+				Rank rank = (Rank) Enum.Parse(typeof(Rank), rankStr);
+
+				string[] people = parts[1].Split(',');
+				foreach(string name in people) {
+					SetRankOf(name, rank);
+				}
+			}
+			
+			// re-save so things get combined if needed.
+			SaveRanks();
+		}
+		
+		public static void SaveRanks() {
+			Dictionary<Rank, List<string>> names = new Dictionary<Rank, List<string>>();
+		 
+			foreach (Rank r in Enum.GetValues(typeof(Rank))) {
+				names[r] = new List<string>();
+			}
+			
+			foreach (KeyValuePair<string, Rank> kvp in PlayerRanks) {
+				names[kvp.Value].Add(kvp.Key);
+			}
+			
+			StreamWriter Writer = new StreamWriter("admins.txt");
+			
+			foreach(KeyValuePair<Rank, List<string>> kvp in names) {
+				if(kvp.Key == Rank.Guest) continue;
+				if(kvp.Value.Count > 0) {
+					Writer.Write(kvp.Key.ToString());
+					Writer.Write("=");
+					Writer.Write(String.Join(",", kvp.Value.ToArray()));
+					Writer.WriteLine();
+				}
+			}
+			
+			Writer.Close();
 		}
 
 		/* ================================================================================
@@ -164,6 +246,9 @@ namespace spacecraft
 		{
 			if(name == null)
 				throw new Exception("tonoes?");
+				
+			PrintMessage(Color.PrivateMsg + "Welcome, " + name + "! You're a " + RankInfo.RankColor(rank) + rank.ToString());
+			
 			if (Spawn != null)
 				Spawn(this);
 		}
@@ -190,6 +275,12 @@ namespace spacecraft
 				// block placed
 				if(placing && type == Block.Obsidian) {
 					type = placeType;
+				}
+				
+				if(type == Block.Stair && Server.theServ.map.GetTile(X, (short)(Y - 1), Z) == Block.Stair) {
+					BlockSet(new BlockPosition(X, Y, Z), Block.Air);
+					type = Block.DoubleStair;
+					--Y;
 				}
 			}
 

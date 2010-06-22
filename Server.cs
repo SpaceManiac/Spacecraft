@@ -53,9 +53,9 @@ namespace spacecraft
 		{
 			// Initialize the map, using the saved one if it exists.
 			if (File.Exists(Map.levelName)) {
-					map = Map.Load(Map.levelName);
+				map = Map.Load(Map.levelName);
 			} else if(File.Exists("server_level.dat")) {
-					map = Map.Load("server_level.dat");
+				map = Map.Load("server_level.dat");
 			}
 
 			if (map == null) {
@@ -145,7 +145,7 @@ namespace spacecraft
 		{
 			while(Running) {
 				TcpClient Client = Listener.AcceptTcpClient();
-				Player Player = new Player(Client, (byte) Players.Count);
+				Player Player = new Player(Client);
 
 				Player.Spawn += new Player.PlayerSpawnHandler(Player_Spawn);
 				Player.Message += new Player.PlayerMsgHandler(Player_Message);
