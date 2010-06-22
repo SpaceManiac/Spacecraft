@@ -149,16 +149,14 @@ namespace spacecraft
 					switch (key)
 					{
 						case "@landmark":
-							int p = value.IndexOf("=");
-							string name = value.Substring(0, p);
-							int p2 = value.IndexOf(",", p + 1);
-							short x = Convert.ToInt16(value.Substring(p + 1, p2 - p));
-							int p3 = value.IndexOf(",", p2 + 1);
-							short z = Convert.ToInt16(value.Substring(p2 + 1, p3 - p2));
-							int p4 = value.IndexOf(",", p3 + 1);
-							short y = Convert.ToInt16(value.Substring(p3 + 1, p4 - p3));
-							int p5 = value.IndexOf(",", p4 + 1);
-							byte heading = Convert.ToByte(value.Substring(p5 + 1));
+							string[] keyval = value.Split(new char[] { '=' });
+							string name = keyval[0];
+							string[] parts = keyval[1].Split(new char[] { ',' });
+							
+							short x = Convert.ToInt16(parts[0]);
+							short z = Convert.ToInt16(parts[1]);
+							short y = Convert.ToInt16(parts[2]);
+							byte heading = Convert.ToByte(parts[3]);
 
 							Position pos = new Position(x, y, z);
 							landmarks.Add(name, new Pair<Position, byte>(pos, heading));
@@ -169,8 +167,8 @@ namespace spacecraft
 							string[] tuples = value.Split('|');
 							foreach (var item in tuples)
 							{
-								string[] parts = item.Split(',');
-								Heights[int.Parse(parts[0]), int.Parse(parts[1])] = int.Parse(parts[2]);
+								string[] parts2 = item.Split(',');
+								Heights[int.Parse(parts2[0]), int.Parse(parts2[1])] = int.Parse(parts2[2]);
 							}
 							break;
 
@@ -284,6 +282,9 @@ namespace spacecraft
 				data.Append(heading);
 				WriteLengthPrefixedString(writer, data.ToString());
 
+
+				// This isn't actually written, so I'm commenting it out for now.
+				/*
 				StringBuilder HeightString = new StringBuilder();
 				for (int x = 0; x < Heights.GetLength(0); x++)
 				{
@@ -296,7 +297,7 @@ namespace spacecraft
 						HeightString.Append(Heights[x,z]);
 					}    
 				}
-
+				*/
 			}
 
 			foreach (KeyValuePair<string, string> pair in meta)
