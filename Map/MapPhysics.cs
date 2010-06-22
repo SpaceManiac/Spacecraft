@@ -259,19 +259,6 @@ namespace spacecraft
 
 					break;
 
-				case Block.Grass:
-					if (Heights[X, Z] > Y)
-					{
-						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Dirt));
-					}
-					break;
-				case Block.Dirt:
-					if (Heights[X, Z] == Y)
-					{
-						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Grass));
-					}
-					break;
-
 				default:
 					break;
 			}
@@ -300,6 +287,9 @@ namespace spacecraft
 			
 			if (opaque)
 			{
+				if(GetTile(x, (short)Heights[x, z], z) == Block.Grass) {
+					SetTile_NoRecalc(x, (short) Heights[x, z], z, Block.Dirt);
+				}
 				Heights[x, z] = Math.Max(Heights[x, z], y);
 			}
 			else
@@ -309,9 +299,13 @@ namespace spacecraft
 					Heights[x, z] = 0;
 					for (short Y = (short)(y-1); Y >= 0; Y--)
 					{
-						if (BlockInfo.IsOpaque(GetTile(x, Y, z)))
+						Block t = GetTile(x, Y, z);
+						if (BlockInfo.IsOpaque(t))
 						{
 							Heights[x, z] = Y;
+							if(t == Block.Dirt) {
+								SetTile_NoRecalc(x, Y, z, Block.Grass);
+							}
 							break;
 						}
 					}
