@@ -263,6 +263,12 @@ namespace spacecraft
 				if(placing && type == Block.Obsidian) {
 					type = placeType;
 				}
+				
+				if(type == Block.Stair && Server.theServ.map.GetTile(X, (short)(Y - 1), Z) == Block.Stair) {
+					BlockSet(new BlockPosition(X, Y, Z), Block.Air);
+					type = Block.DoubleStair;
+					--Y;
+				}
 			}
 
 			if(BlockChange != null)
