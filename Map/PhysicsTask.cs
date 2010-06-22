@@ -14,10 +14,15 @@ namespace spacecraft
 			x = X; y = Y; z = Z; this.To = To;
 			//From = Server.theServ.map.GetTile(xDiff, yDiff, zDiff);
 		}
+		
 		public override int GetHashCode()
 		{
-			return (x * y * z);
+			return (2048 * 2048 * x + 2048 * y + z);
 			// Does not include Tile so that two PhysicsTasks concerning the same space will have the same hash.
+		}
+		
+		public static int HashOf(short X, short Y, short Z) {
+			return (new PhysicsTask(X, Y, Z, Block.Undefined)).GetHashCode();
 		}
 	
 		public int CompareTo(object obj)
