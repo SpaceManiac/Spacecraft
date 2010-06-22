@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <title>Spacecraft Documentation</title>
+	<style>
+	h1 { text-align:center; }
+	
+	</style>
+  </head>
+  <body>
+  <h1>Spacecraft Technical Documentation</h1>
+  
+  <h2>System Requirements</h2>
+  <p>Spacecraft is written in C# 3.0 (Microsoft Visual Studio 2008) and so requires the <a href="http://msdn.microsoft.com/en-gb/ee514466.aspx?WT.srch=1">.NET Framework</a> version 3.5 or greater to be installed on the host machine. (Or an equivalent, such as Project Mono.) The memory and disk space requires of Spacecraft depend on the size of the map being used, although the program itself takes less than 10MB of RAM and 2MB of disk space as of writing.</p>
+  
+  <h2>Installation</h2>
+  <p>
+  Spacecraft's executable requires read and write access to the directory it is placed in, and read and write access to the port specified in the configuration file. (Defaulting to 25565) Other than these, Spacecraft requires no special permissions and should run sucessfully from anywhere.
+  </p>
+  <h2>Configuration Options</h2>
+  <p>
+  When Spacecraft initializes, it creates the file properties.txt in the local directory. This file contains user-configurable settings for Spacecraft, specified in the format <pre>name = value</pre>. Lines beginning with the hash symbol, #, are treated as comments and ignored. The full list of valid names follows. Invalid names are ignored.
+  <ul>
+	<li><b>heartbeat</b> -  "true" or "false". Whether to announce the server's precense to Minecraft.net.
+	<li><b>http-port</b> - Number, no commas, spaces, etc. The port on which to listen for HTTP connections. Defaults to port + 1.
+	<li><b>max-players</b> - Number. Maximum amount of players that can connect concurrently.
+	<li><b>motd</b> -  String less than 64 characters long. The message to display to incoming players.
+	<li><b>port</b> - Number, no commas, spaces, etc. The port on which to listen for incoming players. Defaults to 25565.
+	<li><b>public</b> - "true" or "false". Whether the server is publically accessable. 
+	<li><b>server-name</b> -  String less than 64 characters long. The name of the server.
+	<li><b>verify-names</b> - "true" or "false". Whether to verify the names of incoming players with Minecraft.net, and reject unverified names. Defaults to true.
+  </ul>
+  </p>
+  </body>
+</html>
