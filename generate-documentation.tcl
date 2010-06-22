@@ -34,6 +34,32 @@ if {$genAll} {
 	set gen $canGen
 }
 
+# grab file list for whatever needs it
+
+set files [list]
+
+proc nodotslash {filename} {
+	if {[string match "./*" $filename]} {
+		return [string range $filename 2 end]
+	}
+	return $filename
+}
+
+proc examine {directory {pattern (.cs|.tcl)$}} {
+	global files
+	foreach filename [glob -nocomplain -directory $directory *] {
+		if {[file isdirectory $filename]} {
+			examine $filename $pattern
+		} elseif {[regexp -nocase $pattern $filename]} {
+			lappend files [nodotslash $filename]
+		}
+	}
+}
+
+puts -nonewline "Getting file list... "
+examine . {.cs$}
+puts "Done"
+
 # gen_cmd procedure ---------------
 # generate Commands.textile (-cmd)
 
@@ -119,9 +145,21 @@ proc gen_cmd {} {
 
 proc gen_conf {} {
 	puts -nonewline "Generating Configuration.textile... "
-	global outputFolder
+	global outputFolder files
 	
-	# TODO: generate configuration info
+	# known option descriptions
+	array set configInfo {}
+	
+	foreach filename $files {
+		if {$filename == [file join Utils Config.cs]} {
+			continue
+		}
+		
+		set f [open $filename]
+		set contents [read $f]
+		close $f; unset f
+		
+		
 	
 	puts "Done"
 }

@@ -528,7 +528,7 @@ namespace spacecraft
 				string[] argv = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 				if (argv.Length == 0)
 				{
-					string list = "Options set:" + Config.GetDefinedList();
+					string list = "Options set:" + Config.DefinedList();
 					ChatCommandHandling.WrapMessage(sender, list);
 				}
 				else if (argv.Length == 1)

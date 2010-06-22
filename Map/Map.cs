@@ -216,9 +216,9 @@ namespace spacecraft
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 			
 			BlockPosition pos = new BlockPosition(x, y, z);
-			AlertPhysicsAround(pos);
 
 			data[BlockIndex(x, y, z)] = (byte)tile;
+			AlertPhysicsAround(pos);
 
 			if (BlockChange != null)
 				BlockChange(this, pos, tile);

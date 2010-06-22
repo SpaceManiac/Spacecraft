@@ -50,7 +50,7 @@ namespace spacecraft
 			fh.Close();
 		}
 
-		public static string GetDefinedList()
+		public static string DefinedList()
 		{
 			string r = "";
 			foreach (KeyValuePair<string, string> kvp in _Config) {
