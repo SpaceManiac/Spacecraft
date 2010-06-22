@@ -198,6 +198,10 @@ namespace spacecraft
 			
 			RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
 			
+			if(Heights[x, z] == y && tile == Block.Dirt) {
+				tile = Block.Grass;
+			}
+			
 			BlockPosition pos = new BlockPosition(x, y, z);
 			AlertPhysicsAround(pos);
 
