@@ -63,6 +63,7 @@ namespace spacecraft
 			for(byte i = 1; i <= 255; ++i) {
 				if(!InUseIDs.Contains(i)) {
 					playerID = i;
+					InUseIDs.Add(playerID);
 					break;
 				}
 			}
