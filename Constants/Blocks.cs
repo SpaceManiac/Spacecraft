@@ -104,7 +104,7 @@ namespace spacecraft
 		
 		public static bool RequiresPhysics(Block B)
 		{
-			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge);
+			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge || B == Block.Gravel);
 		}
 
 		static BlockInfo()

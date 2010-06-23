@@ -229,7 +229,7 @@ namespace spacecraft
 				case Block.Sponge:
 					for (int xDiff = -BlockInfo.SpongeRadius; xDiff <= BlockInfo.SpongeRadius; xDiff++)
 					{
-						for (int yDiff = -BlockInfo.SpongeRadius; yDiff <= 0; yDiff++)
+						for (int yDiff = -BlockInfo.SpongeRadius; yDiff <= BlockInfo.SpongeRadius; yDiff++)
 						{
 							for (int zDiff = -BlockInfo.SpongeRadius; zDiff <= BlockInfo.SpongeRadius; zDiff++)
 							{
