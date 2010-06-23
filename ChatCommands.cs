@@ -948,7 +948,7 @@ namespace spacecraft
 						P.UpdateRank(Rank.Guest);
 					}
 					
-					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Guest");
 					Spacecraft.Log(sender.name + " set " + name + " to rank Guest");
 					
 					Player.SaveRanks();
@@ -992,7 +992,7 @@ namespace spacecraft
 						P.UpdateRank(Rank.Builder);
 					}
 					
-					sender.PrintMessage(Color.CommandResult + name + " set to rank Mod");
+					sender.PrintMessage(Color.CommandResult + name + " set to rank Builder");
 					Spacecraft.Log(sender.name + " set " + name + " to rank Builder");
 					
 					Player.SaveRanks();
