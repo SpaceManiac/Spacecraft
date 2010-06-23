@@ -245,7 +245,7 @@ namespace spacecraft
 		void conn_PlayerSpawn()
 		{
 			if(name == null) {
-				conn.SendKick("You tried to spawn with a null username!");
+				Kick("You tried to spawn with a null username!");
 				return;
 			}
 				
