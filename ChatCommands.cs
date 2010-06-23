@@ -682,9 +682,11 @@ namespace spacecraft
 					sender.PrintMessage(Color.CommandResult + args + " is offline");
 					sender.PrintMessage(Color.CommandResult + args + " is a " + RankInfo.RankColor(r) + r.ToString());
 				} else {
+					args = p.name;
 					sender.PrintMessage(Color.CommandResult + args + " is online");
 					sender.PrintMessage(Color.CommandResult + args + " is a " + RankInfo.RankColor(r) + r.ToString());
-					sender.PrintMessage(Color.CommandResult + args + " is at: " + p.pos.x + "," + p.pos.y + "," + p.pos.z);
+					sender.PrintMessage(Color.CommandResult + args + " is at: " + p.pos.x/32 + "," + p.pos.y/32 + "," + p.pos.z/32);
+					sender.PrintMessage(Color.CommandResult + args + " is player #" + p.playerID);
 				}
 			}
 		}
