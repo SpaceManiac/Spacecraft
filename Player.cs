@@ -244,8 +244,10 @@ namespace spacecraft
 
 		void conn_PlayerSpawn()
 		{
-			if(name == null)
-				throw new Exception("tonoes?");
+			if(name == null) {
+				conn.SendKick("You tried to spawn with a null username!");
+				return;
+			}
 				
 			PrintMessage(Color.PrivateMsg + "Welcome, " + name + "! You're a " + RankInfo.RankColor(rank) + rank.ToString());
 			
