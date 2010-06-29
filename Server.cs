@@ -126,6 +126,8 @@ namespace spacecraft
 			clock.Start();
 			double lastHeartbeat = -30;
 			double lastPhysics = -0.5;
+            double lastBookend = 0;
+
 			while(Running) {
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
 					Heartbeat();
@@ -137,6 +139,12 @@ namespace spacecraft
 					map.DoPhysics();
 					lastPhysics = clock.Elapsed.TotalSeconds;
 				}
+
+                if (clock.Elapsed.TotalSeconds - lastPhysics >= (60 * 60))
+                { // More than an hour since last write.
+                    Spacecraft.Log("=======================================================");
+                    // To make keeping track of the logs easier.
+                }
 				Thread.Sleep(10);
 			}
 		}
