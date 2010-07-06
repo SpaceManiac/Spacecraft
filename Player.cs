@@ -68,7 +68,7 @@ namespace spacecraft
 				}
 			}
 			if(playerID == 0) {
-				throw new SpacecraftException("Bah, all out of player IDs");
+				throw new SpacecraftException("Bah, all out of player IDs! This is quite bad.");
 			}
 
 			conn.PlayerMove += new Connection.PlayerMoveHandler(conn_PlayerMove);
@@ -236,10 +236,19 @@ namespace spacecraft
 
 		void conn_ReceivedUsername(string username)
 		{
+			// name's been verified by this point
+			
 			this.name = username;
+			
 			rank = RankOf(username);
-			if(rank == Rank.Banned) {
+			if (rank == Rank.Banned) {
 				conn.SendKick("You're banned!");
+			}
+			
+			Player P = Server.theServ.GetPlayerNot(name, this);
+			if (P != null) {
+				// do what the default server does!
+				P.Kick("You logged on from elsewhere!");
 			}
 		}
 

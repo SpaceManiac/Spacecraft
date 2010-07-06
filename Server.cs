@@ -206,6 +206,24 @@ namespace spacecraft
 			return null;
 		}
 
+		public Player GetPlayerNot(string name, Player not)
+		{
+			name = name.ToLower();
+			
+			if(name == "[console]") {
+				return console;
+			}
+			
+			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
+			List<Player> temp = new List<Player>(Players);
+			foreach(Player P in temp) {
+				if(P.name.ToLower() == name && P != not) {
+					return P;
+				}
+			}
+			return null;
+		}
+
 		private void Heartbeat()
 		{
 			try {

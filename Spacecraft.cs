@@ -23,7 +23,7 @@ namespace spacecraft
 				Log("");		
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
-					Log("Note: admins.txt does not exist, creating.");
+					Log("Note: admins.txt does not exist, creating a blank one. Be sure to add yourself!");
 					File.Create("admins.txt").Close();
 				}
 
