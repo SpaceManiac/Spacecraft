@@ -217,9 +217,8 @@ namespace spacecraft
                     Script = Script.Replace("%2B", "+");
 
                     Console.WriteLine(Script);
-                    
 
-                    //Scripting.Scripting.Interpreter.EvalScript(ASCIIEncoding.ASCII.GetString(bar));
+                    Scripting.Scripting.Interpreter.EvalScript(ASCIIEncoding.ASCII.GetString(bar));
 				}
 				catch (IOException) {}
 				
