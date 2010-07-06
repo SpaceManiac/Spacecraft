@@ -21,6 +21,7 @@ namespace TclWrap {
 		public const int TCL_BREAK = 3;
 		public const int TCL_CONTINUE = 4;
 		
+        // Here be dragons. If anything breaks, it's SM's fault.
 		unsafe public static string[] GetArgumentArray(int argc, IntPtr argv) {
 			char ** argPtr = (char **) argv.ToPointer();
 			List<string> result = new List<string>();
