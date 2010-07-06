@@ -126,7 +126,7 @@ namespace spacecraft
 			clock.Start();
 			double lastHeartbeat = -30;
 			double lastPhysics = -0.5;
-            double lastBookend = 0;
+            double lastBookend = -3600;
 
 			while(Running) {
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
@@ -140,10 +140,10 @@ namespace spacecraft
 					lastPhysics = clock.Elapsed.TotalSeconds;
 				}
 
-                if (clock.Elapsed.TotalSeconds - lastPhysics >= (60 * 60))
-                { // More than an hour since last write.
+                if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {
+                    // To make keeping track of the logs easier, print a line each hour
                     Spacecraft.Log("=======================================================");
-                    // To make keeping track of the logs easier.
+                    lastBookend = clock.Elapsed.TotalSeconds;
                 }
 				Thread.Sleep(10);
 			}

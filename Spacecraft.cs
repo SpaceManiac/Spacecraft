@@ -66,6 +66,7 @@ namespace spacecraft
 
 		public static void Log(string text)
 		{
+			CalculateFilenames();
 			lock (logfileMutex) {
                 StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
 				if (text == "") {
@@ -91,6 +92,7 @@ namespace spacecraft
 				Log("Error: " + text);
 				return;
 			}
+			CalculateFilenames();
 			lock (errorfileMutex)
 			{
                 StreamWriter sw = new StreamWriter("error-" + dateString + ".log", true);
@@ -105,16 +107,6 @@ namespace spacecraft
 				sw.Close();
 				Log("Error: " + text + ": See error.log for details");
 			}
-		}
-
-		public static void Debug(string format, params object[] args)
-		{
-			Debug(string.Format(format, args));
-		}
-	
-		public static void Debug(string text)
-		{
-			System.Diagnostics.Debug.WriteLineIf(DEBUG, text);
 		}
 
 		public static string StripColors(string s)
