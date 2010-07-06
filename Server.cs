@@ -46,6 +46,8 @@ namespace spacecraft
 			theServ = this;
 
 			salt = Spacecraft.random.Next(100000, 999999);
+			
+			IP = "";
 
 			port = Config.GetInt("port", 25565);
 			HTTPport = Config.GetInt("http-port", port+1);
@@ -132,8 +134,27 @@ namespace spacecraft
 			double lastHeartbeat = -30;
 			double lastPhysics = -0.5;
 			double lastBookend = 0;
+			double lastIpAttempt = -10;
+			int ipFailures = 0;
 
 			while(Running) {
+	            if (IP == "" && clock.Elapsed.TotalSeconds - lastIpAttempt >= 10 && ipFailures < 3) {
+	            	try {
+		                WebClient Request = new WebClient();
+		                byte[] data = Request.DownloadData(@"http://whatismyip.org/");
+		                IP = ASCIIEncoding.ASCII.GetString(data);
+		                Spacecraft.Log("IP discovered: " + IP);
+		            }
+		            catch(WebException e) {
+		                lastIpAttempt = clock.Elapsed.TotalSeconds;
+		            	++ipFailures;
+		            	if(ipFailures >= 3) {
+		            		Spacecraft.LogError("Could not discover IP address.", e);
+		            	} else {
+		            		Spacecraft.LogError("Could not discover IP address, reattempting.", e);
+		            	}
+		            }
+	            }
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
 					double now = clock.Elapsed.TotalSeconds;
 					Heartbeat();
@@ -184,14 +205,6 @@ namespace spacecraft
 
 		public void HTTPMonitorThread()
 		{
-            if (IP == null || IP == "")
-            {
-                WebClient Request = new WebClient();
-                byte[] data = Request.DownloadData(@"http://whatismyip.org/");
-                IP = ASCIIEncoding.ASCII.GetString(data);
-                Spacecraft.Log("IP discovered: " + IP);
-            }
-            
 			while (Running) {
 				HttpListenerContext Client = HTTPListener.GetContext();
 				HttpListenerResponse Response = Client.Response;
