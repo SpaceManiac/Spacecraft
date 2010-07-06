@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Security.Cryptography;
 using System.Text;
+using System.Diagnostics;
 
 namespace spacecraft
 {
@@ -14,10 +15,21 @@ namespace spacecraft
     	public const bool DEBUG = true;
 		public static Random random;
         public static string dateString;
+        
+        public static PerformanceCounter cpuCounter; 
+		public static PerformanceCounter ramCounter; 
 
 		public static void Main()
 		{
 			try {
+				cpuCounter = new PerformanceCounter(); 
+				
+				cpuCounter.CategoryName = "Processor"; 
+				cpuCounter.CounterName = "% Processor Time"; 
+				cpuCounter.InstanceName = "_Total"; 
+				
+				ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+
                 CalculateFilenames();
 
 				Log("");		

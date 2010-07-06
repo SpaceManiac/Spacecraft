@@ -31,6 +31,12 @@ namespace spacecraft
 		private List<BlockPosition> ItemsToBeRemoved = new List<BlockPosition>();
 
 		private int[,] Heights;
+		
+		public int ActiveListLength {
+			get { return ActiveBlocks.Count; }
+		}
+		
+		public int UpdatedLastTick { get; protected set; }
 
 		System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -125,13 +131,15 @@ namespace spacecraft
 					}
 				}
 
-				// Process physics updates. 
+				// Process physics updates.
+				int x = 0;
 				foreach (PhysicsTask task in PhysicsUpdates.Values)
 				{
 					if(GetTile(task.x, task.y, task.z) == task.To) continue;
-					AlertPhysicsAround(new BlockPosition(task.x, task.y, task.z));
 					SetTile(task.x, task.y, task.z, task.To);
+					++x;
 				}
+				UpdatedLastTick = x;
 			}
 		}
 

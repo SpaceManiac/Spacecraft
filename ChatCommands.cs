@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace spacecraft
 {
@@ -32,6 +33,8 @@ namespace spacecraft
 			Commands.Add("builder", new ChatCommands.RankBuilder());
 			Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
 			Commands.Add("dehydrate", new ChatCommands.Dehydrate());
+			Commands.Add("diagnostics", new ChatCommands.Diagnostics());
+			Commands.Add("diag", new ChatCommands.Diagnostics());
 			Commands.Add("guest", new ChatCommands.RankGuest());
 			Commands.Add("kick", new ChatCommands.Kick());
 			Commands.Add("mob", new ChatCommands.SpawnMob());
@@ -1072,6 +1075,42 @@ namespace spacecraft
 				
 				ChatCommandHandling.WrapMessage(sender, "Moderators: " + String.Join(", ", mods.ToArray()));
 				ChatCommandHandling.WrapMessage(sender, "Administrators: " + String.Join(", ", admins.ToArray()));
+			}
+		}
+		
+		public class Diagnostics : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Mod; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Display some diagnostic information on physics and server usage."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+	            TimeSpan up = (DateTime.Now - Process.GetCurrentProcess().StartTime);
+	            string Uptime = "";
+	            if(up.Days > 0) {
+	            	Uptime += up.Days + " days ";
+	            }
+	            if(up.Hours > 0) {
+	            	Uptime += up.Hours + " hours ";
+	            }
+	            if(up.Minutes > 0) {
+	            	Uptime += up.Minutes + " minutes ";
+	            }
+	            if(up.Seconds > 0) {
+	            	Uptime += up.Seconds + " seconds ";
+	            }
+            	
+				Server s = Server.theServ;
+				sender.PrintMessage(Color.CommandResult + "Players online: " + s.Players.Count);
+				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
+				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);
+				sender.PrintMessage(Color.CommandResult + "Last heartbeat took: " + s.LastHeartbeatTook + "s - Last physics tick took: " + s.LastPhysicsTickTook + "s");
+				sender.PrintMessage(Color.CommandResult + "CPU usage: " + Math.Round(10*Spacecraft.cpuCounter.NextValue())/10.0 + "% - RAM usage: " + Spacecraft.ramCounter.NextValue() + "Mb");
 			}
 		}
 	}

@@ -34,6 +34,9 @@ namespace spacecraft
 		public string serverhash { get; protected set; }
 	
 		public ConsolePlayer console { get; protected set; }
+		
+		public double LastHeartbeatTook { get; protected set; }
+		public double LastPhysicsTickTook { get; protected set; }
 
 		public Server()
 		{
@@ -126,18 +129,22 @@ namespace spacecraft
 			clock.Start();
 			double lastHeartbeat = -30;
 			double lastPhysics = -0.5;
-            double lastBookend = -3600;
+            double lastBookend = 0;
 
 			while(Running) {
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
+					double now = clock.Elapsed.TotalSeconds;
 					Heartbeat();
 					map.Save(Map.levelName);
 					GC.Collect();
 					lastHeartbeat = clock.Elapsed.TotalSeconds;
+					LastHeartbeatTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
 				if(clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
+					double now = clock.Elapsed.TotalSeconds;
 					map.DoPhysics();
 					lastPhysics = clock.Elapsed.TotalSeconds;
+					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
 
                 if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {
