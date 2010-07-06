@@ -1106,6 +1106,7 @@ namespace spacecraft
 				}
 				
 				Server s = Server.theServ;
+                sender.PrintMessage(Color.CommandResult + "Spacecraft@" + s.IP + ":" + s.port + "," + s.HTTPport);
 				sender.PrintMessage(Color.CommandResult + "Players online: " + s.Players.Count);
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
 				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);

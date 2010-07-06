@@ -32,7 +32,9 @@ namespace spacecraft
 		public string name { get; protected set; }
 		public string motd { get; protected set; }
 		public string serverhash { get; protected set; }
-	
+        public string IP { get; protected set; }
+
+
 		public ConsolePlayer console { get; protected set; }
 		
 		public double LastHeartbeatTook { get; protected set; }
@@ -182,6 +184,14 @@ namespace spacecraft
 
 		public void HTTPMonitorThread()
 		{
+            if (IP == null || IP == "")
+            {
+                WebClient Request = new WebClient();
+                byte[] data = Request.DownloadData(@"http://whatismyip.org/");
+                IP = ASCIIEncoding.ASCII.GetString(data);
+                Spacecraft.Log("IP discovered: " + IP);
+            }
+            
 			while (Running) {
 				HttpListenerContext Client = HTTPListener.GetContext();
 				HttpListenerResponse Response = Client.Response;
