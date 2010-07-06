@@ -10,8 +10,7 @@ namespace TclWrap {
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateInterp();
 		[DllImport("tcl84.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
 		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
-		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_GetObjResult(IntPtr interp);
-		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringFromObj(IntPtr tclObj, IntPtr length);
+		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
 		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
 		
@@ -82,12 +81,7 @@ namespace TclWrap {
 				if (interp == IntPtr.Zero) {
 					throw new SystemException("Attempted to call a closed Tcl interpeter!");
 				}
-				IntPtr obj = TclAPI.Tcl_GetObjResult(interp);
-				if (obj == IntPtr.Zero) {
-					return "";
-				} else {
-					return TclAPI.Tcl_GetStringFromObj(obj,IntPtr.Zero);
-				}
+				return TclAPI.Tcl_GetStringResult(interp);
 			}
 		}
 	}
