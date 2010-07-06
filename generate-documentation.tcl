@@ -22,7 +22,7 @@ set gen [list]
 set canGen [list cmd conf]
 
 foreach arg $argv {
-	if {[lsearch $canGen [string range $arg 1 end]]} {
+	if {[lsearch $canGen [string range $arg 1 end]] >= 0} {
 		set genAll 0
 		lappend gen [string range $arg 1 end]
 	} else {
@@ -68,18 +68,26 @@ proc gen_cmd {} {
 	global outputFolder
 	
 	# read in
-	set infile [open "ChatCommands.cs"]
-	set input [read $infile]
+	set infile [open "ChatCommands/ChatCommandHandling.cs"]
+	set input1 [read $infile]
 	close $infile
+	
+	set input2 ""
+	set files [glob -nocomplain "ChatCommands/*.cs"]
+	foreach file $files {
+		set infile [open $file]
+		append input2 "[read $infile]\n"
+		close $infile
+	}
 
-	# get command list
+	# get command list (input1)
 	
 	array set commands {}
 
-	set i [string first "Commands.Add(" $input]
+	set i [string first "Commands.Add(" $input1]
 	while {$i != -1} {
-		set i2 [string first "())" $input $i]
-		set line [string range $input [expr {$i + [string length "Commands.Add("]}] [expr {$i2 - 1}]]
+		set i2 [string first "())" $input1 $i]
+		set line [string range $input1 [expr {$i + [string length "Commands.Add("]}] [expr {$i2 - 1}]]
 
 		set i3 [string first "\"" $line]
 		set i4 [string first "\"" $line [expr {$i3 + 1}]]
@@ -90,7 +98,7 @@ proc gen_cmd {} {
 		
 		set commands($name) $class
 		
-		set i [string first "Commands.Add(" $input [expr {$i + 1}]]
+		set i [string first "Commands.Add(" $input1 [expr {$i + 1}]]
 	}
 
 	# get help and level for each command
@@ -105,15 +113,15 @@ proc gen_cmd {} {
 	array set commandHelp {}
 
 	foreach cmd [array names commands] {
-		set i [string first "public class $commands($cmd)" $input]
-		set i2 [string first "return Rank." $input $i]
-		set i3 [string first ";" $input $i2]
-		set rank [string range $input [expr {$i2 + [string length "return Rank."]}] [expr {$i3 - 1}]]
+		set i [string first "public class $commands($cmd)" $input2]
+		set i2 [string first "return Rank." $input2 $i]
+		set i3 [string first ";" $input2 $i2]
+		set rank [string range $input2 [expr {$i2 + [string length "return Rank."]}] [expr {$i3 - 1}]]
 		lappend commandList($rank) $cmd
 		
-		set i2 [string first "return \"" $input $i]
-		set i3 [string first "\"" $input [expr {$i2 + [string length "return \""]}]]
-		set help [string range $input [expr {$i2 + [string length "return \""]}] [expr {$i3 - 1}]]
+		set i2 [string first "return \"" $input2 $i]
+		set i3 [string first "\"" $input2 [expr {$i2 + [string length "return \""]}]]
+		set help [string range $input2 [expr {$i2 + [string length "return \""]}] [expr {$i3 - 1}]]
 		
 		if {[string match "/$cmd: *" $help]} {
 			set help [string range $help [string length "/$cmd: "] end]

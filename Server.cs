@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
+using System.Diagnostics;
 using System.IO;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Timers;
-using System.Web;
-using System.Diagnostics;
 
 namespace spacecraft
 {
@@ -32,8 +29,7 @@ namespace spacecraft
 		public string name { get; protected set; }
 		public string motd { get; protected set; }
 		public string serverhash { get; protected set; }
-        public string IP { get; protected set; }
-
+		public string IP { get; protected set; }
 
 		public ConsolePlayer console { get; protected set; }
 		
@@ -138,23 +134,23 @@ namespace spacecraft
 			int ipFailures = 0;
 
 			while(Running) {
-	            if (IP == "" && clock.Elapsed.TotalSeconds - lastIpAttempt >= 10 && ipFailures < 3) {
-	            	try {
-		                WebClient Request = new WebClient();
-		                byte[] data = Request.DownloadData(@"http://whatismyip.org/");
-		                IP = ASCIIEncoding.ASCII.GetString(data);
-		                Spacecraft.Log("IP discovered: " + IP);
-		            }
-		            catch(WebException e) {
-		                lastIpAttempt = clock.Elapsed.TotalSeconds;
-		            	++ipFailures;
-		            	if(ipFailures >= 3) {
-		            		Spacecraft.LogError("Could not discover IP address.", e);
-		            	} else {
-		            		Spacecraft.LogError("Could not discover IP address, reattempting.", e);
-		            	}
-		            }
-	            }
+				if (IP == "" && clock.Elapsed.TotalSeconds - lastIpAttempt >= 10 && ipFailures < 3) {
+					try {
+						WebClient Request = new WebClient();
+						byte[] data = Request.DownloadData(@"http://whatismyip.org/");
+						IP = ASCIIEncoding.ASCII.GetString(data);
+						Spacecraft.Log("IP discovered: " + IP);
+					}
+					catch(WebException e) {
+						lastIpAttempt = clock.Elapsed.TotalSeconds;
+						++ipFailures;
+						if(ipFailures >= 3) {
+							Spacecraft.LogError("Could not discover IP address.", e);
+						} else {
+							Spacecraft.LogError("Could not discover IP address, reattempting.", e);
+						}
+					}
+				}
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
 					double now = clock.Elapsed.TotalSeconds;
 					Heartbeat();
@@ -201,7 +197,7 @@ namespace spacecraft
 			}
 		}
 
-        string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='firstname' />Foo\n</textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
+		string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='firstname' />Foo\n</textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
 
 		public void HTTPMonitorThread()
 		{
@@ -209,15 +205,15 @@ namespace spacecraft
 				HttpListenerContext Client = HTTPListener.GetContext();
 				HttpListenerResponse Response = Client.Response;
 
-                byte[] bar = new byte[50];
+				byte[] bar = new byte[50];
 
-                try 
-                {
-                    Client.Request.InputStream.Read(bar, 0, 50);
-                    Console.WriteLine(ASCIIEncoding.ASCII.GetString(bar));
+				try 
+				{
+					Client.Request.InputStream.Read(bar, 0, 50);
+					Console.WriteLine(ASCIIEncoding.ASCII.GetString(bar));
 
-                }
-                catch (IOException) {}
+				}
+				catch (IOException) {}
 				
 				/*string response = "You've reached " + name + "\n";
 				response += motd + "\n\n";
@@ -225,7 +221,7 @@ namespace spacecraft
 				response += "Please leave a message after the tone. Thank you.\n";*/
 				
 				byte[] bytes = ASCIIEncoding.ASCII.GetBytes(formResponse);
-                Response.OutputStream.Write(bytes, 0, bytes.Length);
+				Response.OutputStream.Write(bytes, 0, bytes.Length);
 
 				Response.Close();
 			}

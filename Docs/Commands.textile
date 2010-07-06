@@ -30,8 +30,10 @@ h1. Mod Commands
 * /physics - Get or change physics status.
 * /place - Place certain special blocks.
 * /rerank - Refresh the rank database
+* /resend - Resend the map for testing purposes (unimplemented).
 * /rmmark - Remove a landmark.
 * /say - Broadcast a message in yellow text.
+* /summon - Teleport a player to you.
 * /unban - Set a user of lesser rank to Guest.
 
 h1. Admin Commands
@@ -39,7 +41,6 @@ h1. Admin Commands
 * /convert - Replace one block with another within a radius (/convert original new)
 * /exit - Gracefully shut down the server
 * /mod - Set a user of lesser rank to Mod.
-* /resend - Resend the map for testing purposes (unimplemented).
 * /save - Saves the current map to disk.
 * /setspawn - Set the map's global spawn point
 
