@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{73A96857-C776-4B30-BE56-EE9A16C3E0FA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>spacecraft</RootNamespace>
+    <AssemblyName>spacecraft</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Map\MapPhysics.cs" />
+    <Compile Include="Scripting\ScriptHandler.cs" />
+    <Compile Include="Utils\Builder.cs" />
+    <Compile Include="Utils\Config.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="NetworkTypes.cs" />
+    <Compile Include="ClientPackets.cs" />
+    <Compile Include="Utils\Pair.cs" />
+    <Compile Include="Position.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="Robot.cs" />
+    <Compile Include="Map\Map.cs" />
+    <Compile Include="ServerPackets.cs" />
+    <Compile Include="Spacecraft.cs" />
+    <Compile Include="Map\DatLoading.cs" />
+    <Compile Include="Map\MapIO.cs" />
+    <Compile Include="Map\PhysicsTask.cs" />
+    <Compile Include="Map\EscherMath.cs" />
+    <Compile Include="Map\BlockPosition.cs" />
+    <Compile Include="Server.cs" />
+    <Compile Include="Constants\Packets.cs" />
+    <Compile Include="Constants\Blocks.cs" />
+    <Compile Include="Constants\Ranks.cs" />
+    <Compile Include="Constants\Colors.cs" />
+    <Compile Include="ConsolePlayer.cs" />
+    <Compile Include="ChatCommands\ChatCommandHandling.cs" />
+    <Compile Include="ChatCommands\Basics.cs" />
+    <Compile Include="ChatCommands\Landmarks.cs" />
+    <Compile Include="ChatCommands\Building.cs" />
+    <Compile Include="ChatCommands\Ranks.cs" />
+    <Compile Include="ChatCommands\Management.cs" />
+    <Compile Include="ChatCommands\Misc.cs" />
+    <Compile Include="Scripting\TclWrap.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
