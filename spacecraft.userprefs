@@ -1,20 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Connection.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ctype="Workbench">
     <Files>
-      <File FileName="Map\Map.cs" Line="192" Column="17" />
-      <File FileName="Map\MapPhysics.cs" Line="299" Column="5" />
-      <File FileName="Spacecraft.cs" Line="133" Column="4" />
-      <File FileName="Map\MapIO.cs" Line="221" Column="23" />
-      <File FileName="Map\PhysicsTask.cs" Line="32" Column="4" />
-      <File FileName="ChatCommands.cs" Line="1042" Column="3" />
-      <File FileName="Utils\Config.cs" Line="96" Column="31" />
-      <File FileName="Player.cs" Line="128" Column="24" />
-      <File FileName="Constants\Ranks.cs" Line="23" Column="12" />
-      <File FileName="Connection.cs" Line="300" Column="5" />
-      <File FileName="Constants\Packets.cs" Line="1" Column="1" />
-      <File FileName="ServerPackets.cs" Line="247" Column="39" />
-      <File FileName="Server.cs" Line="48" Column="30" />
+      <File FileName="Map\MapPhysics.cs" Line="1" Column="1" />
+      <File FileName="Map\PhysicsTask.cs" Line="1" Column="1" />
+      <File FileName="Map\MapIO.cs" Line="1" Column="1" />
+      <File FileName="Utils\Config.cs" Line="1" Column="1" />
+      <File FileName="d:\projects\Downstairs\spacecraft\ChatCommands.cs" Line="1" Column="1" />
+      <File FileName="Map\Map.cs" Line="1" Column="1" />
+      <File FileName="Constants\Blocks.cs" Line="1" Column="1" />
+      <File FileName="NetworkTypes.cs" Line="1" Column="1" />
+      <File FileName="Connection.cs" Line="1" Column="1" />
+      <File FileName="Player.cs" Line="67" Column="12" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,7 +20,7 @@
             <Node name="Constants" expanded="True" />
             <Node name="Map" expanded="True" />
             <Node name="Utils" expanded="True" />
-            <Node name="Connection.cs" selected="True" />
+            <Node name="Player.cs" selected="True" />
           </Node>
         </State>
       </Pad>
