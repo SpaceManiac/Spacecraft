@@ -219,7 +219,7 @@ namespace spacecraft
                     Console.WriteLine(Script);
                     
 
-                    //Scripting.Scripting.Interpreter.EvalScript(ASCIIEncoding.ASCII.GetString(bar));
+                    Scripting.Scripting.Interpreter.EvalScript(ASCIIEncoding.ASCII.GetString(bar));
 				}
 				catch (IOException) {}
 				
