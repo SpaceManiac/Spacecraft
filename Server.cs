@@ -18,7 +18,6 @@ namespace spacecraft
 		private bool Initialized = false;
 
 		private TcpListener Listener;
-		private HttpListener HTTPListener;
 
 		public List<Player> Players { get; private set; }
 		public Map map { get; protected set; }
@@ -46,7 +45,6 @@ namespace spacecraft
 			IP = "";
 
 			port = Config.GetInt("port", 25565);
-			HTTPport = Config.GetInt("http-port", port+1);
 			maxplayers = Config.GetInt("max-players", 16);
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
@@ -76,10 +74,6 @@ namespace spacecraft
 				Listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
 				Listener.Start();
 
-				HTTPListener = new HttpListener();
-				HTTPListener.Prefixes.Add("http://*:" + HTTPport + "/");
-				HTTPListener.Start();
-
 				Spacecraft.Log("Listening on port " + port.ToString());
 				Spacecraft.Log("Server name is " + name);
 				Spacecraft.Log("Server MOTD is " + motd);
@@ -89,15 +83,12 @@ namespace spacecraft
 				Thread T = new Thread(AcceptClientThread);
 				T.Name = "ClientAccept Thread";
 				T.Start();
-				
 
 				Thread T2 = new Thread(TimerThread);
 				T2.Name = "Timer thread.";
 				T2.Start();
 
-				Thread T3 = new Thread(HTTPMonitorThread);
-				T3.Name = "HTTP Daemon thread";
-				T3.Start();
+				HttpMonitor.Start(Config.GetInt("http-port", port + 1));
 				
 				console = new ConsolePlayer();
 				console.Message += new Player.PlayerMsgHandler(Player_Message);
@@ -113,6 +104,7 @@ namespace spacecraft
 			{
 				// Stop listening for new clients.
 				Listener.Stop();
+				HttpMonitor.Stop();
 			}
 			
 			try {
@@ -194,57 +186,6 @@ namespace spacecraft
 				Player.Start();
 
 				Thread.Sleep(10);
-			}
-		}
-		
-        //string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='script' /></textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
-
-		public void HTTPMonitorThread()
-		{
-			while (Running) {
-				HttpListenerContext Client = HTTPListener.GetContext();
-				HttpListenerResponse Response = Client.Response;
-
-                byte[] bar = new byte[2048];
-                
-                string commandResult = "";
-
-				try 
-				{
-					int length = Client.Request.InputStream.Read(bar, 0, 2048);
-					
-					if(length > 0) {
-	                    string Script = ASCIIEncoding.ASCII.GetString(bar).Substring(0, length);
-	                    Script = Script.Replace("+", " ");
-	                    Script = Script.Replace("%2B", "+");
-	                    
-	                    int i = Script.IndexOf('=');
-	                    Script = Script.Substring(i + 1);
-	
-	                    int status = Scripting.Interpreter.EvalScript(Script);
-	                    commandResult = Scripting.Interpreter.Result;
-	                    if (!Scripting.IsOk(status)) {
-	                    	commandResult = "<font color='red'>" + commandResult + "</font>";
-	                    }
-	                }
-				}
-				catch (IOException) {}
-				
-				string response = "<html><body>\n";
-				response += "<p>You've reached " + name + "<br />\n";
-				response += motd + "</p>\n";
-				response += "<p>Players online: " + Players.Count + "<br />\n";
-                response += "Please leave a message after the tone. Thank you.</p>\n";
-                response += "<form method=POST action=#><input type='textbox' name='script' /><button type='submit'></form>";
-                if(commandResult != "") {
-                	response += "<pre><b>Command result</b>:\n" + commandResult + "</pre>";
-                }
-                response += "</body></html>";
-
-				byte[] bytes = ASCIIEncoding.ASCII.GetBytes(response);
-                Response.OutputStream.Write(bytes, 0, bytes.Length);
-
-				Response.Close();
 			}
 		}
 
