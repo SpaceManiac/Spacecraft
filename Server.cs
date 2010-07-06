@@ -197,7 +197,7 @@ namespace spacecraft
 			}
 		}
 		
-        //string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='firstname' />Foo\n</textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
+        //string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='script' /></textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
 
 		public void HTTPMonitorThread()
 		{
@@ -205,20 +205,28 @@ namespace spacecraft
 				HttpListenerContext Client = HTTPListener.GetContext();
 				HttpListenerResponse Response = Client.Response;
 
-				byte[] bar = new byte[50];
+                byte[] bar = new byte[2048];
+
 
 				try 
 				{
-					Client.Request.InputStream.Read(bar, 0, 50);
-					Console.WriteLine(ASCIIEncoding.ASCII.GetString(bar));
+					int length = Client.Request.InputStream.Read(bar, 0, 2048);
 
+                    string Script = ASCIIEncoding.ASCII.GetString(bar).Substring(0, length);
+                    Script = Script.Replace("+", " ");
+                    Script = Script.Replace("%2B", "+");
+
+                    Console.WriteLine(Script);
+                    
+
+                    //Scripting.Scripting.Interpreter.EvalScript(ASCIIEncoding.ASCII.GetString(bar));
 				}
 				catch (IOException) {}
 				
-				string response = "You've reached " + name + "\n";
+				string response = "<html><body><p>You've reached " + name + "\n";
 				response += motd + "\n\n";
 				response += "Players online: " + Players.Count + "\n";
-				response += "Please leave a message after the tone. Thank you.\n";
+                response += "Please leave a message after the tone. Thank you.\n <form method=POST action=#><input type='textbox' name='script' /><button type='submit'></form></p></body></html>";
 
 				byte[] bytes = ASCIIEncoding.ASCII.GetBytes(response);
                 Response.OutputStream.Write(bytes, 0, bytes.Length);

@@ -1,23 +1,32 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Scripting\TclWrap.cs" ctype="Workbench">
     <Files>
-      <File FileName="d:\projects\Downstairs\spacecraft\ChatCommands.cs" Line="21" Column="4" />
       <File FileName="Spacecraft.cs" Line="1" Column="1" />
-      <File FileName="Server.cs" Line="1" Column="1" />
+      <File FileName="Server.cs" Line="329" Column="55" />
+      <File FileName="ChatCommands\ChatCommandHandling.cs" Line="28" Column="55" />
+      <File FileName="ChatCommands\Basics.cs" Line="14" Column="36" />
+      <File FileName="ChatCommands\Landmarks.cs" Line="4" Column="18" />
+      <File FileName="ChatCommands\Building.cs" Line="5" Column="13" />
+      <File FileName="ChatCommands\Ranks.cs" Line="3" Column="1" />
+      <File FileName="ChatCommands\Management.cs" Line="4" Column="11" />
+      <File FileName="ChatCommands\Misc.cs" Line="4" Column="18" />
+      <File FileName="Scripting\TclWrap.cs" Line="26" Column="45" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="spacecraft" expanded="True">
+          <Node name="spacecraft" expanded="True" selected="True">
+            <Node name="ChatCommands" expanded="True" />
             <Node name="Constants" expanded="True" />
             <Node name="Map" expanded="True" />
+            <Node name="Scripting" expanded="True" />
             <Node name="Utils" expanded="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
-        <State expanded="True" selected="True" />
+        <State selected="True" />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
         <State selected="True" />
