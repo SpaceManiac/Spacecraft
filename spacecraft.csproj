@@ -70,5 +70,8 @@
     <Compile Include="Constants\Colors.cs" />
     <Compile Include="ConsolePlayer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder1\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

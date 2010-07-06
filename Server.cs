@@ -201,7 +201,7 @@ namespace spacecraft
 			}
 		}
 
-        string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='firstname' />Foo\n</textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
+        //string formResponse = "<form method=POST action=# ><textarea cols=50 rows=50 name='firstname' />Foo\n</textarea><br /><input type='password' name='pass' /><button type='submit'></form>";
 
 		public void HTTPMonitorThread()
 		{
@@ -219,12 +219,12 @@ namespace spacecraft
                 }
                 catch (IOException) {}
 				
-				/*string response = "You've reached " + name + "\n";
+				string response = "You've reached " + name + "\n";
 				response += motd + "\n\n";
 				response += "Players online: " + Players.Count + "\n";
-				response += "Please leave a message after the tone. Thank you.\n";*/
+				response += "Please leave a message after the tone. Thank you.\n";
 				
-				byte[] bytes = ASCIIEncoding.ASCII.GetBytes(formResponse);
+				byte[] bytes = ASCIIEncoding.ASCII.GetBytes(response);
                 Response.OutputStream.Write(bytes, 0, bytes.Length);
 
 				Response.Close();
