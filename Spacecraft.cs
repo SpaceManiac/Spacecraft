@@ -17,18 +17,12 @@ namespace spacecraft
 		public static string dateString;
 		
 		public static PerformanceCounter cpuCounter; 
-		public static PerformanceCounter ramCounter; 
 
 		public static void Main()
 		{
 			try {
-				cpuCounter = new PerformanceCounter(); 
-				
-				cpuCounter.CategoryName = "Processor"; 
-				cpuCounter.CounterName = "% Processor Time"; 
-				cpuCounter.InstanceName = "_Total"; 
-				
-				ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
+				cpuCounter.NextValue();
 
 				CalculateFilenames();
 

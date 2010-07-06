@@ -1105,17 +1105,20 @@ namespace spacecraft
 					Uptime += up.Seconds + " seconds ";
 				}
 				
+				Process p = Process.GetCurrentProcess();
 				Server s = Server.theServ;
+				
+				double cpu = Spacecraft.cpuCounter.NextValue();
+				cpu = Math.Round(10 * cpu) / 10.0;
+				
+				double ram = p.PagedMemorySize64 / (1024.0 * 1024.0);
+				ram = Math.Round(10 * ram) / 10.0;
+				
 				sender.PrintMessage(Color.CommandResult + "Players online: " + s.Players.Count);
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
 				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);
 				sender.PrintMessage(Color.CommandResult + "Last heartbeat took: " + s.LastHeartbeatTook + "s - Last physics tick took: " + s.LastPhysicsTickTook + "s");
-				try {
-					sender.PrintMessage(Color.CommandResult + "CPU usage: " + Math.Round(10*Spacecraft.cpuCounter.NextValue())/10.0 + "% - RAM usage: " + Spacecraft.ramCounter.NextValue() + "Mb");
-				}
-				catch(NotImplementedException e) {
-					sender.PrintMessage(Color.CommandError + "CPU and RAM usage are unavailable under Mono.");
-				}
+				sender.PrintMessage(Color.CommandResult + "CPU usage: " + cpu + "% - RAM usage: " + ram + "Mb");
 			}
 		}
 	}
