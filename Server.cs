@@ -314,18 +314,13 @@ namespace spacecraft
 				o.Close();
 	
 				WebResponse resp = req.GetResponse();
-				if (resp == null)
-				{
-					Spacecraft.Log("Error: unable to heartbeat!");
-					return;
-				}
-	
 				StreamReader sr = new StreamReader(resp.GetResponseStream());
 				string data = sr.ReadToEnd().Trim();
+				
 				if (!Initialized)
 				{
 					if (data.Substring(0, 7) != "http://") {
-						Spacecraft.Log("Error: unable to retreive external URL!");
+						Spacecraft.LogError("Heartbeat successful, but no URL returned!", null);
 					} else {
 						int i = data.IndexOf('=');
 						serverhash = data.Substring(i + 1);
