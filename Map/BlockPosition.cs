@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 /* struct Position
  * contains a set of xDiff, yDiff, zDiff map coordiantes (not world coordinates)
