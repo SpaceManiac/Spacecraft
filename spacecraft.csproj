@@ -75,6 +75,10 @@
     <Compile Include="ChatCommands\Ranks.cs" />
     <Compile Include="ChatCommands\Management.cs" />
     <Compile Include="ChatCommands\Misc.cs" />
+    <Compile Include="Scripting\TclWrap.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Scripting\" />
+  </ItemGroup>
 </Project>
