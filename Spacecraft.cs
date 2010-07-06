@@ -11,12 +11,15 @@ namespace spacecraft
 {
 	class Spacecraft
 	{
-	public const bool DEBUG = true;
+    	public const bool DEBUG = true;
 		public static Random random;
+        public static string dateString;
 
 		public static void Main()
 		{
 			try {
+                CalculateFilenames();
+
 				Log("");		
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
@@ -34,7 +37,7 @@ namespace spacecraft
 				Player.LoadRanks();
 
 				Server serv = new Server();
-				
+
 				serv.Start();
 
 				Log("Bye!");
@@ -46,12 +49,25 @@ namespace spacecraft
 			}
 		}
 
+        static void CalculateFilenames()
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append(DateTime.Now.Year);
+            b.Append("-");
+            b.Append(DateTime.Now.Month);
+            b.Append("-");
+            b.Append(DateTime.Now.Day);
+
+            dateString = b.ToString();
+        }
+
+
 		private static object logfileMutex = new object();
 
 		public static void Log(string text)
 		{
 			lock (logfileMutex) {
-				StreamWriter sw = new StreamWriter("server.log", true);
+                StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
 				if (text == "") {
 					sw.WriteLine();
 				} else {
@@ -77,7 +93,8 @@ namespace spacecraft
 			}
 			lock (errorfileMutex)
 			{
-				StreamWriter sw = new StreamWriter("error.log", true);
+                StreamWriter sw = new StreamWriter("error-" + dateString + ".log", true);
+
 				sw.Write("==== ");
 				sw.Write(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
 				sw.Write(" ====");
