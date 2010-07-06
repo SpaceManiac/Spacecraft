@@ -6,6 +6,7 @@ h1. Guest Commands
 * /help - Get general help, a list of commands, or help on a specific command
 * /me - Third-person roleplay-like actions ( * Bob uses magic!)
 * /rules - Show the server rules.
+* /staff - Displays a list of all the server's staff.
 
 h1. Builder Commands
 * /mark - Create a landmark.
@@ -21,6 +22,8 @@ h1. Mod Commands
 * /builder - Set a user of lesser rank to Builder.
 * /conwiz - What does /conwiz do? What DOESN'T it do?
 * /dehydrate - Remove all active water and lava from the map.
+* /diag - Display some diagnostic information on physics and server usage.
+* /diagnostics - Display some diagnostic information on physics and server usage.
 * /guest - Set a user of lesser rank to Guest.
 * /kick - Kick a player.
 * /mob - Spawn an AI mob (unimplemented).

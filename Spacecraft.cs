@@ -12,11 +12,11 @@ namespace spacecraft
 {
 	class Spacecraft
 	{
-    	public const bool DEBUG = true;
+		public const bool DEBUG = true;
 		public static Random random;
-        public static string dateString;
-        
-        public static PerformanceCounter cpuCounter; 
+		public static string dateString;
+		
+		public static PerformanceCounter cpuCounter; 
 		public static PerformanceCounter ramCounter; 
 
 		public static void Main()
@@ -30,7 +30,7 @@ namespace spacecraft
 				
 				ramCounter = new PerformanceCounter("Memory", "Available MBytes");
 
-                CalculateFilenames();
+				CalculateFilenames();
 
 				Log("");		
 				Log("Spacecraft is starting...");
@@ -61,18 +61,17 @@ namespace spacecraft
 			}
 		}
 
-        static void CalculateFilenames()
-        {
-            StringBuilder b = new StringBuilder();
-            b.Append(DateTime.Now.Year);
-            b.Append("-");
-            b.Append(DateTime.Now.Month);
-            b.Append("-");
-            b.Append(DateTime.Now.Day);
+		static void CalculateFilenames()
+		{
+			StringBuilder b = new StringBuilder();
+			b.Append(DateTime.Now.Year);
+			b.Append("-");
+			b.Append(DateTime.Now.Month);
+			b.Append("-");
+			b.Append(DateTime.Now.Day);
 
-            dateString = b.ToString();
-        }
-
+			dateString = b.ToString();
+		}
 
 		private static object logfileMutex = new object();
 
@@ -80,7 +79,7 @@ namespace spacecraft
 		{
 			CalculateFilenames();
 			lock (logfileMutex) {
-                StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
+				StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
 				if (text == "") {
 					sw.WriteLine();
 				} else {
@@ -107,7 +106,7 @@ namespace spacecraft
 			CalculateFilenames();
 			lock (errorfileMutex)
 			{
-                StreamWriter sw = new StreamWriter("error-" + dateString + ".log", true);
+				StreamWriter sw = new StreamWriter("error-" + dateString + ".log", true);
 
 				sw.Write("==== ");
 				sw.Write(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));

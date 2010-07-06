@@ -1090,21 +1090,21 @@ namespace spacecraft
 			
 			public override void Run(Player sender, string cmd, string arg)
 			{
-	            TimeSpan up = (DateTime.Now - Process.GetCurrentProcess().StartTime);
-	            string Uptime = "";
-	            if(up.Days > 0) {
-	            	Uptime += up.Days + " days ";
-	            }
-	            if(up.Hours > 0) {
-	            	Uptime += up.Hours + " hours ";
-	            }
-	            if(up.Minutes > 0) {
-	            	Uptime += up.Minutes + " minutes ";
-	            }
-	            if(up.Seconds > 0) {
-	            	Uptime += up.Seconds + " seconds ";
-	            }
-            	
+				TimeSpan up = (DateTime.Now - Process.GetCurrentProcess().StartTime);
+				string Uptime = "";
+				if(up.Days > 0) {
+					Uptime += up.Days + " days ";
+				}
+				if(up.Hours > 0) {
+					Uptime += up.Hours + " hours ";
+				}
+				if(up.Minutes > 0) {
+					Uptime += up.Minutes + " minutes ";
+				}
+				if(up.Seconds > 0) {
+					Uptime += up.Seconds + " seconds ";
+				}
+				
 				Server s = Server.theServ;
 				sender.PrintMessage(Color.CommandResult + "Players online: " + s.Players.Count);
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);

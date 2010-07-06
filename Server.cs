@@ -129,7 +129,7 @@ namespace spacecraft
 			clock.Start();
 			double lastHeartbeat = -30;
 			double lastPhysics = -0.5;
-            double lastBookend = 0;
+			double lastBookend = 0;
 
 			while(Running) {
 				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
@@ -147,11 +147,11 @@ namespace spacecraft
 					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
 
-                if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {
-                    // To make keeping track of the logs easier, print a line each hour
-                    Spacecraft.Log("=======================================================");
-                    lastBookend = clock.Elapsed.TotalSeconds;
-                }
+				if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {
+					// To make keeping track of the logs easier, print a line each hour
+					Spacecraft.Log("=======================================================");
+					lastBookend = clock.Elapsed.TotalSeconds;
+				}
 				Thread.Sleep(10);
 			}
 		}
