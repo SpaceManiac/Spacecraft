@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,6 @@ namespace spacecraft.Scripting
     public class Scripting
     {
         public static TclInterpreter Interpreter { get; set; }
-
 
         static Scripting()
         {
@@ -31,10 +30,12 @@ namespace spacecraft.Scripting
             short x = short.Parse(args[1]);
             short y = short.Parse(args[2]);
             short z = short.Parse(args[3]);
+            
+            args[4] = args[4].ToLower();
 
             if (!BlockInfo.NameExists(args[4]))
             {
-                TclAPI.SetResult(interp, "Block name does not exist");
+                TclAPI.SetResult(interp, "Block name \"" + args[4] + "\" does not exist");
                 return TclAPI.TCL_ERROR;
             }
 
