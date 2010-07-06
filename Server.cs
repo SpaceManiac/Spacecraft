@@ -217,7 +217,8 @@ namespace spacecraft
 			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
 			List<Player> temp = new List<Player>(Players);
 			foreach(Player P in temp) {
-				if(P.name.ToLower() == name && P != not) {
+				if(P.name.ToLower() == name &&
+				  P != not) {
 					return P;
 				}
 			}
@@ -302,6 +303,11 @@ namespace spacecraft
 			catch(WebException e) {
 				Spacecraft.LogError("Unable to heartbeat", e);
 			}
+		}
+		
+		public void RemovePlayer(Player p)
+		{
+			Players.Remove(p);
 		}
 
 		void Player_Disconnect(Player Player)

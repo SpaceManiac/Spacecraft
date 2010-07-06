@@ -57,7 +57,7 @@ namespace spacecraft
 		public Player(TcpClient client)
 		{
 			pos = Server.theServ.map.spawn;
-			conn = new Connection(client);
+			conn = new Connection(client, this);
 
 			playerID = 0;
 			for(byte i = 1; i <= 255; ++i) {
@@ -242,6 +242,7 @@ namespace spacecraft
 			
 			rank = RankOf(username);
 			if (rank == Rank.Banned) {
+				Server.theServ.RemovePlayer(this);
 				conn.SendKick("You're banned!");
 			}
 			

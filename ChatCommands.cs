@@ -18,6 +18,7 @@ namespace spacecraft
 			Commands.Add("go", new ChatCommands.LandmarkGoto());
 			Commands.Add("help", new ChatCommands.Help());
 			Commands.Add("me", new ChatCommands.ThirdPerson());
+			Commands.Add("staff", new ChatCommands.StaffList());
 			
 			Commands.Add("mark", new ChatCommands.LandmarkAdd());
 			Commands.Add("paint", new ChatCommands.Paint());
@@ -1043,6 +1044,34 @@ namespace spacecraft
 					
 					Player.SaveRanks();
 				}
+			}
+		}
+		
+		public class StaffList : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Guest; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Displays a list of all the server's staff."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				List<string> mods = new List<string>();
+				List<string> admins = new List<string>();
+				
+				foreach(KeyValuePair<string, Rank> kvp in Player.PlayerRanks) {
+					if(kvp.Value == Rank.Mod) {
+						mods.Add(kvp.Key);
+					} else if(kvp.Value == Rank.Admin) {
+						admins.Add(kvp.Key);
+					}
+				}
+				
+				ChatCommandHandling.WrapMessage(sender, "Moderators: " + String.Join(", ", mods.ToArray()));
+				ChatCommandHandling.WrapMessage(sender, "Administrators: " + String.Join(", ", admins.ToArray()));
 			}
 		}
 	}

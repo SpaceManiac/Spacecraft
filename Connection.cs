@@ -34,11 +34,15 @@ namespace spacecraft
 		bool Connected = true;
 		private object SendQueueMutex = new object();
 		Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
+		
+		Player player;
 
 		TcpClient _client;
 
-		public Connection(TcpClient c)
+		public Connection(TcpClient c, Player P)
 		{
+			this.player = P;
+			
 			SendQueue = new Queue<ServerPacket>();
 
 			_client = c;
@@ -137,6 +141,7 @@ namespace spacecraft
 			if (IncomingPacket.Version != PROTOCOL_VERSION) {
 				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
 				SendKick("Wrong protocol version!");
+				Server.theServ.RemovePlayer(player);
 				return;
 			}
 			bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
@@ -144,6 +149,7 @@ namespace spacecraft
 			if (Config.GetBool("verify-names", true) && !success) {
 				Spacecraft.Log(IncomingPacket.Username.ToString() + " attempted to join, but didn't verify");
 				SendKick("Your name wasn't verified by minecraft.net!");
+				Server.theServ.RemovePlayer(player);
 				return;
 		   	}
 
