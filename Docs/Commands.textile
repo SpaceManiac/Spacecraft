@@ -43,4 +43,5 @@ h1. Admin Commands
 * /mod - Set a user of lesser rank to Mod.
 * /save - Saves the current map to disk.
 * /setspawn - Set the map's global spawn point
+* /tcl - Execute Tcl code.
 

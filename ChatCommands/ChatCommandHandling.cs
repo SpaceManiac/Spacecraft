@@ -51,6 +51,7 @@ namespace spacecraft
 			Commands.Add("save", new ChatCommands.SaveMap());
 			Commands.Add("setspawn", new ChatCommands.SetSpawn());
 			Commands.Add("mod", new ChatCommands.RankMod());
+			Commands.Add("tcl", new ChatCommands.ExecuteTcl());
 
 			if(File.Exists("rules.txt")) {
 				RulesText = File.ReadAllText("rules.txt").TrimEnd();

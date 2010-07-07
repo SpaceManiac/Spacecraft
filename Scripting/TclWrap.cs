@@ -9,7 +9,7 @@ namespace TclWrap {
 		
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateInterp();
 		[DllImport("tcl84.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
-		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
+		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, IntPtr result, IntPtr method);
 		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
 		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
@@ -31,17 +31,20 @@ namespace TclWrap {
 		}
 		
 		public static void SetResult(IntPtr interp, string result) {
-			// (IntPtr) 1 is TCL_VOLATILE, meaning 'result' might not hang around after the call is complete,
-			// which it probably won't, given .NET and all that
-			TclAPI.Tcl_SetResult(interp, result, (IntPtr) 1);
+			// (IntPtr) 1 is TCL_VOLATILE, meaning 'result' won't hang around once the call is complete
+			IntPtr ptr = Marshal.StringToHGlobalAuto(result);
+			TclAPI.Tcl_SetResult(interp, ptr, (IntPtr) 1);
+			Marshal.FreeHGlobal(ptr);
 		}
 	}
 
 	public class TclInterpreter {
 		private IntPtr interp;
+		private List<TclAPI.TclCommand> delegates;
 
 		public TclInterpreter() {
 			interp = TclAPI.Tcl_CreateInterp();
+			delegates = new List<TclAPI.TclCommand>();
 			if (interp == IntPtr.Zero) {
 				throw new SystemException("Unable to initalize Tcl interpreter");
 			}
@@ -56,6 +59,7 @@ namespace TclWrap {
 		public void Close() {
 			TclAPI.Tcl_DeleteInterp(interp);
 			interp = IntPtr.Zero;
+			Console.WriteLine("interpeter closed D: D:");
 		}
 
 		public int EvalScript(string script) {
@@ -74,6 +78,8 @@ namespace TclWrap {
 				throw new SystemException("Attempted to call a closed Tcl interpeter!");
 			}
 			TclAPI.Tcl_CreateCommand(interp, commandName, Marshal.GetFunctionPointerForDelegate(cmd), IntPtr.Zero, IntPtr.Zero);
+			// We must maintain a reference to the delegate or the garbage collector will release it
+			delegates.Add(cmd);
 		}
 
 		public string Result {

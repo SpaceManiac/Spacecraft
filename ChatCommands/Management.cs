@@ -204,6 +204,27 @@ namespace spacecraft {
 			}
 		}
 		
+		public class ExecuteTcl : ChatCommandBase
+		{
+			public override Rank RankNeeded {
+				get { return Rank.Admin; }
+			}
+			
+			public override string HelpMsg {
+				get { return "Execute Tcl code."; }
+			}
+			
+			public override void Run(Player sender, string cmd, string args)
+			{
+                int status = Scripting.Interpreter.EvalScript(args);
+                string commandResult = Scripting.Interpreter.Result;
+                if (!Scripting.IsOk(status)) {
+                	commandResult = Color.CommandError + commandResult;
+                }
+                sender.PrintMessage(Color.CommandResult + "Result: " + commandResult);
+			}
+		}
+		
 		public class Diagnostics : ChatCommandBase
 		{
 			public override Rank RankNeeded {
