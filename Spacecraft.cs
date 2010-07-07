@@ -11,8 +11,10 @@ namespace spacecraft
 		public const bool DEBUG = true;
 		public static Random random;
 		public static string dateString;
-		
-		public static PerformanceCounter cpuCounter; 
+
+#if WIN32 
+		public static PerformanceCounter cpuCounter; // This is apparently not implemented on Mono, so debug constants time!
+#endif
 
 		public static void Main(string[] args)
 		{
@@ -23,9 +25,11 @@ namespace spacecraft
 					Log("Note: admins.txt does not exist, creating a blank one. Be sure to add yourself!");
 					File.Create("admins.txt").Close();
 				}
-				
+
+#if WIN32
 				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
 				cpuCounter.NextValue();
+#endif
 
 				CalculateFilenames();
 

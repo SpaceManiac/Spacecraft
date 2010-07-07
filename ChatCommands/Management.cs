@@ -261,8 +261,10 @@ namespace spacecraft {
 				Process p = Process.GetCurrentProcess();
 				Server s = Server.theServ;
 				
+#if WIN32
 				double cpu = Spacecraft.cpuCounter.NextValue();
 				cpu = Math.Round(10 * cpu) / 10.0;
+#endif
 				
 				double ram = p.PagedMemorySize64 / (1024.0 * 1024.0);
 				ram = Math.Round(10 * ram) / 10.0;
@@ -272,7 +274,11 @@ namespace spacecraft {
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
 				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);
 				sender.PrintMessage(Color.CommandResult + "Last heartbeat took: " + s.LastHeartbeatTook + "s - Last physics tick took: " + s.LastPhysicsTickTook + "s");
-				sender.PrintMessage(Color.CommandResult + "CPU usage: " + cpu + "% - RAM usage: " + ram + "Mb");
+				sender.PrintMessage(Color.CommandResult + 
+#if WIN32 
+                    "CPU usage: " + cpu + 
+#endif 
+                    "% - RAM usage: " + ram + "Mb");
 			}
 		}
 	}
