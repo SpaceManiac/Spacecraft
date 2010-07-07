@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace TclWrap {
 	public class TclAPI {
 		public delegate int TclCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr);
-    	
+		
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateInterp();
 		[DllImport("tcl84.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
 		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
@@ -20,7 +20,7 @@ namespace TclWrap {
 		public const int TCL_BREAK = 3;
 		public const int TCL_CONTINUE = 4;
 		
-        // Here be dragons. If anything breaks, it's SM's fault.
+		// Here be dragons. If anything breaks, it's SM's fault.
 		unsafe public static string[] GetArgumentArray(int argc, IntPtr argv) {
 			char ** argPtr = (char **) argv.ToPointer();
 			List<string> result = new List<string>();
