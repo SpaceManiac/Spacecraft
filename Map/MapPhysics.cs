@@ -111,7 +111,7 @@ namespace spacecraft
 			lock (PhysicsMutex) {
 				PhysicsUpdates.Clear();
 				
-				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count);
+				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count + 20);
 				temp.AddRange(ActiveBlocks);
 				ActiveBlocks.Clear();
 
