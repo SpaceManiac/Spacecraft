@@ -36,8 +36,8 @@ namespace spacecraft
 					HandleMessage(line);
 				}
 				catch(Exception e) {
-					Spacecraft.LogError("couldn't read from the console", e);
-					return;
+					Spacecraft.LogError("couldn't read from the console (probably tried to read empty line)", e);
+					//return;
 				}
 			}
 		}
