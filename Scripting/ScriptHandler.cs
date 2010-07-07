@@ -5,25 +5,28 @@ namespace spacecraft
 {
 	public class Scripting
 	{
+        static bool Initialized = false;
+
 		public static TclInterpreter Interpreter { get; set; }
 
-		static Scripting()
-		{
-			Interpreter = new TclInterpreter();
-			
-			// Overwrite standard source, since it seems to crash :|
-			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
-			
-			// Basic actions
-			Interpreter.CreateCommand("log", new TclAPI.TclCommand(ScriptLog));
-			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
-			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
-			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
-			
-			// Callbacks
-			Interpreter.CreateCommand("registerChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
-		}
-		
+        public static void Initialize()
+        {
+            if (Initialized) return;
+
+            Interpreter = new TclInterpreter();
+
+            // Overwrite standard source, since it seems to crash :|
+            Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
+
+            // Spacecraft stuff
+            Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
+            Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
+            Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
+            Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+
+            Initialized = true;
+        }
+
 		public static bool IsOk(int status) {
 			return status != TclAPI.TCL_ERROR;
 		}

@@ -92,13 +92,22 @@ namespace spacecraft {
                 }
             }
             catch(IOException) {}
-			
-			string response = "<html><body>\n";
-			response += "<p>You've reached " + Server.theServ.name + "<br />\n";
-			response += Server.theServ.motd + "</p>\n";
-			response += "<p>Players online: " + Server.theServ.Players.Count + "<br />\n";
-			response += "Please leave a message after the tone. Thank you.</p>\n";
-			response += "<form method=POST action=#><input type='textbox' name='script' /><button type='submit'></form>";
+
+            StringBuilder builder = new StringBuilder();
+			builder.Append("<html><body>\n");
+			builder.Append( "<p>You've reached ");
+            builder.Append(Server.theServ.name);
+            builder.Append("<br />\n");
+            builder.Append(Server.theServ.motd);
+            builder.Append("</p>\n");
+			builder.Append("<p>Players online: " );
+            builder.Append(Server.theServ.Players.Count );
+            builder.Append("<br />\n");
+			builder.Append( "Please leave a message after the tone. Thank you.</p>\n");
+			builder.Append( "<form method=POST action=#><input type='textbox' name='script' /><button type='submit>Submit</button></form>");
+
+            string response = builder.ToString();
+
 			if(commandResult != "") {
 				response += "<pre><b>Command result</b>:\n" + commandResult + "</pre>";
 			}
