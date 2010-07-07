@@ -24,10 +24,6 @@ namespace spacecraft
 		/// A set of the tile changes we must perform this tick.
 		/// </summary>
 		private Dictionary<int, PhysicsTask> PhysicsUpdates = new Dictionary<int, PhysicsTask>();
-		/// <summary>
-		/// The list of items that must be removed from ActiveBlocks at the end of this tick, as they are no longer physics-active.
-		/// </summary>
-		private List<BlockPosition> ItemsToBeRemoved = new List<BlockPosition>();
 
 		private int[,] Heights;
 		
@@ -113,7 +109,6 @@ namespace spacecraft
 			++physicsCount;
 
 			lock (PhysicsMutex) {
-				ItemsToBeRemoved.Clear();
 				PhysicsUpdates.Clear();
 				
 				List<BlockPosition> temp = new List<BlockPosition>(ActiveBlocks.Count);
@@ -134,7 +129,17 @@ namespace spacecraft
 				int x = 0;
 				foreach (PhysicsTask task in PhysicsUpdates.Values)
 				{
-					if(GetTile(task.x, task.y, task.z) == task.To) continue;
+					if(task.To == Block.Undefined) {
+						// This block was "claimed" by a sponge or similar.
+						// Do nothing.
+						continue;
+					}
+						
+					if(GetTile(task.x, task.y, task.z) == task.To) {
+						// No need to send updates if it's already that tile
+						continue;
+					}
+					
 					SetTile(task.x, task.y, task.z, task.To);
 					++x;
 				}
@@ -154,9 +159,6 @@ namespace spacecraft
 			switch (block)
 			{
 				case Block.Water:
-					//bool Sponged = false; 
-					//List<PhysicsTask> spreadTiles = new List<PhysicsTask>();
-
 					for (int x = -1; x <= 1; x++)
 					{
 						for (int y = -1; y <= 0; y++)
@@ -171,7 +173,7 @@ namespace spacecraft
 								
 									int Hash = PhysicsTask.HashOf(newX, newY, newZ);
 									
-									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Air) {
+									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Undefined) {
 										// Been claimed by a sponge
 										// See issue #7, bullet point 3
 										continue;
@@ -193,12 +195,16 @@ namespace spacecraft
 							}
 						}
 					}
+					
+					// turn lava directly above the water level into lava.
+					// without this, lava above water will not form stone.
+					if(GetTile(X, (short)(Y + 1), Z) == Block.Lava) {
+						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y + 1), Z, Block.Rock));
+					}
+					
 					break;
 
 				case Block.Lava:
-					//bool Sponged = false; 
-					//List<PhysicsTask> spreadTiles = new List<PhysicsTask>();
-
 					for (int x = -1; x <= 1; x++)
 					{
 						for (int y = -1; y <= 0; y++)
@@ -213,7 +219,7 @@ namespace spacecraft
 								
 									int Hash = PhysicsTask.HashOf(newX, newY, newZ);
 									
-									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Air) {
+									if(PhysicsUpdates.ContainsKey(Hash) && PhysicsUpdates[Hash].To == Block.Undefined) {
 										// Been claimed by a sponge
 										// See issue #7, bullet point 3
 										continue;
@@ -260,16 +266,21 @@ namespace spacecraft
 								}
 								else if (GetTile(newX, newY, newZ) == Block.Air)
 								{
-									// "claim" the air space so fluids will not expand here
+									// "claim" the air space so fluids will not expand here - Block.Undefined will
+									// always cause no real change, but will stop the water or lava.
 									// see issue #7, bullet point 3
-									AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Air));
+									AddPhysicsUpdate(new PhysicsTask(newX, newY, newZ, Block.Undefined));
 								}
 							}
 						}
 					}
 					
 					// So the sponge stays active even if water doesn't directly touch it
-					AddActiveBlock(new BlockPosition(X, Y, Z));
+					// We have the Contains here so we don't end up with the same sponge on the list
+					// a bajillion times (which apparently is a severe issue :P)
+					if(!ActiveBlocks.Contains(new BlockPosition(X, Y, Z))) {
+						AddActiveBlock(new BlockPosition(X, Y, Z));
+					}
 					break;
 
 				case Block.Sand:
