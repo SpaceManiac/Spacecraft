@@ -15,13 +15,13 @@ namespace spacecraft
 			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
 			
 			// Basic actions
-			Interpreter.CreateCommand("Log", new TclAPI.TclCommand(ScriptLog));
-			Interpreter.CreateCommand("SetTile", new TclAPI.TclCommand(ScriptSetTile));
-			Interpreter.CreateCommand("GetTile", new TclAPI.TclCommand(ScriptGetTile));
-			Interpreter.CreateCommand("Broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+			Interpreter.CreateCommand("log", new TclAPI.TclCommand(ScriptLog));
+			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
+			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
+			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
 			
 			// Callbacks
-			Interpreter.CreateCommand("RegisterChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
+			Interpreter.CreateCommand("registerChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 		}
 		
 		public static bool IsOk(int status) {
@@ -131,7 +131,7 @@ namespace spacecraft
 				return TclAPI.TCL_ERROR;
 			}
 
-			//ChatCommandHandling.
+			//ChatCommandHandling.RegisterChatCommand(args[0], args[1]);
 
 			TclAPI.SetResult(interp, "command isn't implemented");
 			return TclAPI.TCL_ERROR;
