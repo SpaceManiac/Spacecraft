@@ -9,7 +9,7 @@ namespace TclWrap {
 		
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateInterp();
 		[DllImport("tcl84.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
-		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, IntPtr result, IntPtr method);
+		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
 		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
 		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
@@ -32,9 +32,7 @@ namespace TclWrap {
 		
 		public static void SetResult(IntPtr interp, string result) {
 			// (IntPtr) 1 is TCL_VOLATILE, meaning 'result' won't hang around once the call is complete
-			IntPtr ptr = Marshal.StringToHGlobalAuto(result);
-			TclAPI.Tcl_SetResult(interp, ptr, (IntPtr) 1);
-			Marshal.FreeHGlobal(ptr);
+			TclAPI.Tcl_SetResult(interp, result, (IntPtr) 1);
 		}
 	}
 

@@ -216,12 +216,18 @@ namespace spacecraft {
 			
 			public override void Run(Player sender, string cmd, string args)
 			{
+				Spacecraft.Log(sender.name + " executed Tcl: " + args);
                 int status = Scripting.Interpreter.EvalScript(args);
                 string commandResult = Scripting.Interpreter.Result;
                 if (!Scripting.IsOk(status)) {
+                	if(commandResult == "") {
+                		commandResult = "Unknown error!";
+                	}
                 	commandResult = Color.CommandError + commandResult;
                 }
-                sender.PrintMessage(Color.CommandResult + "Result: " + commandResult);
+                if(commandResult != "") {
+                	sender.PrintMessage(Color.CommandResult + "Result: " + commandResult);
+                }
 			}
 		}
 		

@@ -10,6 +10,12 @@ namespace spacecraft
 		static Scripting()
 		{
 			Interpreter = new TclInterpreter();
+			
+			// Overwrite standard source, since it seems to crash :|
+			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
+			
+			// Spacecraft stuff
+			Interpreter.CreateCommand("Log", new TclAPI.TclCommand(ScriptLog));
 			Interpreter.CreateCommand("SetTile", new TclAPI.TclCommand(ScriptSetTile));
 			Interpreter.CreateCommand("GetTile", new TclAPI.TclCommand(ScriptGetTile));
 			Interpreter.CreateCommand("Broadcast", new TclAPI.TclCommand(ScriptBroadcast));
@@ -18,6 +24,37 @@ namespace spacecraft
 		public static bool IsOk(int status) {
 			return status != TclAPI.TCL_ERROR;
 		}
+		
+		static int ScriptLog(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 2) {
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " text\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			Spacecraft.Log("[S] " + args[1]);
+
+			TclAPI.SetResult(interp, "");
+			return TclAPI.TCL_OK;
+		}
+
+		
+		static int ScriptEvalFile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 2) {
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " fileName\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			Interpreter.SourceFile(args[1]);
+
+			TclAPI.SetResult(interp, "");
+			return TclAPI.TCL_OK;
+		}
 
 		static int ScriptSetTile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
@@ -25,7 +62,7 @@ namespace spacecraft
 
 			if (argc != 5)
 			{
-				TclAPI.SetResult(interp, "Wrong number of arguments, expected 4, got " + argc.ToString());
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\" x y z type");
 				return TclAPI.TCL_ERROR;
 			}
 
