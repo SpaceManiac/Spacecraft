@@ -147,8 +147,6 @@ namespace spacecraft
 
         static int ScriptGetPlayers(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
         {
-            string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
-
             if (argc != 1)
             {
                 TclAPI.SetResult(interp, "Wrong number of arguments, expected 0, got " + argc.ToString());
@@ -204,8 +202,6 @@ namespace spacecraft
             TclAPI.SetResult(interp, Builder.ToString());
             return TclAPI.TCL_OK;
         }
-
-
 		
 		static int ScriptRegisterChatCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{

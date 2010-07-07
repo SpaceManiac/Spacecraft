@@ -14,7 +14,6 @@ namespace TclWrap {
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
 		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
 
-
 		public const int TCL_OK = 0;
 		public const int TCL_ERROR = 1;
 		public const int TCL_RETURN = 2;
@@ -43,10 +42,11 @@ namespace TclWrap {
 
 		public TclInterpreter() {
 			interp = TclAPI.Tcl_CreateInterp();
-			delegates = new List<TclAPI.TclCommand>();
 			if (interp == IntPtr.Zero) {
 				throw new SystemException("Unable to initalize Tcl interpreter");
 			}
+			TclAPI.SetResult(interp, "");
+			delegates = new List<TclAPI.TclCommand>();
 		}
 		
 		~TclInterpreter() {
@@ -89,7 +89,12 @@ namespace TclWrap {
 				if (interp == IntPtr.Zero) {
 					throw new SystemException("Attempted to call a closed Tcl interpeter!");
 				}
-				return TclAPI.Tcl_GetStringResult(interp);
+				try {
+					return TclAPI.Tcl_GetStringResult(interp);
+				}
+				catch(Exception) {
+					return "Tcl done asploded!";
+				}
 			}
 		}
 	}

@@ -74,7 +74,7 @@ namespace spacecraft {
 			
 			try 
 			{
-				int length = Client.Request.InputStream.Read(bar, 0, 2048);
+				int length = Request.InputStream.Read(bar, 0, 2048);
 				
 				if(length > 0) {
                     string Script = ASCIIEncoding.ASCII.GetString(bar).Substring(0, length);
