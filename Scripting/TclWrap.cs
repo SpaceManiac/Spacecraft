@@ -13,7 +13,8 @@ namespace TclWrap {
 		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
 		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
 		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
-		
+
+
 		public const int TCL_OK = 0;
 		public const int TCL_ERROR = 1;
 		public const int TCL_RETURN = 2;
