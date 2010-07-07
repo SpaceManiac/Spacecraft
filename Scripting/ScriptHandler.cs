@@ -50,10 +50,7 @@ namespace spacecraft
 				return TclAPI.TCL_ERROR;
 			}
 			
-			Interpreter.SourceFile(args[1]);
-
-			TclAPI.SetResult(interp, "");
-			return TclAPI.TCL_OK;
+			return Interpreter.SourceFile(args[1]);
 		}
 
 		static int ScriptSetTile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)

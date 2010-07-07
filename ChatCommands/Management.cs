@@ -267,7 +267,7 @@ namespace spacecraft {
 				double ram = p.PagedMemorySize64 / (1024.0 * 1024.0);
 				ram = Math.Round(10 * ram) / 10.0;
 				
-				sender.PrintMessage(Color.CommandResult + "Spacecraft @ " + s.IP + ":" + s.port + " (http: " + s.HTTPport + ")");
+				sender.PrintMessage(Color.CommandResult + "Spacecraft @ " + s.IP + ":" + s.port + " (http: " + HttpMonitor.port + ")");
 				sender.PrintMessage(Color.CommandResult + "Players online: " + s.Players.Count);
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
 				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);

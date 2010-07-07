@@ -11,6 +11,8 @@ namespace spacecraft {
 		private static int Port;
 		private static HttpListener Listener;
 		
+		public static int port { get { return Port; } }
+		
 		public static void Start(int port)
 		{
 			// Port of 0 equals disabled.

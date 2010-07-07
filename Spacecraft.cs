@@ -14,20 +14,20 @@ namespace spacecraft
 		
 		public static PerformanceCounter cpuCounter; 
 
-		public static void Main()
+		public static void Main(string[] args)
 		{
-			try {
-				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
-				cpuCounter.NextValue();
-
-				CalculateFilenames();
-
+			try {				
 				Log("");		
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating a blank one. Be sure to add yourself!");
 					File.Create("admins.txt").Close();
 				}
+				
+				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
+				cpuCounter.NextValue();
+
+				CalculateFilenames();
 
 				// allow an explicit seed
 				int seed = Config.GetInt("random-seed", -1);

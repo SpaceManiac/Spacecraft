@@ -57,7 +57,6 @@ namespace TclWrap {
 		public void Close() {
 			TclAPI.Tcl_DeleteInterp(interp);
 			interp = IntPtr.Zero;
-			Console.WriteLine("interpeter closed D: D:");
 		}
 
 		public int EvalScript(string script) {
@@ -68,6 +67,10 @@ namespace TclWrap {
 		}
 		
 		public int SourceFile(string filename) {
+			if(!File.Exists(filename)) {
+				TclAPI.SetResult(interp, "couldn't read file \"" + filename + "\": no such file or directory");
+				return TclAPI.TCL_ERROR;
+			}
 			return EvalScript(File.ReadAllText(filename));
 		}
 
