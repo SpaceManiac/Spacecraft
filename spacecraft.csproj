@@ -81,5 +81,10 @@
     <Compile Include="Scripting\TclWrap.cs" />
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="tcl84.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

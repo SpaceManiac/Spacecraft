@@ -48,6 +48,8 @@ namespace spacecraft
 			maxplayers = Config.GetInt("max-players", 16);
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
+
+            Scripting.Initialize();
 		}
 
 		public void Start()

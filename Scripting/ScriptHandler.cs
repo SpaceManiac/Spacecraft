@@ -5,22 +5,29 @@ namespace spacecraft
 {
 	public class Scripting
 	{
+        static bool Initialized = false;
+
 		public static TclInterpreter Interpreter { get; set; }
 
-		static Scripting()
-		{
-			Interpreter = new TclInterpreter();
-			
-			// Overwrite standard source, since it seems to crash :|
-			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
-			
-			// Spacecraft stuff
-			Interpreter.CreateCommand("Log", new TclAPI.TclCommand(ScriptLog));
-			Interpreter.CreateCommand("SetTile", new TclAPI.TclCommand(ScriptSetTile));
-			Interpreter.CreateCommand("GetTile", new TclAPI.TclCommand(ScriptGetTile));
-			Interpreter.CreateCommand("Broadcast", new TclAPI.TclCommand(ScriptBroadcast));
-		}
-		
+        public static void Initialize()
+        {
+            if (Initialized) return;
+
+            Interpreter = new TclInterpreter();
+
+            // Overwrite standard source, since it seems to crash :|
+            Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
+
+            // Spacecraft stuff
+            Interpreter.CreateCommand("Log", new TclAPI.TclCommand(ScriptLog));
+            Interpreter.CreateCommand("SetTile", new TclAPI.TclCommand(ScriptSetTile));
+            Interpreter.CreateCommand("GetTile", new TclAPI.TclCommand(ScriptGetTile));
+            Interpreter.CreateCommand("Broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+
+            Initialized = true;
+        }
+
+
 		public static bool IsOk(int status) {
 			return status != TclAPI.TCL_ERROR;
 		}
