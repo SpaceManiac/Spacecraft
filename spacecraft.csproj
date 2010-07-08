@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿ac<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -80,6 +80,11 @@
     <Compile Include="ChatCommands\Misc.cs" />
     <Compile Include="Scripting\TclWrap.cs" />
     <Compile Include="HttpMonitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripting\levelgen.tcl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="tcl84.dll">

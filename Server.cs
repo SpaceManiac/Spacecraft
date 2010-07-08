@@ -49,7 +49,7 @@ namespace spacecraft
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
 
-            Scripting.Initialize();
+			Scripting.Initialize();
 		}
 
 		public void Start()
@@ -361,14 +361,14 @@ namespace spacecraft
 
 		public void MessageAll(string message)
 		{
-            if (Players != null && Players.Count != 0)
-            {
-                List<Player> temp = new List<Player>(Players);
-                foreach (Player P in temp)
-                {
-                    P.PrintMessage(message);
-                }
-            }
+			if (Players != null && Players.Count != 0)
+			{
+				List<Player> temp = new List<Player>(Players);
+				foreach (Player P in temp)
+				{
+					P.PrintMessage(message);
+				}
+			}
 			Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
 		}
 

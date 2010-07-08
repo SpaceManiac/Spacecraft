@@ -6,35 +6,35 @@ namespace spacecraft
 {
 	public class Scripting
 	{
-        static bool Initialized = false;
+		static bool Initialized = false;
 
 		public static TclInterpreter Interpreter { get; set; }
 
-        public static void Initialize()
-        {
-            if (!Config.GetBool("tcl", false)) 
-                return;
-            
-            if (Initialized) 
-                return;
+		public static void Initialize()
+		{
+			if (!Config.GetBool("tcl", false)) 
+				return;
+			
+			if (Initialized) 
+				return;
 
-            Interpreter = new TclInterpreter();
+			Interpreter = new TclInterpreter();
 
-            // Overwrite standard source, since it seems to crash :|
-            Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
+			// Overwrite standard source, since it seems to crash :|
+			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
 
-            // Spacecraft stuff
-            Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
-            Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
-            Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
-            Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
-            Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
-            Interpreter.CreateCommand("players", new TclAPI.TclCommand(ScriptGetPlayers));
-            Interpreter.CreateCommand("getPlayer", new TclAPI.TclCommand(ScriptGetPlayerStats));
-            Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
+			// Spacecraft stuff
+			Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
+			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
+			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
+			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
+			Interpreter.CreateCommand("players", new TclAPI.TclCommand(ScriptGetPlayers));
+			Interpreter.CreateCommand("getPlayer", new TclAPI.TclCommand(ScriptGetPlayerStats));
+			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
 
-            Initialized = true;
-        }
+			Initialized = true;
+		}
 
 		public static bool IsOk(int status) {
 			return status != TclAPI.TCL_ERROR;
@@ -133,80 +133,80 @@ namespace spacecraft
 			return TclAPI.TCL_OK;
 		}
 
-        static int ScriptSendMessage(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
-        {
-            string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+		static int ScriptSendMessage(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-            if (argc != 3)
-            {
-                TclAPI.SetResult(interp, "Wrong number of arguments, expected 2, got " + argc.ToString());
-                return TclAPI.TCL_ERROR;
-            }
+			if (argc != 3)
+			{
+				TclAPI.SetResult(interp, "Wrong number of arguments, expected 2, got " + argc.ToString());
+				return TclAPI.TCL_ERROR;
+			}
 
-            Player P = Server.theServ.GetPlayer(args[1]);
-            P.PrintMessage(args[2]);
+			Player P = Server.theServ.GetPlayer(args[1]);
+			P.PrintMessage(args[2]);
 
-            TclAPI.SetResult(interp, "");
-            return TclAPI.TCL_OK;
-        }
+			TclAPI.SetResult(interp, "");
+			return TclAPI.TCL_OK;
+		}
 
-        static int ScriptGetPlayers(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
-        {
-            if (argc != 1)
-            {
-                TclAPI.SetResult(interp, "Wrong number of arguments, expected 0, got " + argc.ToString());
-                return TclAPI.TCL_ERROR;
-            }
+		static int ScriptGetPlayers(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			if (argc != 1)
+			{
+				TclAPI.SetResult(interp, "Wrong number of arguments, expected 0, got " + argc.ToString());
+				return TclAPI.TCL_ERROR;
+			}
 
-            StringBuilder Result = new StringBuilder();
+			StringBuilder Result = new StringBuilder();
 
-            foreach (Player P in Server.theServ.Players)
-            {
-                if (P != null)
-                {
-                    Result.Append(P.name);
-                    Result.Append(" ");
-                }
-            }
+			foreach (Player P in Server.theServ.Players)
+			{
+				if (P != null)
+				{
+					Result.Append(P.name);
+					Result.Append(" ");
+				}
+			}
 
-            TclAPI.SetResult(interp, Result.ToString());
-            return TclAPI.TCL_OK;
+			TclAPI.SetResult(interp, Result.ToString());
+			return TclAPI.TCL_OK;
 
-        }
+		}
 
-        static int ScriptGetPlayerStats(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
-        {
-            string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+		static int ScriptGetPlayerStats(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-            if (argc != 2)
-            {
-                TclAPI.SetResult(interp, "Wrong number of arguments, expected 1, got " + argc.ToString());
-                return TclAPI.TCL_ERROR;
-            }
+			if (argc != 2)
+			{
+				TclAPI.SetResult(interp, "Wrong number of arguments, expected 1, got " + argc.ToString());
+				return TclAPI.TCL_ERROR;
+			}
 
-            Player Target = Server.theServ.GetPlayer(args[1]);
+			Player Target = Server.theServ.GetPlayer(args[1]);
 
-            StringBuilder Builder = new StringBuilder();
-            Builder.Append(Target.playerID);
-            Builder.Append(" ");
-            Builder.Append(Target.pos.x);
-            Builder.Append(" ");
-            Builder.Append(Target.pos.y);
-            Builder.Append(" ");
-            Builder.Append(Target.pos.z);
-            Builder.Append(" ");
+			StringBuilder Builder = new StringBuilder();
+			Builder.Append(Target.playerID);
+			Builder.Append(" ");
+			Builder.Append(Target.pos.x);
+			Builder.Append(" ");
+			Builder.Append(Target.pos.y);
+			Builder.Append(" ");
+			Builder.Append(Target.pos.z);
+			Builder.Append(" ");
 
-            Builder.Append(Target.heading);
-            Builder.Append(" ");
-            Builder.Append(Target.pitch);
-            Builder.Append(" ");
+			Builder.Append(Target.heading);
+			Builder.Append(" ");
+			Builder.Append(Target.pitch);
+			Builder.Append(" ");
 
-            Builder.Append(Target.rank);
-            Builder.Append(" ");
+			Builder.Append(Target.rank);
+			Builder.Append(" ");
 
-            TclAPI.SetResult(interp, Builder.ToString());
-            return TclAPI.TCL_OK;
-        }
+			TclAPI.SetResult(interp, Builder.ToString());
+			return TclAPI.TCL_OK;
+		}
 		
 		static int ScriptRegisterChatCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
@@ -224,26 +224,26 @@ namespace spacecraft
 			return TclAPI.TCL_ERROR;
 		}
 
-        static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
-        {
-            string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+		static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-            if (argc != 5)
-            {
-                TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " x y z\"");
-                return TclAPI.TCL_ERROR;
-            }
+			if (argc != 5)
+			{
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " x y z\"");
+				return TclAPI.TCL_ERROR;
+			}
 
-            short x = (short)(short.Parse(args[1]) * 32);
-            short y = (short)(short.Parse(args[2]) * 32);
-            short z = (short)(short.Parse(args[3]) * 32);
-            byte heading = byte.Parse(args[4]);
+			short x = (short)(short.Parse(args[1]) * 32);
+			short y = (short)(short.Parse(args[2]) * 32);
+			short z = (short)(short.Parse(args[3]) * 32);
+			byte heading = byte.Parse(args[4]);
 
-            Server.theServ.map.SetSpawn(new Position(x,y,z), heading);
+			Server.theServ.map.SetSpawn(new Position(x,y,z), heading);
 
-            TclAPI.SetResult(interp,"");
-            return TclAPI.TCL_OK;
-        }
+			TclAPI.SetResult(interp,"");
+			return TclAPI.TCL_OK;
+		}
 
 	}
 }

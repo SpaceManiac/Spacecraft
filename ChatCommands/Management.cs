@@ -217,17 +217,17 @@ namespace spacecraft {
 			public override void Run(Player sender, string cmd, string args)
 			{
 				Spacecraft.Log(sender.name + " executed Tcl: " + args);
-                int status = Scripting.Interpreter.EvalScript(args);
-                string commandResult = Scripting.Interpreter.Result;
-                if (!Scripting.IsOk(status)) {
-                	if(commandResult == "") {
-                		commandResult = "Unknown error!";
-                	}
-                	commandResult = Color.CommandError + commandResult;
-                }
-                if(commandResult != "") {
-                	sender.PrintMessage(Color.CommandResult + "Result: " + commandResult);
-                }
+				int status = Scripting.Interpreter.EvalScript(args);
+				string commandResult = Scripting.Interpreter.Result;
+				if (!Scripting.IsOk(status)) {
+					if(commandResult == "") {
+						commandResult = "Unknown error!";
+					}
+					commandResult = Color.CommandError + commandResult;
+				}
+				if(commandResult != "") {
+					sender.PrintMessage(Color.CommandResult + "Result: " + commandResult);
+				}
 			}
 		}
 		
@@ -276,9 +276,9 @@ namespace spacecraft {
 				sender.PrintMessage(Color.CommandResult + "Last heartbeat took: " + s.LastHeartbeatTook + "s - Last physics tick took: " + s.LastPhysicsTickTook + "s");
 				sender.PrintMessage(Color.CommandResult + 
 #if WIN32 
-                    "CPU usage: " + cpu + 
+					"CPU usage: " + cpu + 
 #endif 
-                    "% - RAM usage: " + ram + "Mb");
+					"% - RAM usage: " + ram + "Mb");
 			}
 		}
 	}

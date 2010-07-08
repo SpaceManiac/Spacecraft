@@ -77,36 +77,36 @@ namespace spacecraft {
 				int length = Request.InputStream.Read(bar, 0, 2048);
 				
 				if(length > 0) {
-                    string Script = ASCIIEncoding.ASCII.GetString(bar).Substring(0, length);
-                    Script = Script.Replace("+", " ");
-                    Script = Script.Replace("%2B", "+");
-                    
-                    int i = Script.IndexOf('=');
-                    Script = Script.Substring(i + 1);
+					string Script = ASCIIEncoding.ASCII.GetString(bar).Substring(0, length);
+					Script = Script.Replace("+", " ");
+					Script = Script.Replace("%2B", "+");
+					
+					int i = Script.IndexOf('=');
+					Script = Script.Substring(i + 1);
 
-                    int status = Scripting.Interpreter.EvalScript(Script);
-                    commandResult = Scripting.Interpreter.Result;
-                    if (!Scripting.IsOk(status)) {
-                    	commandResult = "<font color='red'>" + commandResult + "</font>";
-                    }
-                }
-            }
-            catch(IOException) {}
+					int status = Scripting.Interpreter.EvalScript(Script);
+					commandResult = Scripting.Interpreter.Result;
+					if (!Scripting.IsOk(status)) {
+						commandResult = "<font color='red'>" + commandResult + "</font>";
+					}
+				}
+			}
+			catch(IOException) {}
 
-            StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			builder.Append("<html><body>\n");
 			builder.Append( "<p>You've reached ");
-            builder.Append(Server.theServ.name);
-            builder.Append("<br />\n");
-            builder.Append(Server.theServ.motd);
-            builder.Append("</p>\n");
+			builder.Append(Server.theServ.name);
+			builder.Append("<br />\n");
+			builder.Append(Server.theServ.motd);
+			builder.Append("</p>\n");
 			builder.Append("<p>Players online: " );
-            builder.Append(Server.theServ.Players.Count );
-            builder.Append("<br />\n");
+			builder.Append(Server.theServ.Players.Count );
+			builder.Append("<br />\n");
 			builder.Append( "Please leave a message after the tone. Thank you.</p>\n");
 			builder.Append( "<form method=POST action=#><input type='textbox' name='script' /><button type='submit>Submit</button></form>");
 
-            string response = builder.ToString();
+			string response = builder.ToString();
 
 			if(commandResult != "") {
 				response += "<pre><b>Command result</b>:\n" + commandResult + "</pre>";
@@ -127,8 +127,8 @@ namespace spacecraft {
 			 {0}http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd{0}>
 			<HTML>
 			  <HEAD>
-			    <TITLE>Error</TITLE>
-			    <META HTTP-EQUIV={0}Content-Type{0} CONTENT={0}text/html; charset=ISO-8859-1{0}>
+				<TITLE>Error</TITLE>
+				<META HTTP-EQUIV={0}Content-Type{0} CONTENT={0}text/html; charset=ISO-8859-1{0}>
 			  </HEAD>
 			  <BODY><H1>401 Unauthorized.</H1></BODY>
 			</HTML>";
