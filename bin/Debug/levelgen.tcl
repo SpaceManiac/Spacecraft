@@ -8,9 +8,9 @@ for {set x 0} {$x < 64} {incr x} {
                     setTile $x $y $z "Dirt"
                 }
 	    } elseif {$y > 31} {
-                setTile $x $y $z "Air"
+                setTile $x $y $z "Air" False
             } else {
-                setTile $x $y $z "Dirt"
+                setTile $x $y $z "Dirt" False
             }
         }
     }

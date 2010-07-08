@@ -89,6 +89,8 @@ namespace spacecraft
 
             data = new byte[xdim * ydim * zdim];
 
+            DateTime Begin = DateTime.Now;
+
             if (Config.GetBool("tcl", false) && File.Exists("levelgen.tcl") && !skipTcl)
             {
                 int value = Scripting.Interpreter.SourceFile("levelgen.tcl");
@@ -102,7 +104,7 @@ namespace spacecraft
             }
             else
             {
-                DateTime Begin = DateTime.Now;
+                
 
                 physicsCount = 0;
                 spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
@@ -130,11 +132,11 @@ namespace spacecraft
                     }
                 }
 
-                DateTime End = DateTime.Now;
-                System.Diagnostics.Debug.WriteLine((End - Begin).TotalMilliseconds);
+                
                 
             }
-            Spacecraft.Log("Generation complete");
+            DateTime End = DateTime.Now;
+            Spacecraft.Log("Generation complete. Took " + (End - Begin).TotalMilliseconds + "ms");
 		}
 
 		// zips a copy of the block array
