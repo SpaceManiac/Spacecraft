@@ -6,13 +6,17 @@ namespace spacecraft
 {
 	public class Scripting
 	{
-		static bool Initialized = false;
+		public static bool Initialized { get; protected set; }
 
 		public static TclInterpreter Interpreter { get; set; }
+		
+		static Scripting() {
+			Initialized = false;
+		}
 
 		public static void Initialize()
 		{
-			if (!Config.GetBool("tcl", false)) 
+			if (!Config.GetBool("tcl", false))
 				return;
 			
 			if (Initialized) 
@@ -34,7 +38,11 @@ namespace spacecraft
 			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
 			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
 			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
+			
+			// 3. Callbacks
+			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 
+			Spacecraft.Log("Tcl scripting initialized");
 			Initialized = true;
 		}
 
@@ -250,21 +258,27 @@ namespace spacecraft
 		
 		static int ScriptRegisterChatCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
-			// syntax: registerChatCommand cmdName help script
-			// help: Registers a new chat command. Unimplemented; do not use.
+			// syntax: createChatCommand commandName rankNeeded help script
+			// help: Registers a new chat command. The _script_ will be called with the sender's name and the rest of the arguments.
 			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-			if (argc != 4)
+			if (argc != 5)
 			{
-				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " cmdName help script\"");
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " cmdName rankNeeded help script\"");
 				return TclAPI.TCL_ERROR;
 			}
 
-			//ChatCommandHandling.RegisterChatCommand(args[0], args[1]);
+			try {
+				ChatCommandHandling.AddTclCommand(args[1], args[2], args[3], args[4]);
+			}
+			catch(Exception e) {
+				TclAPI.SetResult(interp, "exception: " + e.Message);
+				return TclAPI.TCL_ERROR;
+			}
 
-			TclAPI.SetResult(interp, "command isn't implemented");
-			return TclAPI.TCL_ERROR;
+			TclAPI.SetResult(interp, "");
+			return TclAPI.TCL_OK;
 		}
 
 		static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
@@ -290,6 +304,5 @@ namespace spacecraft
 			TclAPI.SetResult(interp,"");
 			return TclAPI.TCL_OK;
 		}
-
 	}
 }

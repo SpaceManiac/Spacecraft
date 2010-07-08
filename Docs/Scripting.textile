@@ -18,5 +18,11 @@ table.
 |*tell*|tell playerName message|Send a message with no extra coloring to an individual player.|
 |*setSpawn*|setSpawn x y z|Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.|
 
+h2. Callbacks
+
+table.
+|*Name*|*Syntax*|*Information*|
+|*createChatCommand*|createChatCommand commandName rankNeeded help script|Registers a new chat command. The _script_ will be called with the sender's name and the rest of the arguments.|
+
 
 This documentation was auto-generated based on Spacecraft's source.

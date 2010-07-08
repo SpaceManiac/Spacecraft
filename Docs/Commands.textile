@@ -1,6 +1,7 @@
 Spacecraft supports several commands for building and management. See [[User Ranks]] for more information on ranks.
 
 h1. Guest Commands
+* / - Get general help, a list of commands, or help on a specific command
 * /clear - Clear the chat log of the user
 * /go - Teleport to a landmark.
 * /help - Get general help, a list of commands, or help on a specific command

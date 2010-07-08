@@ -106,5 +106,69 @@ namespace spacecraft {
 				//sender.ResendMap();
 			}
 		}
+		
+		public class ExecuteTcl : ChatCommandBase
+		{
+			Rank _rankNeeded;
+			string _script;
+			string _helpMsg;
+			
+			public override Rank RankNeeded {
+				// fool the documentation script
+				// get { return Rank.Admin; }
+				get { return _rankNeeded; }
+			}
+			
+			public override string HelpMsg {
+				// fool the documentation script
+				// get { return "Execute Tcl code."; }
+				get { return _helpMsg; }
+			}
+			
+			public ExecuteTcl()
+			{
+				// default constructor: this is being added as the normal /tcl command
+				_rankNeeded = Rank.Admin;
+				_script = "";
+				_helpMsg = "Execute Tcl code.";
+			}
+			
+			public ExecuteTcl(string rankNeeded, string help, string script)
+			{
+				// special constructor: this is a Tcl command
+				_rankNeeded = (Rank) Enum.Parse(typeof(Rank), rankNeeded.ToLower(), true);
+				_script = script;
+				_helpMsg = help;
+			}
+			
+			public override void Run(Player sender, string cmd, string args)
+			{
+				if(_script == "") {
+					// Normal, /tcl command
+					Spacecraft.Log(sender.name + " executed Tcl: " + args);
+					int status = Scripting.Interpreter.EvalScript(args);
+					string result = Scripting.Interpreter.Result;
+					if (Scripting.IsOk(status)) {
+						if(result != "") {
+							ChatCommandHandling.WrapMessage(sender, result);
+						}
+					} else {
+						ChatCommandHandling.WrapMessage(sender, "Tcl error: " + Scripting.Interpreter.Result, Color.CommandError);
+					}
+				} else {
+					// It's a Tcl-defined command.
+					// it'll be called along the lines of "script SpaceManiac argument argument"
+					int status = Scripting.Interpreter.EvalScript(_script + " " + sender.name + " " + args);
+					string result = Scripting.Interpreter.Result;
+					if (Scripting.IsOk(status)) {
+						if(result != "") {
+							ChatCommandHandling.WrapMessage(sender, result);
+						}
+					} else {
+						ChatCommandHandling.WrapMessage(sender, "Tcl error: " + Scripting.Interpreter.Result, Color.CommandError);
+					}
+				}
+			}
+		}
 	}
 }

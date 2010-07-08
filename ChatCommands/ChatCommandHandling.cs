@@ -59,6 +59,14 @@ namespace spacecraft
 					Commands.Add("rules", new ChatCommands.Rules());
 			}
 		}
+		
+		static public void AddTclCommand(string commandName, string rankNeeded, string help, string script)
+		{
+			if(Commands.ContainsKey(commandName)) {
+				Commands.Remove(commandName);
+			}
+			Commands.Add(commandName, new ChatCommands.ExecuteTcl(rankNeeded, help, script));
+		}
 
 		/// <summary>
 		/// Lookup the command cmd, and execute it using args as the arguments. sender is used to post error messages back to the user.

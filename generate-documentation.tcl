@@ -249,7 +249,7 @@ proc gen_tcl {} {
 	set contents [read $infile]
 	close $infile
 	
-	set numSections 2
+	set numSections 3
 	
 	for {set i 1} {$i <= $numSections} {incr i} {
 		set ind1 [string first "// $i." $contents]
