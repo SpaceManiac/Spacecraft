@@ -79,7 +79,7 @@ namespace spacecraft
 			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-            if (argc != 5 && argc != 6)
+			if (argc != 5 && argc != 6)
 			{
 				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\" x y z type ?fast?");
 				return TclAPI.TCL_ERROR;
@@ -98,10 +98,10 @@ namespace spacecraft
 			}
 
 			Block B = BlockInfo.names[args[4]];
-            bool slow = true;
+			bool slow = true;
 
-            if (argc == 6)
-                slow = bool.Parse(args[5]);
+			if (argc == 6)
+				slow = bool.Parse(args[5]);
 
 			Server.theServ.map.SetTile(x, y, z, B, slow);
 
