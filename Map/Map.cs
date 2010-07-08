@@ -95,7 +95,8 @@ namespace spacecraft
                 if (!Scripting.IsOk(value))
                 {
                     // Tcl failed.
-                    Spacecraft.LogError("TCL map generation failed.", new SpacecraftException("TCL map generation failed."));
+
+                    Spacecraft.LogError("TCL map generation failed." + Scripting.Interpreter.Result, new SpacecraftException("TCL map generation failed." + Scripting.Interpreter.Result));
                     Generate(true);
                 }
             }

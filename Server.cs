@@ -361,7 +361,7 @@ namespace spacecraft
 
 		public void MessageAll(string message)
 		{
-            if (Players.Count != 0)
+            if (Players != null && Players.Count != 0)
             {
                 List<Player> temp = new List<Player>(Players);
                 foreach (Player P in temp)
