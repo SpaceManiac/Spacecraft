@@ -20,7 +20,7 @@ namespace spacecraft
 			}
 			StreamReader input = new StreamReader(CONFIG_FILENAME);
 			string raw = input.ReadToEnd();
-			raw = raw.Replace("\r\n", "\n"); // Just in case we have to deal with silly UNIX line-endings.
+			raw = raw.Replace("\r\n", "\n"); // Just in case we have to deal with silly Windows/UNIX line-endings.
 			string[] lines = raw.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 			input.Close();
 			foreach (var line in lines)

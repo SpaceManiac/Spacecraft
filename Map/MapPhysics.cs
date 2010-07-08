@@ -331,7 +331,7 @@ namespace spacecraft
 			{
 				if(Heights[x, z] < y) {
 					if(GetTile(x, (short)Heights[x, z], z) == Block.Grass) {
-						SetTile_NoRecalc(x, (short) Heights[x, z], z, Block.Dirt);
+						SetTile(x, (short) Heights[x, z], z, Block.Dirt, false);
 					}
 					Heights[x, z] = y;
 				}
@@ -348,7 +348,7 @@ namespace spacecraft
 						{
 							Heights[x, z] = Y;
 							if(t == Block.Dirt) {
-								SetTile_NoRecalc(x, Y, z, Block.Grass);
+								SetTile(x, Y, z, Block.Grass, false);
 							}
 							break;
 						}

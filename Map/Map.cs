@@ -74,44 +74,66 @@ namespace spacecraft
 			spawnHeading = heading;
 		}
 
-		public void Generate()
+        public void Generate()
+        {
+            Generate(false);
+        }
+
+		public void Generate(bool skipTcl)
 		{
-			DateTime Begin = DateTime.Now;
+            Spacecraft.Log("Generating map...");
 
-			physicsCount = 0;
-			Spacecraft.Log("Generating map...");
+            xdim = DefaultWidth;
+            ydim = DefaultHeight;
+            zdim = DefaultDepth;
 
-			xdim = DefaultWidth;
-			ydim = DefaultHeight;
-			zdim = DefaultDepth;
-			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
-			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
-			data = new byte[xdim * ydim * zdim];
-			for (short x = 0; x < xdim; ++x)
-			{
-				if (x == (short)(xdim / 2))
-				{
-					Spacecraft.Log("Generation 50% complete");
-				}
-				for (short z = 0; z < zdim; ++z)
-				{
-					for (short y = 0; y < ydim / 2; ++y)
-					{
-						if (y == ydim / 2 - 1)
-						{
-							SetTile_Fast(x, y, z, Block.Grass);
-						}
-						else
-						{
-							SetTile_Fast(x, y, z, Block.Dirt);
-						}
-					}
-				}
-			}
+            data = new byte[xdim * ydim * zdim];
 
-			DateTime End = DateTime.Now;
-			System.Diagnostics.Debug.WriteLine((End - Begin).TotalMilliseconds);
-			Spacecraft.Log("Generation complete");
+            if (Config.GetBool("tcl", false) && File.Exists("levelgen.tcl") && !skipTcl)
+            {
+                int value = Scripting.Interpreter.SourceFile("levelgen.tcl");
+                if (!Scripting.IsOk(value))
+                {
+                    // Tcl failed.
+                    Spacecraft.LogError("TCL map generation failed.", new SpacecraftException("TCL map generation failed."));
+                    Generate(true);
+                }
+            }
+            else
+            {
+                DateTime Begin = DateTime.Now;
+
+                physicsCount = 0;
+                spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
+                // Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
+
+                for (short x = 0; x < xdim; ++x)
+                {
+                    if (x == (short)(xdim / 2))
+                    {
+                        Spacecraft.Log("Generation 50% complete");
+                    }
+                    for (short z = 0; z < zdim; ++z)
+                    {
+                        for (short y = 0; y < ydim / 2; ++y)
+                        {
+                            if (y == ydim / 2 - 1)
+                            {
+                                SetTile_Fast(x, y, z, Block.Grass);
+                            }
+                            else
+                            {
+                                SetTile_Fast(x, y, z, Block.Dirt);
+                            }
+                        }
+                    }
+                }
+
+                DateTime End = DateTime.Now;
+                System.Diagnostics.Debug.WriteLine((End - Begin).TotalMilliseconds);
+                
+            }
+            Spacecraft.Log("Generation complete");
 		}
 
 		// zips a copy of the block array
@@ -192,35 +214,32 @@ namespace spacecraft
 
 		public void SetTile(short x, short y, short z, Block tile)
 		{
-			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-			
-			RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
-			
-			if(Heights[x, z] == y && tile == Block.Dirt) {
-				tile = Block.Grass;
-			}
-			
-			BlockPosition pos = new BlockPosition(x, y, z);
-
-			data[BlockIndex(x, y, z)] = (byte)tile;
-			AlertPhysicsAround(pos);
-
-			if (BlockChange != null)
-				BlockChange(this, pos, tile);
+            SetTile(x, y, z, tile, true);
 		}
 
-		private void SetTile_NoRecalc(short x, short y, short z, Block tile)
-		{
-			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
-			
-			BlockPosition pos = new BlockPosition(x, y, z);
+        public void SetTile(short x, short y, short z, Block tile, bool calculateHeights)
+        {
+            if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 
-			data[BlockIndex(x, y, z)] = (byte)tile;
-			AlertPhysicsAround(pos);
+            if (calculateHeights)
+            {
+                RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
 
-			if (BlockChange != null)
-				BlockChange(this, pos, tile);
-		}
+                if (Heights[x, z] == y && tile == Block.Dirt)
+                {
+                    tile = Block.Grass;
+                }
+            }
+        
+            BlockPosition pos = new BlockPosition(x, y, z);
+
+            data[BlockIndex(x, y, z)] = (byte)tile;
+            AlertPhysicsAround(pos);
+
+            if (BlockChange != null)
+                BlockChange(this, pos, tile);
+        }
+
 
 		private void SetTile_Fast(short x, short y, short z, Block tile)
 		{

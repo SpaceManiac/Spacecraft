@@ -361,10 +361,14 @@ namespace spacecraft
 
 		public void MessageAll(string message)
 		{
-			List<Player> temp = new List<Player>(Players);
-			foreach (Player P in temp) {
-				P.PrintMessage(message);
-			}
+            if (Players.Count != 0)
+            {
+                List<Player> temp = new List<Player>(Players);
+                foreach (Player P in temp)
+                {
+                    P.PrintMessage(message);
+                }
+            }
 			Spacecraft.Log("[>] " + Spacecraft.StripColors(message));
 		}
 

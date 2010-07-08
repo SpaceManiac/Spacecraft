@@ -12,7 +12,11 @@ namespace spacecraft
 
         public static void Initialize()
         {
-            if (Initialized) return;
+            if (!Config.GetBool("tcl", false)) 
+                return;
+            
+            if (Initialized) 
+                return;
 
             Interpreter = new TclInterpreter();
 
@@ -26,7 +30,8 @@ namespace spacecraft
             Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
             Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
             Interpreter.CreateCommand("players", new TclAPI.TclCommand(ScriptGetPlayers));
-            Interpreter.CreateCommand("getplayer", new TclAPI.TclCommand(ScriptGetPlayerStats));
+            Interpreter.CreateCommand("getPlayer", new TclAPI.TclCommand(ScriptGetPlayerStats));
+            Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
 
             Initialized = true;
         }
@@ -218,5 +223,27 @@ namespace spacecraft
 			TclAPI.SetResult(interp, "command isn't implemented");
 			return TclAPI.TCL_ERROR;
 		}
+
+        static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+        {
+            string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+
+            if (argc != 5)
+            {
+                TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " x y z\"");
+                return TclAPI.TCL_ERROR;
+            }
+
+            short x = (short)(short.Parse(args[1]) * 32);
+            short y = (short)(short.Parse(args[2]) * 32);
+            short z = (short)(short.Parse(args[3]) * 32);
+            byte heading = byte.Parse(args[4]);
+
+            Server.theServ.map.SetSpawn(new Position(x,y,z), heading);
+
+            TclAPI.SetResult(interp,"");
+            return TclAPI.TCL_OK;
+        }
+
 	}
 }
