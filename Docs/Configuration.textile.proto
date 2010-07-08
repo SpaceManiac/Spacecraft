@@ -1,4 +1,1 @@
-When Spacecraft starts up, it looks for the the file @properties.txt@ in the local directory.
-This file contains user-configurable settings for Spacecraft, specified in the format @name = value@.
-Lines beginning with the hash symbol @#@ are treated as comments and ignored, as are any invalid names.
-If there isn't a @properties.txt@, Spacecraft will generate a default one. The full list of valid configuration names follows.
+When Spacecraft starts up, it looks for the the file @properties.txt@ in the local directory. This file contains user-configurable settings for Spacecraft, specified in the format @name = value@. Lines beginning with the hash symbol @#@ are treated as comments and ignored, as are any invalid names. If there isn't a @properties.txt@, Spacecraft will generate a default one. The full list of valid configuration names follows.
