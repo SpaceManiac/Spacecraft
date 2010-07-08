@@ -22,15 +22,17 @@ namespace spacecraft
 
 			// Overwrite standard source, since it seems to crash :|
 			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
-
-			// Spacecraft stuff
-			Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
-			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
+			
+			// 1. Getting information
 			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
+			Interpreter.CreateCommand("playerList", new TclAPI.TclCommand(ScriptPlayerList));
+			Interpreter.CreateCommand("playerInfo", new TclAPI.TclCommand(ScriptGetPlayerInfo));
+
+			// 2. Affecting the world
+			Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
 			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
 			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
-			Interpreter.CreateCommand("players", new TclAPI.TclCommand(ScriptGetPlayers));
-			Interpreter.CreateCommand("getPlayer", new TclAPI.TclCommand(ScriptGetPlayerStats));
 			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
 
 			Initialized = true;
@@ -54,6 +56,9 @@ namespace spacecraft
 		
 		static int ScriptLog(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: scLog text
+			// help: Log _text_ with the [S] designation to Spacecraft's log files
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 			
 			if (argc != 2) {
@@ -69,11 +74,14 @@ namespace spacecraft
 
 		static int ScriptSetTile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: setTile x y z type _?fast?_
+			// help: Set a tile (_type_ should be a string). If _fast_ is enabled, the block will be set but no updates will be sent.
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
             if (argc != 5 && argc != 6)
 			{
-				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\" x y z type [fast]");
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\" x y z type ?fast?");
 				return TclAPI.TCL_ERROR;
 			}
 
@@ -103,6 +111,9 @@ namespace spacecraft
 
 		static int ScriptGetTile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: getTile x y z
+			// help: Returns the block type of a location in string form.
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 4)
@@ -117,12 +128,15 @@ namespace spacecraft
 
 			Block B = Server.theServ.map.GetTile(x, y, z);
 
-			TclAPI.SetResult(interp, B.ToString());
+			TclAPI.SetResult(interp, B.ToString().ToLower());
 			return TclAPI.TCL_OK;
 		}
 
 		static int ScriptBroadcast(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: broadcast message
+			// help: Broadcast a message in yellow text, a la /say
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 2)
@@ -139,26 +153,40 @@ namespace spacecraft
 
 		static int ScriptSendMessage(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: tell playerName message
+			// help: Send a message with no extra coloring to an individual player.
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 3)
 			{
-				TclAPI.SetResult(interp, "Wrong number of arguments, expected 2, got " + argc.ToString());
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " playerName message\"");
 				return TclAPI.TCL_ERROR;
 			}
 
 			Player P = Server.theServ.GetPlayer(args[1]);
+			
+			if(P == null) {
+				TclAPI.SetResult(interp, "no such player \"" + args[1] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
 			P.PrintMessage(args[2]);
 
 			TclAPI.SetResult(interp, "");
 			return TclAPI.TCL_OK;
 		}
 
-		static int ScriptGetPlayers(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		static int ScriptPlayerList(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: playerList
+			// help: Returns a list of all players online.
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
 			if (argc != 1)
 			{
-				TclAPI.SetResult(interp, "Wrong number of arguments, expected 0, got " + argc.ToString());
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\"");
 				return TclAPI.TCL_ERROR;
 			}
 
@@ -178,17 +206,25 @@ namespace spacecraft
 
 		}
 
-		static int ScriptGetPlayerStats(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		static int ScriptGetPlayerInfo(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: playerInfo playerName
+			// help: Returns a list of player info in the form {id x y z heading pitch rank}
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 2)
 			{
-				TclAPI.SetResult(interp, "Wrong number of arguments, expected 1, got " + argc.ToString());
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " playerName\"");
 				return TclAPI.TCL_ERROR;
 			}
 
 			Player Target = Server.theServ.GetPlayer(args[1]);
+			
+			if(Target == null) {
+				TclAPI.SetResult(interp, "no such player \"" + args[1] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
 
 			StringBuilder Builder = new StringBuilder();
 			Builder.Append(Target.playerID);
@@ -214,11 +250,14 @@ namespace spacecraft
 		
 		static int ScriptRegisterChatCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: registerChatCommand cmdName help script
+			// help: Registers a new chat command. Unimplemented; do not use.
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
-			if (argc != 3)
+			if (argc != 4)
 			{
-				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " cmdName script\"");
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " cmdName help script\"");
 				return TclAPI.TCL_ERROR;
 			}
 
@@ -230,6 +269,9 @@ namespace spacecraft
 
 		static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
+			// syntax: setSpawn x y z
+			// help: Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.
+			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 5)

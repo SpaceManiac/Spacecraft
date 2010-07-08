@@ -1,0 +1,1 @@
+Spacecraft supports scripting via the "Tcl scripting language":http://www.tcl.tk/. The commands Spacecraft's API exposes are classified into several groups:

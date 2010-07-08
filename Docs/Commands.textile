@@ -45,3 +45,5 @@ h1. Admin Commands
 * /setspawn - Set the map's global spawn point
 * /tcl - Execute Tcl code.
 
+
+This documentation was auto-generated based on Spacecraft's source.

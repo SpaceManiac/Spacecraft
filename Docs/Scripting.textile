@@ -1,0 +1,22 @@
+Spacecraft supports scripting via the "Tcl scripting language":http://www.tcl.tk/. The commands Spacecraft's API exposes are classified into several groups:
+
+h2. Getting information
+
+table.
+|*Name*|*Syntax*|*Information*|
+|*getTile*|getTile x y z|Returns the block type of a location in string form.|
+|*playerList*|playerList|Returns a list of all players online.|
+|*playerInfo*|playerInfo playerName|Returns a list of player info in the form {id x y z heading pitch rank}|
+
+h2. Affecting the world
+
+table.
+|*Name*|*Syntax*|*Information*|
+|*scLog*|scLog text|Log _text_ with the [S] designation to Spacecraft's log files|
+|*broadcast*|broadcast message|Broadcast a message in yellow text, a la /say|
+|*setTile*|setTile x y z type _?fast?_|Set a tile (_type_ should be a string). If _fast_ is enabled, the block will be set but no updates will be sent.|
+|*tell*|tell playerName message|Send a message with no extra coloring to an individual player.|
+|*setSpawn*|setSpawn x y z|Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.|
+
+
+This documentation was auto-generated based on Spacecraft's source.
