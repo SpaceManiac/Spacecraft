@@ -27,22 +27,33 @@ namespace spacecraft
 			// Overwrite standard source, since it seems to crash :|
 			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
 			
-			// 1. Getting information
+			// 1. Get static info
+			Interpreter.CreateCommand("getBlockName", new TclAPI.TclCommand(ScriptGetBlockName));
+			Interpreter.CreateCommand("getBlockID", new TclAPI.TclCommand(ScriptGetBlockID));
+			Interpreter.CreateCommand("getColorCode", new TclAPI.TclCommand(ScriptGetColorCode));
+			
+			// 2. Get info on the world
 			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
 			Interpreter.CreateCommand("playerList", new TclAPI.TclCommand(ScriptPlayerList));
 			Interpreter.CreateCommand("playerInfo", new TclAPI.TclCommand(ScriptGetPlayerInfo));
 
-			// 2. Affecting the world
+			// 3. Affect the world
 			Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
 			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
 			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
 			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
 			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
 			
-			// 3. Callbacks
+			// 4. Register callbacks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 
-			Spacecraft.Log("Tcl scripting initialized");
+			Spacecraft.Log("Reading startup.tcl...");
+			int status = Interpreter.SourceFile("Scripting/startup.tcl");
+			if (!IsOk(status)) {
+				Spacecraft.Log("Error in startup.tcl: " + Interpreter.Result);
+			}
+			Spacecraft.Log("Tcl initialized");
+			
 			Initialized = true;
 		}
 
@@ -60,6 +71,111 @@ namespace spacecraft
 			}
 			
 			return Interpreter.SourceFile(args[1]);
+		}
+		
+		static int ScriptGetBlockName(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: getBlockName blockID
+			// help: returns the block name for the specified _blockID_ byte
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 2) {
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " blockID\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			try {
+				int i = int.Parse(args[1]);
+				if(i < 0 || i > (int)Block.Obsidian) {
+					TclAPI.SetResult(interp, "block id out of range");
+					return TclAPI.TCL_ERROR;
+				} else {
+					Block b = (Block) i;
+					TclAPI.SetResult(interp, b.ToString().ToLower());
+					return TclAPI.TCL_OK;
+				}
+			}
+			catch(ArgumentException) {
+				TclAPI.SetResult(interp, "expected integer instead of \"" + args[1] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
+		}
+		
+		static int ScriptGetBlockID(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: getBlockID blockName
+			// help: returns the block ID byte for the specified _blockName_
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 2) {
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " blockName\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			try {
+				int i = (int) (Block) Enum.Parse(typeof(Block), args[1], true);
+				TclAPI.SetResult(interp, i.ToString());
+				return TclAPI.TCL_OK;
+			}
+			catch(ArgumentException) {
+				TclAPI.SetResult(interp, "unknown block name \"" + args[1] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
+		}
+		
+		static string ScriptHelper_GetColorCode(string s) {
+			switch(s) {
+				case "black": return Color.Black;
+				case "darkblue": return Color.DarkBlue;
+				case "darkgreen": return Color.DarkGreen;
+				case "darkteal": return Color.DarkTeal;
+				case "darkred": return Color.DarkRed;
+				case "purple": return Color.Purple;
+				case "darkyellow": return Color.DarkYellow;
+				case "gray": return Color.Gray;
+				case "grey": return Color.Gray;
+				case "darkgray": return Color.DarkGray;
+				case "darkgrey": return Color.DarkGray;
+				case "blue": return Color.Blue;
+				case "green": return Color.Green;
+				case "teal": return Color.Teal;
+				case "red": return Color.Red;
+				case "pink": return Color.Pink;
+				case "yellow": return Color.Yellow;
+				case "white": return Color.White;
+				
+				case "announce": return Color.Announce;
+				case "privatemsg": return Color.PrivateMsg;
+				case "commandresult": return Color.CommandResult;
+				case "commanderror": return Color.CommandError;
+				
+				default: return "";
+			}
+		}
+		
+		static int ScriptGetColorCode(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: getColorCode colorName
+			// help: returns the &x color code for the specified _colorName_ (special names are announce, privatemsg, commandresult, and commanderror)
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 2) {
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " colorName\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			string s = ScriptHelper_GetColorCode(args[1].ToLower());
+			
+			if (s != "") {
+				TclAPI.SetResult(interp, s);
+				return TclAPI.TCL_OK;
+			} else {
+				TclAPI.SetResult(interp, "unknown color name \"" + args[1] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
 		}
 		
 		static int ScriptLog(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)

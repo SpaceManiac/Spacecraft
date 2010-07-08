@@ -1,6 +1,14 @@
 Spacecraft supports scripting via the "Tcl scripting language":http://www.tcl.tk/. The commands Spacecraft's API exposes are classified into several groups:
 
-h2. Getting information
+h2. Get static info
+
+table.
+|*Name*|*Syntax*|*Information*|
+|*getBlockName*|getBlockName blockID|returns the block name for the specified _blockID_ byte|
+|*getBlockID*|getBlockID blockName|returns the block ID byte for the specified _blockName_|
+|*getColorCode*|getColorCode colorName|returns the &x color code for the specified _colorName_ (special names are announce, privatemsg, commandresult, and commanderror)|
+
+h2. Get info on the world
 
 table.
 |*Name*|*Syntax*|*Information*|
@@ -8,7 +16,7 @@ table.
 |*playerList*|playerList|Returns a list of all players online.|
 |*playerInfo*|playerInfo playerName|Returns a list of player info in the form {id x y z heading pitch rank}|
 
-h2. Affecting the world
+h2. Affect the world
 
 table.
 |*Name*|*Syntax*|*Information*|
@@ -18,7 +26,7 @@ table.
 |*tell*|tell playerName message|Send a message with no extra coloring to an individual player.|
 |*setSpawn*|setSpawn x y z|Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.|
 
-h2. Callbacks
+h2. Register callbacks
 
 table.
 |*Name*|*Syntax*|*Information*|

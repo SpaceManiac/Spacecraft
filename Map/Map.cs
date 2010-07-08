@@ -96,9 +96,7 @@ namespace spacecraft
 				int value = Scripting.Interpreter.SourceFile("levelgen.tcl");
 				if (!Scripting.IsOk(value))
 				{
-					// Tcl failed.
-
-					Spacecraft.LogError("TCL map generation failed." + Scripting.Interpreter.Result, new SpacecraftException("TCL map generation failed." + Scripting.Interpreter.Result));
+					Spacecraft.LogError("Tcl map generation failed.", new SpacecraftException("TCL map generation failed:\n" + Scripting.Interpreter.Result));
 					Generate(true);
 				}
 			}
