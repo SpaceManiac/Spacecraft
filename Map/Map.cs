@@ -89,14 +89,18 @@ namespace spacecraft
 
 			data = new byte[xdim * ydim * zdim];
 
-			if (Config.GetBool("tcl", false) && File.Exists("levelgen.tcl") && !skipTcl)
+			if (Config.GetBool("tcl", false) && File.Exists("Scripting/levelgen.tcl") && !skipTcl)
 			{
-				int value = Scripting.Interpreter.SourceFile("levelgen.tcl");
+				int value = Scripting.Interpreter.SourceFile("Scripting/levelgen.tcl");
 				if (!Scripting.IsOk(value))
 				{
 					// Tcl failed.
-
-					Spacecraft.LogError("TCL map generation failed." + Scripting.Interpreter.Result, new SpacecraftException("TCL map generation failed." + Scripting.Interpreter.Result));
+					try {
+						throw new SpacecraftException("Tcl map generation failed:\n" + Scripting.Interpreter.Result);
+					} 
+					catch(SpacecraftException ex) {
+						Spacecraft.LogError("Tcl map generation failed", ex);
+					}
 					Generate(true);
 				}
 			}
