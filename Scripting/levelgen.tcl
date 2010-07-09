@@ -1,17 +1,25 @@
-setSpawn 32 32 32 0
+# levelgen.tcl
+# this is a basic Tcl version of the standard flatgrass generation
 
-for {set x 0} {$x < 64} {incr x} { 
-	for {set y 0} {$y < 64} {incr y} { 
-		for {set z 0} {$z < 64} {incr z} { 
-			if {$y == 32 || $y == 31} {
-				if { rand() > 0.5 } {
-					setTile $x $y $z "Dirt"
+
+proc generateLevel {xdim ydim zdim} {
+	setSpawn [expr {$xdim/2}] [expr {$ydim/2}] [expr {$zdim/2}] 0
+
+	scLog "$xdim,$ydim,$zdim"
+	for {set x 0} {$x < $xdim} {incr x} { 
+		for {set y 0} {$y < ($ydim / 2)} {incr y} { 
+			for {set z 0} {$z < $zdim} {incr z} { 
+				if {$y == ($ydim / 2 - 1)} {
+					setTile $x $y $z grass false
+				} else {
+					setTile $x $y $z dirt false
 				}
-		} elseif {$y > 31} {
-				setTile $x $y $z "Air"
-			} else {
-				setTile $x $y $z "Dirt"
 			}
+		}
+		if {$x % 10 == 0} {
+			scLog $x
 		}
 	}
 }
+
+#onLevelGeneration generateLevel

@@ -31,6 +31,7 @@ h2. Register callbacks
 table.
 |*Name*|*Syntax*|*Information*|
 |*createChatCommand*|createChatCommand commandName rankNeeded help script|Registers a new chat command. The _script_ will be called with the sender's name and the rest of the arguments.|
+|*onLevelGeneration*|onLevelGeneration command|Registers a hook for onLevelGeneration. See the Hooks section for more information.|
 
 
 This documentation was auto-generated based on Spacecraft's source.

@@ -13,5 +13,6 @@ proc qf {var from to code} {
 proc qs {f} { source [file join Scripting $f] }
 
 # load other files
+qs levelgen.tcl
 qs testcmd.tcl
 qs bother.tcl

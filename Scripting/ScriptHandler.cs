@@ -1,14 +1,15 @@
 using System;
 using TclWrap;
 using System.Text;
+using System.Collections.Generic;
 
 namespace spacecraft
 {
 	public class Scripting
 	{
 		public static bool Initialized { get; protected set; }
-
 		public static TclInterpreter Interpreter { get; set; }
+		private static Dictionary<string, string> Hooks;
 		
 		static Scripting() {
 			Initialized = false;
@@ -23,6 +24,7 @@ namespace spacecraft
 				return;
 
 			Interpreter = new TclInterpreter();
+			Hooks = new Dictionary<string, string>();
 
 			// Overwrite standard source, since it seems to crash :|
 			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
@@ -46,6 +48,7 @@ namespace spacecraft
 			
 			// 4. Register callbacks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
+			Interpreter.CreateCommand("onLevelGeneration", new TclAPI.TclCommand(ScriptGenericHook));
 
 			Spacecraft.Log("Reading startup.tcl...");
 			int status = Interpreter.SourceFile("Scripting/startup.tcl");
@@ -59,6 +62,14 @@ namespace spacecraft
 
 		public static bool IsOk(int status) {
 			return status != TclAPI.TCL_ERROR;
+		}
+		
+		public static bool HookDefined(string hookName) {
+			return Hooks.ContainsKey(hookName);
+		}
+		
+		public static int ExecuteHook(string hookName, string arguments) {
+			return Interpreter.EvalScript(Hooks[hookName] + " " + arguments);
 		}
 		
 		static int ScriptEvalFile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
@@ -227,7 +238,11 @@ namespace spacecraft
 			if (argc == 6)
 				slow = bool.Parse(args[5]);
 
-			Server.theServ.map.SetTile(x, y, z, B, slow);
+			if(slow) {
+				Server.theServ.map.SetTile(x, y, z, B);
+			} else {
+				Server.theServ.map.SetTile_Fast(x, y, z, B);
+			}
 
 			TclAPI.SetResult(interp, "");
 			return TclAPI.TCL_OK;
@@ -417,7 +432,32 @@ namespace spacecraft
 
 			Server.theServ.map.SetSpawn(new Position(x,y,z), heading);
 
-			TclAPI.SetResult(interp,"");
+			TclAPI.SetResult(interp, "");
+			return TclAPI.TCL_OK;
+		}
+
+		static int ScriptGenericHook(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: (hookname) command
+			// help: Registers a hook for (hookname). See the Hooks section for more information.
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+
+			if (argc != 2)
+			{
+				Spacecraft.Log("ono " + argc);
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " command\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			if(Hooks.ContainsKey(args[0])) {
+				Hooks.Remove(args[0]);
+			}
+			Hooks.Add(args[0], args[1]);
+			
+			Spacecraft.Log("Hook defined: " + args[0]);
+
+			TclAPI.SetResult(interp, "");
 			return TclAPI.TCL_OK;
 		}
 	}

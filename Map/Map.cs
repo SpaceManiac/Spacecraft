@@ -91,12 +91,12 @@ namespace spacecraft
 
 			DateTime Begin = DateTime.Now;
 
-			if (Config.GetBool("tcl", false) && File.Exists("levelgen.tcl") && !skipTcl)
+			if (Config.GetBool("tcl", false) && Scripting.HookDefined("onLevelGeneration") && !skipTcl)
 			{
-				int value = Scripting.Interpreter.SourceFile("levelgen.tcl");
+				int value = Scripting.ExecuteHook("onLevelGeneration", xdim + " " + ydim + " " + zdim);
 				if (!Scripting.IsOk(value))
 				{
-					Spacecraft.LogError("Tcl map generation failed.", new SpacecraftException("TCL map generation failed:\n" + Scripting.Interpreter.Result));
+					Spacecraft.LogError("Tcl map generation failed", new SpacecraftException("Tcl map generation failed:\n" + Scripting.Interpreter.Result));
 					Generate(true);
 				}
 			}
@@ -208,23 +208,19 @@ namespace spacecraft
 			} // lock(PhysicsMutex)
 		}
 
-		public void SetTile(short x, short y, short z, Block tile)
-		{
-			SetTile(x, y, z, tile, true);
+		public void SetTile(short x, short y, short z, Block tile) {
+			SetTile(x,y,z,tile,true);
 		}
 
-		public void SetTile(short x, short y, short z, Block tile, bool calculateHeights)
+		public void SetTile(short x, short y, short z, Block tile, bool calcHeights)
 		{
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 
-			if (calculateHeights)
-			{
-				RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
+			RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
 
-				if (Heights[x, z] == y && tile == Block.Dirt)
-				{
-					tile = Block.Grass;
-				}
+			if (Heights[x, z] == y && tile == Block.Dirt)
+			{
+				tile = Block.Grass;
 			}
 		
 			BlockPosition pos = new BlockPosition(x, y, z);
@@ -236,7 +232,7 @@ namespace spacecraft
 				BlockChange(this, pos, tile);
 		}
 
-		private void SetTile_Fast(short x, short y, short z, Block tile)
+		public void SetTile_Fast(short x, short y, short z, Block tile)
 		{
 			data[BlockIndex(x, y, z)] = (byte)tile;
 		}

@@ -296,12 +296,14 @@ proc gen_tcl {} {
 		if {$i2 != -1 && $i2 < $i3} {
 			set i4 [string first "\n" $contents $i2]
 			set syntax [string range $contents [expr {$i2 + 11}] [expr {$i4 - 1}]]
+			set syntax [regsub {\(hookname\)} $syntax $cmdName]
 			set commandSyntax($cmdName) $syntax
 		}
 		set i2 [string first "// help:" $contents $i]
 		if {$i2 != -1 && $i2 < $i3} {
 			set i4 [string first "\n" $contents $i2]
 			set help [string range $contents [expr {$i2 + 9}] [expr {$i4 - 1}]]
+			set help [regsub {\(hookname\)} $help $cmdName]
 			set commandHelp($cmdName) $help
 		}
 	}
