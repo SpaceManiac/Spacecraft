@@ -52,6 +52,7 @@ namespace spacecraft
 			// 4. Register hooks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 			Interpreter.CreateCommand("onLevelGeneration", new TclAPI.TclCommand(ScriptGenericHook));
+			Interpreter.CreateCommand("onPlayerChangeBlock", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("onPlayerJoin", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("onPlayerDepart", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("onWorldTick", new TclAPI.TclCommand(ScriptGenericHook));
@@ -422,7 +423,6 @@ namespace spacecraft
 
 			TclAPI.SetResult(interp, Result.ToString());
 			return TclAPI.TCL_OK;
-
 		}
 
 		static int ScriptGetLandmarkInfo(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
@@ -454,6 +454,40 @@ namespace spacecraft
 				return TclAPI.TCL_OK;
 			} else {
 				TclAPI.SetResult(interp, "no such landmark \"" + landmark + "\"");
+				return TclAPI.TCL_ERROR;
+			}
+		}
+		
+		
+
+		static int ScriptPlayerToLandmark(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: playerToLandmark playerName landmarkName
+			// help: Teleports the given player to the given landmark
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+
+			if (argc != 3)
+			{
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " playerName landmarkName\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			Player P = Server.theServ.GetPlayer(args[1]);
+			if (P != null) {
+				string landmark = args[2];
+				Dictionary<string, Pair<Position, byte>> landmarks = Server.theServ.map.landmarks;
+				if (landmarks.ContainsKey(landmark)) {
+					Pair<Position, byte> mrk = landmarks[landmark];
+					Server.theServ.MovePlayer(P, mrk.First, mrk.Second, 0);
+					TclAPI.SetResult(interp, "");
+					return TclAPI.TCL_OK;
+				} else {
+					TclAPI.SetResult(interp, "no such landmark \"" + landmark + "\"");
+					return TclAPI.TCL_ERROR;
+				}
+			} else {
+				TclAPI.SetResult(interp, "no such player \"" + args[1] + "\"");
 				return TclAPI.TCL_ERROR;
 			}
 		}
