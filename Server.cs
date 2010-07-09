@@ -34,6 +34,7 @@ namespace spacecraft
 		
 		public double LastHeartbeatTook { get; protected set; }
 		public double LastPhysicsTickTook { get; protected set; }
+		public double LastTclTickTook { get; protected set; }
 
 		public Server()
 		{
@@ -83,11 +84,11 @@ namespace spacecraft
 				Running = true;
 
 				Thread T = new Thread(AcceptClientThread);
-				T.Name = "ClientAccept Thread";
+				T.Name = "AcceptClient Thread";
 				T.Start();
 
 				Thread T2 = new Thread(TimerThread);
-				T2.Name = "Timer thread.";
+				T2.Name = "Timer thread";
 				T2.Start();
 
 				HttpMonitor.Start(Config.GetInt("http-port", port + 1));
@@ -125,6 +126,7 @@ namespace spacecraft
 			double lastPhysics = -0.5;
 			double lastBookend = 0;
 			double lastIpAttempt = -10;
+			bool tclOnWorldTick = true;
 			int ipFailures = 0;
 
 			while(Running) {
@@ -139,13 +141,14 @@ namespace spacecraft
 						lastIpAttempt = clock.Elapsed.TotalSeconds;
 						++ipFailures;
 						if(ipFailures >= 3) {
-							Spacecraft.LogError("Could not discover IP address.", e);
+							Spacecraft.LogError("Could not discover IP address", e);
 						} else {
-							Spacecraft.LogError("Could not discover IP address, reattempting.", e);
+							Spacecraft.LogError("Could not discover IP address, reattempting", e);
 						}
 					}
 				}
-				if(clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
+				
+				if (clock.Elapsed.TotalSeconds - lastHeartbeat >= 30) {
 					double now = clock.Elapsed.TotalSeconds;
 					Heartbeat();
 					map.Save(Map.levelName);
@@ -153,11 +156,24 @@ namespace spacecraft
 					lastHeartbeat = clock.Elapsed.TotalSeconds;
 					LastHeartbeatTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
-				if(clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
+				
+				if (clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
+					// physics tick
 					double now = clock.Elapsed.TotalSeconds;
 					map.DoPhysics();
 					lastPhysics = clock.Elapsed.TotalSeconds;
 					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
+					
+					// tcl tick
+					now = clock.Elapsed.TotalSeconds;
+					if (tclOnWorldTick && Scripting.Initialized && Scripting.HookDefined("onWorldTick")) {
+						int status = Scripting.ExecuteHook("onWorldTick", "");
+						if (!Scripting.IsOk(status)) {
+							Spacecraft.LogError("Tcl onWorldTick failed", new SpacecraftException("Tcl onWorldTick failed:\n" + Scripting.Interpreter.Result));
+							tclOnWorldTick = false;
+						}
+					}
+					LastTclTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
 
 				if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {

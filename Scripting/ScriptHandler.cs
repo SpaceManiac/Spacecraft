@@ -49,6 +49,7 @@ namespace spacecraft
 			// 4. Register callbacks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 			Interpreter.CreateCommand("onLevelGeneration", new TclAPI.TclCommand(ScriptGenericHook));
+			Interpreter.CreateCommand("onWorldTick", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("dropHook", new TclAPI.TclCommand(ScriptDropHook));
 
 			Spacecraft.Log("Reading startup.tcl...");

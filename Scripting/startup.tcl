@@ -20,4 +20,9 @@ proc cmdQs {sender args} {
 	tell $sender "[getColorCode privatemsg][lindex $args 0] quicksourced"
 }
 
-createChatCommand qsrc Admin "Quicksource the given script file" cmdQs
+createChatCommand "qsrc" Admin "Quicksource the given script file" cmdQs
+
+# add Tcl event loop update hook
+# useful for the "after" command
+
+onWorldTick update

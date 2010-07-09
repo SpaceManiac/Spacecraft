@@ -91,7 +91,7 @@ namespace spacecraft
 
 			DateTime Begin = DateTime.Now;
 
-			if (Config.GetBool("tcl", false) && Scripting.HookDefined("onLevelGeneration") && !skipTcl)
+			if (Scripting.Initialized && Scripting.HookDefined("onLevelGeneration") && !skipTcl)
 			{
 				int value = Scripting.ExecuteHook("onLevelGeneration", xdim + " " + ydim + " " + zdim);
 				if (!Scripting.IsOk(value))
@@ -108,20 +108,15 @@ namespace spacecraft
 
 				for (short x = 0; x < xdim; ++x)
 				{
-					if (x == (short)(xdim / 2))
-					{
+					if (x == (short)(xdim / 2)) {
 						Spacecraft.Log("Generation 50% complete");
 					}
-					for (short z = 0; z < zdim; ++z)
-					{
-						for (short y = 0; y < ydim / 2; ++y)
-						{
-							if (y == ydim / 2 - 1)
-							{
+					
+					for (short z = 0; z < zdim; ++z) {
+						for (short y = 0; y < ydim / 2; ++y) {
+							if (y == ydim / 2 - 1) {
 								SetTile_Fast(x, y, z, Block.Grass);
-							}
-							else
-							{
+							} else {
 								SetTile_Fast(x, y, z, Block.Dirt);
 							}
 						}
@@ -139,7 +134,7 @@ namespace spacecraft
 			{
 				if (prependBlockCount)
 				{
-					// convert block count to big-endian
+					// convert block count to network order
 					int convertedBlockCount = IPAddress.HostToNetworkOrder(data.Length);
 					// write block count to gzip stream
 					compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, sizeof(int));
