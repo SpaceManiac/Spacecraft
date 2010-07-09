@@ -9,7 +9,7 @@ namespace spacecraft
 	{
 		public static bool Initialized { get; protected set; }
 		public static TclInterpreter Interpreter { get; set; }
-		private static Dictionary<string, string> Hooks;
+		private static Dictionary<string, List<string>> Hooks;
 		
 		static Scripting() {
 			Initialized = false;
@@ -24,7 +24,7 @@ namespace spacecraft
 				return;
 
 			Interpreter = new TclInterpreter();
-			Hooks = new Dictionary<string, string>();
+			Hooks = new Dictionary<string, List<string>>();
 
 			// Overwrite standard source, since it seems to crash :|
 			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
@@ -49,6 +49,7 @@ namespace spacecraft
 			// 4. Register callbacks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 			Interpreter.CreateCommand("onLevelGeneration", new TclAPI.TclCommand(ScriptGenericHook));
+			Interpreter.CreateCommand("dropHook", new TclAPI.TclCommand(ScriptDropHook));
 
 			Spacecraft.Log("Reading startup.tcl...");
 			int status = Interpreter.SourceFile("Scripting/startup.tcl");
@@ -65,11 +66,16 @@ namespace spacecraft
 		}
 		
 		public static bool HookDefined(string hookName) {
-			return Hooks.ContainsKey(hookName);
+			return Hooks.ContainsKey(hookName) && Hooks[hookName].Count > 0;
 		}
 		
 		public static int ExecuteHook(string hookName, string arguments) {
-			return Interpreter.EvalScript(Hooks[hookName] + " " + arguments);
+			foreach(string command in new List<String>(Hooks[hookName])) {
+				if(!IsOk(Interpreter.EvalScript(command + " " + arguments))) {
+					return TclAPI.TCL_ERROR;
+				}
+			}
+			return TclAPI.TCL_OK;
 		}
 		
 		static int ScriptEvalFile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
@@ -415,7 +421,7 @@ namespace spacecraft
 		static int ScriptSetSpawnPoint(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
 			// syntax: setSpawn x y z
-			// help: Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.
+			// help: Sets the spawn point to {_x y z_} in terms of block coordinates.
 			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
@@ -439,26 +445,55 @@ namespace spacecraft
 		static int ScriptGenericHook(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{
 			// syntax: (hookname) command
-			// help: Registers a hook for (hookname). See the Hooks section for more information.
+			// help: Registers a hook for (hookname). See the Hooks section.
 			
 			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
 
 			if (argc != 2)
 			{
-				Spacecraft.Log("ono " + argc);
 				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " command\"");
 				return TclAPI.TCL_ERROR;
 			}
 			
-			if(Hooks.ContainsKey(args[0])) {
-				Hooks.Remove(args[0]);
+			if(!Hooks.ContainsKey(args[0])) {
+				Hooks.Add(args[0], new List<string>());
 			}
-			Hooks.Add(args[0], args[1]);
+			Hooks[args[0]].Add(args[1]);
 			
 			Spacecraft.Log("Hook defined: " + args[0]);
 
 			TclAPI.SetResult(interp, "");
 			return TclAPI.TCL_OK;
+		}
+		
+		static int ScriptDropHook(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: dropHook hookName command
+			// help: Drops the specified hook from _hookName_. See the Hooks section.
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+
+			if (argc != 3)
+			{
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " hookName command\"");
+				return TclAPI.TCL_ERROR;
+			}
+			
+			string hook = args[1];
+			string cmd = args[2];
+			
+			if(Hooks.ContainsKey(hook) && Hooks[hook].Contains(cmd)) {
+				Hooks[hook].Remove(cmd);
+				if(Hooks[hook].Count == 0) {
+					Hooks.Remove(hook);
+				}
+				Spacecraft.Log("Hook dropped: " + args[1]);
+				TclAPI.SetResult(interp, "");
+				return TclAPI.TCL_OK;
+			} else {
+				TclAPI.SetResult(interp, "hook \"" + hook + "\" does not have command \"" + cmd + "\" attached");
+				return TclAPI.TCL_ERROR;
+			}
 		}
 	}
 }

@@ -12,7 +12,6 @@ proc qf {var from to code} {
 # quick-source
 proc qs {f} {
 	source [file join .. .. Scripting $f]
-	puts ""
 }
 
 proc cmdQs {sender args} {
@@ -21,8 +20,4 @@ proc cmdQs {sender args} {
 	tell $sender "[getColorCode privatemsg][lindex $args 0] quicksourced"
 }
 
-createChatCommand source Admin "Quicksource the given script file" cmdQs
-
-# load other files
-qs testcmd.tcl
-qs bother.tcl
+createChatCommand qsrc Admin "Quicksource the given script file" cmdQs
