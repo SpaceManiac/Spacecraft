@@ -333,6 +333,13 @@ namespace spacecraft
 				P.PlayerDisconnects(ID);
 			}
 			MessageAll(Color.Yellow + Player.name + " has left");
+			
+			if (Scripting.Initialized && Scripting.HookDefined("onPlayerDepart")) {
+				int status = Scripting.ExecuteHook("onPlayerDepart", Player.name);
+				if (!Scripting.IsOk(status)) {
+					Spacecraft.LogError("Tcl onPlayerDepart failed", new SpacecraftException("Tcl onPlayerDepart failed:\n" + Scripting.Interpreter.Result));
+				}
+			}
 		}
 
 		void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
@@ -373,6 +380,13 @@ namespace spacecraft
 
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
 			MessageAll(Color.Yellow + sender.name + " has joined!");
+			
+			if (Scripting.Initialized && Scripting.HookDefined("onPlayerJoin")) {
+				int status = Scripting.ExecuteHook("onPlayerJoin", sender.name);
+				if (!Scripting.IsOk(status)) {
+					Spacecraft.LogError("Tcl onPlayerJoin failed", new SpacecraftException("Tcl onPlayerJoin failed:\n" + Scripting.Interpreter.Result));
+				}
+			}
 		}
 
 		public void MessageAll(string message)

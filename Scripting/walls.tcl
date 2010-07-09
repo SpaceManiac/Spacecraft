@@ -1,6 +1,6 @@
 # walls.tcl
 
-proc walls {} {
+proc makeAdminiumWalls {} {
 	# x=0 and x=255 walls
 	for {set z 0} {$z < 256} {incr z} {
 		for {set y 0} {$y < 128} {incr y} {

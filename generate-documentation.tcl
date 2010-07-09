@@ -290,7 +290,7 @@ proc gen_tcl {} {
 	array set commandHelp {}
 	
 	foreach {cmdName csCmd} [array get commands] {
-		set i [string first "static int $csCmd" $contents]
+		set i [string first "static int $csCmd\(" $contents]
 		set i2 [string first "// syntax:" $contents $i]
 		set i3 [string first "string" $contents $i]
 		if {$i2 != -1 && $i2 < $i3} {

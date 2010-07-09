@@ -46,9 +46,11 @@ namespace spacecraft
 			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
 			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
 			
-			// 4. Register callbacks
+			// 4. Register hooks
 			Interpreter.CreateCommand("createChatCommand", new TclAPI.TclCommand(ScriptRegisterChatCommand));
 			Interpreter.CreateCommand("onLevelGeneration", new TclAPI.TclCommand(ScriptGenericHook));
+			Interpreter.CreateCommand("onPlayerJoin", new TclAPI.TclCommand(ScriptGenericHook));
+			Interpreter.CreateCommand("onPlayerDepart", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("onWorldTick", new TclAPI.TclCommand(ScriptGenericHook));
 			Interpreter.CreateCommand("dropHook", new TclAPI.TclCommand(ScriptDropHook));
 
