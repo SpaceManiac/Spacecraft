@@ -13,7 +13,10 @@ proc bother {sender args} {
 	for {set xn [expr {$x - 1}]} {$xn <= ($x + 1)} {incr xn} {
 		for {set zn [expr {$z - 1}]} {$zn <= ($z + 1)} {incr zn} {
 			for {set yn $y} {$yn >= ($y - 3)} {incr yn -1} {
-				setTile $xn $yn $zn air
+				set t [getTile $xn $yn $zn]
+				if {$t != "adminium"} {
+					setTile $xn $yn $zn air
+				}
 			}
 		}
 	}

@@ -216,11 +216,13 @@ namespace spacecraft
 		{
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 
-			RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
-
-			if (Heights[x, z] == y && tile == Block.Dirt)
-			{
-				tile = Block.Grass;
+			if(calcHeights) {
+				RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
+	
+				if (Heights[x, z] == y && tile == Block.Dirt)
+				{
+					tile = Block.Grass;
+				}
 			}
 		
 			BlockPosition pos = new BlockPosition(x, y, z);

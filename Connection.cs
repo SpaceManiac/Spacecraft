@@ -206,6 +206,10 @@ namespace spacecraft
 				P.PercentComplete = (byte) (100 * ((double)bytesSent / compressedData.Length));
 
 				SendPacket(P);
+				
+				// yield to other threads
+				// in case it takes someone a loooong time to load
+				Thread.Sleep(10);
 			}
 
 			LevelEndPacket End = new LevelEndPacket();

@@ -1,7 +1,6 @@
 # levelgen.tcl
 # this is a basic Tcl version of the standard flatgrass generation
 
-
 proc generateLevel {xdim ydim zdim} {
 	setSpawn [expr {$xdim/2}] [expr {$ydim/2}] [expr {$zdim/2}] 0
 
@@ -22,4 +21,4 @@ proc generateLevel {xdim ydim zdim} {
 	}
 }
 
-#onLevelGeneration generateLevel
+# onLevelGeneration generateLevel
