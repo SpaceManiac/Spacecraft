@@ -236,7 +236,7 @@ namespace spacecraft
 			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
 			List<Player> temp = new List<Player>(Players);
 			foreach(Player P in temp) {
-				if(P.name.ToLower() == name &&
+				if(P.name != null && P.name.ToLower() == name &&
 				  P != not) {
 					return P;
 				}

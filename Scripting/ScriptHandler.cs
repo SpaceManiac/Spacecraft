@@ -38,10 +38,13 @@ namespace spacecraft
 			Interpreter.CreateCommand("getTile", new TclAPI.TclCommand(ScriptGetTile));
 			Interpreter.CreateCommand("playerList", new TclAPI.TclCommand(ScriptPlayerList));
 			Interpreter.CreateCommand("playerInfo", new TclAPI.TclCommand(ScriptGetPlayerInfo));
+			Interpreter.CreateCommand("landmarkList", new TclAPI.TclCommand(ScriptLandmarkList));
+			Interpreter.CreateCommand("landmarkInfo", new TclAPI.TclCommand(ScriptGetLandmarkInfo));
 
 			// 3. Affect the world
 			Interpreter.CreateCommand("scLog", new TclAPI.TclCommand(ScriptLog));
 			Interpreter.CreateCommand("broadcast", new TclAPI.TclCommand(ScriptBroadcast));
+			Interpreter.CreateCommand("playerToLandmark", new TclAPI.TclCommand(ScriptPlayerToLandmark));
 			Interpreter.CreateCommand("setTile", new TclAPI.TclCommand(ScriptSetTile));
 			Interpreter.CreateCommand("tell", new TclAPI.TclCommand(ScriptSendMessage));
 			Interpreter.CreateCommand("setSpawn", new TclAPI.TclCommand(ScriptSetSpawnPoint));
@@ -394,6 +397,65 @@ namespace spacecraft
 
 			TclAPI.SetResult(interp, Builder.ToString());
 			return TclAPI.TCL_OK;
+		}
+		
+		static int ScriptLandmarkList(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: landmarkList
+			// help: Returns a list of all landmark names in the world.
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+			
+			if (argc != 1)
+			{
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + "\"");
+				return TclAPI.TCL_ERROR;
+			}
+
+			StringBuilder Result = new StringBuilder();
+
+			foreach (string landmark in Server.theServ.map.landmarks.Keys)
+			{
+				Result.Append(landmark);
+				Result.Append(" ");
+			}
+
+			TclAPI.SetResult(interp, Result.ToString());
+			return TclAPI.TCL_OK;
+
+		}
+
+		static int ScriptGetLandmarkInfo(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
+		{
+			// syntax: landmarkInfo landmarkName
+			// help: Returns a list of landmark info in the form {x y z heading}
+			
+			string[] args = TclAPI.GetArgumentArray(argc, argsPtr);
+
+			if (argc != 2)
+			{
+				TclAPI.SetResult(interp, "wrong # args: should be \"" + args[0] + " landmarkName\"");
+				return TclAPI.TCL_ERROR;
+			}
+
+			string landmark = args[1];
+			Dictionary<string, Pair<Position, byte>> landmarks = Server.theServ.map.landmarks;
+			if (landmarks.ContainsKey(landmark)) {
+				Pair<Position, byte> mrk = landmarks[landmark];
+				StringBuilder Builder = new StringBuilder();
+				Builder.Append(mrk.First.x);
+				Builder.Append(" ");
+				Builder.Append(mrk.First.y);
+				Builder.Append(" ");
+				Builder.Append(mrk.First.z);
+				Builder.Append(" ");
+				Builder.Append(mrk.Second);
+				TclAPI.SetResult(interp, Builder.ToString());
+				return TclAPI.TCL_OK;
+			} else {
+				TclAPI.SetResult(interp, "no such landmark \"" + landmark + "\"");
+				return TclAPI.TCL_ERROR;
+			}
 		}
 		
 		static int ScriptRegisterChatCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
