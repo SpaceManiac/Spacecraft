@@ -60,14 +60,13 @@ namespace spacecraft
 		Books = 47,
 		MossyCobblestone = 48,
 		Obsidian = 49,
-		Test = 44,
-
-		Maximum = Obsidian
 
 		/* indev only
-		I_Torch = 0x32,
-		I_Fire = 0x33,
-		I_InfWater = 0x34 */
+		Torch = 50,
+		Fire = 51,
+		InfiniteWater = 52,*/
+
+        Maximum = Obsidian
 	}
 
 	public static class BlockInfo

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Map\MapPhysics.cs" />
+    <Compile Include="Map\McLevelFactory.cs" />
     <Compile Include="Scripting\ScriptHandler.cs" />
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="Utils\Config.cs" />
