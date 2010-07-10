@@ -1,13 +1,25 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Scripting\ScriptHandler.cs" ctype="Workbench">
     <Files>
-      <File FileName="Scripting\TclWrap.cs" Line="1" Column="1" />
-      <File FileName="Server.cs" Line="1" Column="1" />
+      <File FileName="Scripting\ScriptHandler.cs" Line="468" Column="59" />
+      <File FileName="Server.cs" Line="197" Column="19" />
+      <File FileName="Map\Map.cs" Line="35" Column="73" />
+      <File FileName="ConsolePlayer.cs" Line="62" Column="17" />
+      <File FileName="Player.cs" Line="300" Column="23" />
+      <File FileName="ChatCommands\Landmarks.cs" Line="31" Column="49" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State selected="True" />
+        <State expanded="True">
+          <Node name="spacecraft" expanded="True">
+            <Node name="ChatCommands" expanded="True" />
+            <Node name="Map" expanded="True" />
+            <Node name="Scripting" expanded="True">
+              <Node name="ScriptHandler.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
       </Pad>
       <Pad Id="ClassPad">
         <State selected="True" />
