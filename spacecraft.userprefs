@@ -8,16 +8,13 @@
       <File FileName="ConsolePlayer.cs" Line="1" Column="1" />
       <File FileName="Player.cs" Line="1" Column="1" />
       <File FileName="ChatCommands\Landmarks.cs" Line="1" Column="1" />
-      <File FileName="Map\McLevelFactory.cs" Line="150" Column="43" />
-      <File FileName="TestingSuite\Program.cs" Line="16" Column="19" />
+      <File FileName="Map\McLevelFactory.cs" Line="86" Column="52" />
+      <File FileName="TestingSuite\Program.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="spacecraft" expanded="True" selected="True">
-            <Node name="Map" expanded="True" />
-          </Node>
-          <Node name="TestingSuite" expanded="True" />
+          <Node name="TestingSuite" expanded="True" selected="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

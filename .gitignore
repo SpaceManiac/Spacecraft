@@ -1,6 +1,3 @@
-bin\
+bin/
 spacecraft.pidb
 spacecraft.userprefs
-TestingSuite\bin\
-TestingSuite\TestingSuite.pidb
-TestingSuite\TestingSuite.userprefs
