@@ -22,7 +22,7 @@ namespace spacecraft
 		/// </summary>
 		public event PlayerMoveHandler Move;
 
-		public delegate void PlayerBlockChangeHandler(BlockPosition pos, Block type);
+		public delegate void PlayerBlockChangeHandler(Player player, BlockPosition pos, Block type);
 		/// <summary>
 		/// Triggred when the player changes a block.
 		/// </summary>
@@ -297,7 +297,7 @@ namespace spacecraft
 			}
 
 			if(BlockChange != null)
-				BlockChange(new BlockPosition(X, Y, Z), type);
+				BlockChange(this, new BlockPosition(X, Y, Z), type);
 		}
 
 		void conn_ReceivedMessage(string message)

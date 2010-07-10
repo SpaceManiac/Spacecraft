@@ -236,7 +236,7 @@ namespace spacecraft
 			// TODO: implement abbreviations (i.e. 'Space' could become 'SpaceManiac')
 			List<Player> temp = new List<Player>(Players);
 			foreach(Player P in temp) {
-				if(P.name.ToLower() == name &&
+				if(P.name != null && P.name.ToLower() == name &&
 				  P != not) {
 					return P;
 				}
@@ -349,10 +349,21 @@ namespace spacecraft
 				P.BlockSet(pos, BlockType);
 			}
 		}
+		
+		bool tclOnBlockChange = true;
 
-		void Player_BlockChange(BlockPosition pos, Block BlockType)
+		void Player_BlockChange(Player sender, BlockPosition pos, Block BlockType)
 		{
 			map.SetTile(pos.x, pos.y, pos.z, BlockType);
+			
+			if (tclOnBlockChange && Scripting.Initialized && Scripting.HookDefined("onPlayerChangeBlock")) {
+				string args = sender.name + " " + pos.x + " " + pos.y + " " + pos.z + BlockType.ToString().ToLower();
+				int status = Scripting.ExecuteHook("onPlayerChangeBlock", args);
+				if (!Scripting.IsOk(status)) {
+					Spacecraft.LogError("Tcl onPlayerChangeBlock failed (disabling!)", new SpacecraftException("Tcl onPlayerChangeBlock failed:\n" + Scripting.Interpreter.Result));
+					tclOnBlockChange = false;
+				}
+			}
 		}
 
 		void Player_Move(Player sender, Position dest, byte heading, byte pitch)

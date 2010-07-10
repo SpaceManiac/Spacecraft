@@ -28,4 +28,3 @@ createChatCommand "qsrc" Admin "Quicksource the given script file" cmdQs
 onWorldTick update
 
 qs levelgen.tcl
-qs hooks-test.tcl

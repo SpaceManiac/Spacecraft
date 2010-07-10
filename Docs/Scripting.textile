@@ -15,6 +15,8 @@ table.
 |*getTile*|getTile x y z|Returns the block type of a location in string form.|
 |*playerList*|playerList|Returns a list of all players online.|
 |*playerInfo*|playerInfo playerName|Returns a list of player info in the form {id x y z heading pitch rank}|
+|*landmarkList*|landmarkList|Returns a list of all landmark names in the world.|
+|*landmarkInfo*|landmarkInfo landmarkName|Returns a list of landmark info in the form {x y z heading}|
 
 h2. Affect the world
 
@@ -22,16 +24,22 @@ table.
 |*Name*|*Syntax*|*Information*|
 |*scLog*|scLog text|Log _text_ with the [S] designation to Spacecraft's log files|
 |*broadcast*|broadcast message|Broadcast a message in yellow text, a la /say|
+|*playerToLandmark*|playerToLandmark playerName landmarkName|Teleports the given player to the given landmark|
 |*setTile*|setTile x y z type _?fast?_|Set a tile (_type_ should be a string). If _fast_ is enabled, the block will be set but no updates will be sent.|
 |*tell*|tell playerName message|Send a message with no extra coloring to an individual player.|
-|*setSpawn*|setSpawn x y z|Sets the spawn point to (_x_,_y_,_z_) in terms of block coordinates.|
+|*setSpawn*|setSpawn x y z|Sets the spawn point to {_x y z_} in terms of block coordinates.|
 
-h2. Register callbacks
+h2. Register hooks
 
 table.
 |*Name*|*Syntax*|*Information*|
 |*createChatCommand*|createChatCommand commandName rankNeeded help script|Registers a new chat command. The _script_ will be called with the sender's name and the rest of the arguments.|
-|*onLevelGeneration*|onLevelGeneration command|Registers a hook for onLevelGeneration. See the Hooks section for more information.|
+|*onLevelGeneration*|onLevelGeneration command|Registers a hook for onLevelGeneration. See the Hooks section.|
+|*onPlayerChangeBlock*|onPlayerChangeBlock command|Registers a hook for onPlayerChangeBlock. See the Hooks section.|
+|*onPlayerJoin*|onPlayerJoin command|Registers a hook for onPlayerJoin. See the Hooks section.|
+|*onPlayerDepart*|onPlayerDepart command|Registers a hook for onPlayerDepart. See the Hooks section.|
+|*onWorldTick*|onWorldTick command|Registers a hook for onWorldTick. See the Hooks section.|
+|*dropHook*|dropHook hookName command|Drops the specified hook from _hookName_. See the Hooks section.|
 
 
 This documentation was auto-generated based on Spacecraft's source.
