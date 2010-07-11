@@ -557,9 +557,11 @@ namespace spacecraft
 			if(!Hooks.ContainsKey(args[0])) {
 				Hooks.Add(args[0], new List<string>());
 			}
-			Hooks[args[0]].Add(args[1]);
+			if(!Hooks[args[0]].Contains(args[1])) {
+				Hooks[args[0]].Add(args[1]);
+			}
 			
-			Spacecraft.Log("Hook defined: " + args[0]);
+			Spacecraft.Log("Hook defined: " + args[0] + " = " + args[1]);
 
 			TclAPI.SetResult(interp, "");
 			return TclAPI.TCL_OK;

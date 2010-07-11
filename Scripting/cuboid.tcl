@@ -26,5 +26,6 @@ proc cuboid {sender args} {
 }
 
 proc z {args} {
-	catch {eval cuboid "" $args}
+	catch {eval cuboid "" $args} x
+	return $x
 }

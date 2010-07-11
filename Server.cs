@@ -158,14 +158,8 @@ namespace spacecraft
 				}
 				
 				if (clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
-					// physics tick
-					double now = clock.Elapsed.TotalSeconds;
-					map.DoPhysics();
-					lastPhysics = clock.Elapsed.TotalSeconds;
-					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
-					
 					// tcl tick
-					now = clock.Elapsed.TotalSeconds;
+					double now = clock.Elapsed.TotalSeconds;
 					if (tclOnWorldTick && Scripting.Initialized && Scripting.HookDefined("onWorldTick")) {
 						int status = Scripting.ExecuteHook("onWorldTick", "");
 						if (!Scripting.IsOk(status)) {
@@ -174,6 +168,12 @@ namespace spacecraft
 						}
 					}
 					LastTclTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
+					
+					// physics tick
+					now = clock.Elapsed.TotalSeconds;
+					map.DoPhysics();
+					lastPhysics = clock.Elapsed.TotalSeconds;
+					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
 				}
 
 				if (clock.Elapsed.TotalSeconds - lastBookend >= 3600) {
@@ -354,10 +354,12 @@ namespace spacecraft
 
 		void Player_BlockChange(Player sender, BlockPosition pos, Block BlockType)
 		{
+			Block was = map.GetTile(pos.x, pos.y, pos.z);
 			map.SetTile(pos.x, pos.y, pos.z, BlockType);
 			
 			if (tclOnBlockChange && Scripting.Initialized && Scripting.HookDefined("onPlayerChangeBlock")) {
-				string args = sender.name + " " + pos.x + " " + pos.y + " " + pos.z + BlockType.ToString().ToLower();
+				string args = sender.name + " " + pos.x + " " + pos.y + " " + pos.z + " "
+					+ BlockType.ToString().ToLower() + " " + was.ToString().ToLower();
 				int status = Scripting.ExecuteHook("onPlayerChangeBlock", args);
 				if (!Scripting.IsOk(status)) {
 					Spacecraft.LogError("Tcl onPlayerChangeBlock failed (disabling!)", new SpacecraftException("Tcl onPlayerChangeBlock failed:\n" + Scripting.Interpreter.Result));
