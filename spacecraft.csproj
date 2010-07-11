@@ -48,6 +48,10 @@
     <Compile Include="Map\MapPhysics.cs" />
     <Compile Include="Map\McLevelFactory.cs" />
     <Compile Include="Scripting\ScriptHandler.cs" />
+    <Compile Include="Skeet_Conversion\BigEndianBitConverter.cs" />
+    <Compile Include="Skeet_Conversion\EndianBitConverter.cs" />
+    <Compile Include="Skeet_Conversion\Endianness.cs" />
+    <Compile Include="Skeet_Conversion\LittleEndianBitConverter.cs" />
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="AssemblyInfo.cs" />

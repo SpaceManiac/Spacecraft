@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Xml;
 using System.Net;
+using MiscUtil.Conversion;
 
 namespace spacecraft
 {
@@ -217,8 +218,8 @@ namespace spacecraft
 
         static StringBuilder XMLBuilder = new StringBuilder();
 
+        static Stack<TagType> CompoundStack = new Stack<TagType>();
 
-        static int UnfinishedCompounds = 0;
         static int ListItemsRemaining = -1; // How many items remain in the list. -1 represents no list at all.
         static byte[] buffer;
         static TagType ListType = TagType.UNKNOWN;
@@ -231,29 +232,25 @@ namespace spacecraft
             do
             {
                 TagType ID;
-                if (ListType == TagType.UNKNOWN)
+                if (CompoundStack.Count == 0 || CompoundStack.Peek() == TagType.Compound)
                 {
                     int B = ByteStream.ReadByte();
                     ID = (TagType) B;
-                    if (B == -1)
-                    {
-                        EOF = true;
-                        break;
-                    }
                 }
                 else
                 {
                     ID = ListType;
                 }
                 string name = "";
-                if (ListItemsRemaining < 0 && ID != TagType.End)
+                if (ListItemsRemaining <= 0 && ID != TagType.End)
                     name = ReadShortPrefixedString(ByteStream);
 
                 switch (ID)
                 {
                     case TagType.End:
                         XMLBuilder.Append("</compound>");
-                        --UnfinishedCompounds;
+                        System.Diagnostics.Debug.WriteLine(ByteStream.Position);
+                        CompoundStack.Pop();
                         break;
                     
                     case TagType.Byte:
@@ -300,7 +297,7 @@ namespace spacecraft
 
                         buffer = new byte[4];
                         ByteStream.Read(buffer, 0, 4);
-                        int I = BitConverter.ToInt32(buffer,0);
+                        int I = EndianBitConverter.Big.ToInt32(buffer,0);
 
                         XMLBuilder.Append(I.ToString());
                         XMLBuilder.Append("\" />");
@@ -319,7 +316,7 @@ namespace spacecraft
 
                         buffer = new byte[8];
                         ByteStream.Read(buffer, 0, 8);
-                        long L = BitConverter.ToInt64(buffer, 0);
+                        long L =  EndianBitConverter.Big.ToInt64(buffer, 0);
 
                         XMLBuilder.Append(L.ToString());
                         XMLBuilder.Append("\" />");
@@ -338,7 +335,8 @@ namespace spacecraft
 
                         buffer = new byte[4];
                         ByteStream.Read(buffer, 0, 4);
-                        float F = BitConverter.ToSingle(buffer, 0);
+                        float F = EndianBitConverter.Big.ToSingle(buffer, 0);
+
 
                         XMLBuilder.Append(F.ToString());
                         XMLBuilder.Append("\" />");
@@ -357,7 +355,7 @@ namespace spacecraft
 
                         buffer = new byte[8];
                         ByteStream.Read(buffer, 0, 8);
-                        double D = BitConverter.ToDouble(buffer, 0);
+                        double D = EndianBitConverter.Big.ToDouble(buffer, 0);
 
                         XMLBuilder.Append(D.ToString());
                         XMLBuilder.Append("\" />");
@@ -376,7 +374,7 @@ namespace spacecraft
 
                         buffer = new byte[4];
                         ByteStream.Read(buffer, 0, 4);
-                        int length = BitConverter.ToInt32(buffer, 0);
+                        int length =  EndianBitConverter.Big.ToInt32(buffer, 0);
 
                         buffer = new byte[length];
                         ByteStream.Read(buffer, 0, length);
@@ -414,7 +412,9 @@ namespace spacecraft
                         XMLBuilder.Append(" >");
 
                         ListType = (TagType) ByteStream.ReadByte();
-                        
+
+                        CompoundStack.Push(ListType);
+
                         ListItemsRemaining = 0;
                         ListItemsRemaining += ByteStream.ReadByte() << 24;
                         ListItemsRemaining += ByteStream.ReadByte() << 16;
@@ -432,7 +432,7 @@ namespace spacecraft
                             XMLBuilder.Append("\"");
                         }
                         XMLBuilder.Append(" >");
-                        ++UnfinishedCompounds;
+                        CompoundStack.Push(TagType.Compound);
                         Started = true;
                         break;
                     
@@ -440,21 +440,22 @@ namespace spacecraft
                         throw new IOException("The parser exploded.");
                 }
 
-                if (ListItemsRemaining >= 0)
+                if (ListItemsRemaining > 0 && ID == CompoundStack.Peek())
                 {
                     --ListItemsRemaining;
                     if (ListItemsRemaining == 0)
                     {
-                        ListType = TagType.UNKNOWN;
+                        CompoundStack.Pop();
                         XMLBuilder.Append("</list>");
                     }
                 }
 
-                //if ()//Started && UnfinishedCompounds == 0)
-                  //  EOF = true;
+                if (Started && CompoundStack.Count == 0)
+                    EOF = true;
 
             }
             while (!EOF);
+
 
             MemoryStream M = new MemoryStream(UTF8Encoding.UTF8.GetBytes(XMLBuilder.ToString()));
             return new XmlTextReader(M);
@@ -503,6 +504,4 @@ namespace spacecraft
         }
 
     }
-
-    
 }

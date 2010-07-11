@@ -8,7 +8,7 @@ namespace spacecraft
 	/// A generalization of StringBuilder.
 	/// </summary>
 	/// <typeparam name="T">The type to build an array of</typeparam>
-	class Builder<T>
+	public class Builder<T>
 	{
 		List<T> _contents = new List<T>();
 
