@@ -14,7 +14,7 @@ namespace spacecraft
 	{
 		public const string levelName = "level.fcm";
 
-		// continued in Map.cs
+		// continued in MapTag.cs
 
 		// ==== Loading ====
 
@@ -67,7 +67,7 @@ namespace spacecraft
 			}
 			/*catch (Exception ex)
 			{
-				Spacecraft.Log("Map.Load: Error trying to read from \"" + filename + "\": " + ex.Message);
+				Spacecraft.Log("MapTag.Load: Error trying to read from \"" + filename + "\": " + ex.Message);
 				return null;
 			}*/
 			finally

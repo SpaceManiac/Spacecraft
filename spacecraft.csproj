@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;WIN32</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WIN32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Map\MapPhysics.cs" />
-    <Compile Include="Map\McLevelFactory.cs" />
+    <Compile Include="Map\McLevelSaving.cs" />
     <Compile Include="Map\McLevelLoading.cs" />
     <Compile Include="Map\NBT.cs" />
     <Compile Include="Scripting\ScriptHandler.cs" />

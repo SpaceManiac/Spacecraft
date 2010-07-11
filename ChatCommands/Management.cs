@@ -247,12 +247,14 @@ namespace spacecraft {
 				sender.PrintMessage(Color.CommandResult + "ActiveList length: " + s.map.ActiveListLength + " - Updates last tick: " + s.map.UpdatedLastTick);
 				sender.PrintMessage(Color.CommandResult + "Server uptime: " + Uptime);
 				sender.PrintMessage(Color.CommandResult + "Last heartbeat took: " + s.LastHeartbeatTook + "s - Last physics tick took: " + s.LastPhysicsTickTook + "s");
+#if WIN32
 				try {
 					sender.PrintMessage(Color.CommandResult + "CPU usage: " + cpu + "% - RAM usage: " + ram + "Mb");
 				}
 				catch(NotImplementedException) {
 					sender.PrintMessage(Color.CommandResult + "CPU/RAM usage unavailable under Mono");
 				}
+#endif
 			}
 		}
 	}
