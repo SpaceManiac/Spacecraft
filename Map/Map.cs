@@ -161,6 +161,12 @@ namespace spacecraft
 			return true;
 		}
 
+        /// <summary>
+        /// Search/replace blocks. Max = -1 for no limit.
+        /// </summary>
+        /// <param name="From"></param>
+        /// <param name="To"></param>
+        /// <param name="max"></param>
 		public void ReplaceAll(Block From, Block To, int max)
 		{
 			lock (PhysicsMutex)
@@ -175,7 +181,7 @@ namespace spacecraft
 							if (GetTile(x, y, z) == From)
 							{
 								SetTile(x, y, z, To);
-								if (++total >= max) return;
+								if (++total >= max || max != -1) return;
 							}
 						}
 					}

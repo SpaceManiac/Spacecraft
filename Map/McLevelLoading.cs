@@ -63,6 +63,10 @@ namespace spacecraft
                         short y = (short)List[1].Payload;
                         short z = (short)List[2].Payload;
 
+                        x *= 32;
+                        y *= 32;
+                        z *= 32;
+
                         MapInProgress.SetSpawn(new Position(x, y, z), 0);
 
                         break;
@@ -70,6 +74,10 @@ namespace spacecraft
                         break;
                 }
             }
+
+            // We do our own optimizations.
+            MapInProgress.ReplaceAll(Block.StillWater, Block.Water, -1);
+            MapInProgress.ReplaceAll(Block.StillLava, Block.Lava, -1);
 
             return MapInProgress;
 		}
