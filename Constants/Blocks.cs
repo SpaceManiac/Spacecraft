@@ -66,7 +66,7 @@ namespace spacecraft
 		Fire = 51,
 		InfiniteWater = 52,*/
 
-        Maximum = Obsidian
+		Maximum = Obsidian
 	}
 
 	public static class BlockInfo
