@@ -55,3 +55,4 @@ proc lremove args {
 onWorldTick update
 qs levelgen.tcl
 qs spelunker.tcl
+qs cuboid.tcl

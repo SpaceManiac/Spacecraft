@@ -1,7 +1,8 @@
 # spelunker.tcl
+# procedures for the /spelunker minigame
 
-# CHANGE THIS
-set spelunker_party 1
+# Change this if you're not on the test server
+set spelunker_party 0
 
 set spelunker {}
 set spelunker_started 0
@@ -124,8 +125,8 @@ proc spelunkerTick {} {
 				broadcast "Spelunker: $player crossed the finish line ($time)!"
 			} else {
 				set spelunker_started 2
-				broadcast "Spelunker: $player WINS ($time)! 60 seconds remain."
-				after 60000 spelunkerEnd
+				broadcast "Spelunker: $player WINS ($time)! 90 seconds remain."
+				after 90000 spelunkerEnd
 			}
 			set spelunker [lremove $spelunker $player]
 		}

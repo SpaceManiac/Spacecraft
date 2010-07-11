@@ -1,5 +1,7 @@
 # walls.tcl
 
+# makeAdminiumWalls procedure
+# builds adminium walls around the bottom half of the map (flood barriers)
 proc makeAdminiumWalls {} {
 	# x=0 and x=255 walls
 	for {set z 0} {$z < 256} {incr z} {
