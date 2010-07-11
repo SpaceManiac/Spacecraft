@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Xml;
+using System.Net;
 
 namespace spacecraft
 {
@@ -30,7 +32,9 @@ namespace spacecraft
 
         }
 
-        /// <summary>
+        #region Old code
+
+        /*/// <summary>
         /// Used for handling nested TAG_Compound items. The current Compound is always the first item.
         /// </summary>
         static Stack<BinaryTag> CompoundStack;
@@ -42,9 +46,21 @@ namespace spacecraft
         /// <summary>
         /// For miscellanous use.
         /// </summary>
-        static byte[] buffer; 
+        static byte[] buffer;
 
-        public static BinaryTag ParseTagStream(Stream ByteStream)
+        /// <summary>
+        /// How many items are left in the current TAG_List, if any.
+        /// </summary>
+        static int ListItemsRemaining = 0;
+
+        /// <summary>
+        /// The type of items in the list currently being parsed.
+        /// </summary>
+        static TagType ListType = TagType.UNKNOWN;
+
+        static BinaryTag CurrentList;
+
+        public static BinaryTag ParseTagStreamDepracated(Stream ByteStream)
         {
             // Initialize everything.
             if (CompoundStack == null)
@@ -59,9 +75,21 @@ namespace spacecraft
             // C# complains if this isn't defined.
             BinaryTag Root = new BinaryTag() { Name = "", Payload = null, Type = TagType.End };
 
+
+            // While there is still an unterminated TAG_Compound.
             while (!FoundEnd || CompoundStack.Count > 0)
             {
-                TagType ID = (TagType)(Byte)ByteStream.ReadByte();
+                TagType ID = TagType.UNKNOWN;
+
+                if (ListType == TagType.UNKNOWN)
+                {
+                    ID = (TagType)ByteStream.ReadByte();
+                }
+                else
+                {
+                    ID = ListType;
+                }
+
 
                 Root = new BinaryTag(ID);
 
@@ -77,7 +105,7 @@ namespace spacecraft
                 }
 
 
-                Root.Type = ID;
+               // Root.Type = ID;
 
                 switch (ID)
                 {
@@ -145,7 +173,14 @@ namespace spacecraft
                         break;
                     
                     case TagType.List:
-                        throw new NotImplementedException();
+                        ListType = (TagType) ByteStream.ReadByte();
+                        
+                        buffer = new byte[4];
+                        ByteStream.Read(buffer, 0, 4);
+                        int ListLength = BitConverter.ToInt32(buffer,0);
+                        ListItemsRemaining = ListLength;
+                        CurrentList = Root;
+                        break;
                     
                     case TagType.Compound:
                         CompoundStack.Push(Root);
@@ -157,16 +192,290 @@ namespace spacecraft
                 }
 
                 if (!FoundEnd && ID != TagType.Compound)
+                {
                     Children.Add(Root);
+                    if (ListType != TagType.UNKNOWN)
+                    { // We've just parsed a list item, so decrement the counter.
+                        --ListItemsRemaining;
+                    }
+                }
+                // No more list items remaining
+                if (ListItemsRemaining == 0 && ListType != TagType.UNKNOWN)
+                {
+                    // No more list items remaining
+                    ListType = TagType.UNKNOWN;
+                    BinaryTag[] children = Children.ToArray();
+                    CurrentList.Payload = children;
+                }
 
             }
             return Root;
+        }*/
+
+        #endregion
+
+
+        static StringBuilder XMLBuilder = new StringBuilder();
+
+
+        static int UnfinishedCompounds = 0;
+        static int ListItemsRemaining = -1; // How many items remain in the list. -1 represents no list at all.
+        static byte[] buffer;
+        static TagType ListType = TagType.UNKNOWN;
+
+        public static XmlTextReader ParseTagStream(Stream ByteStream)
+        {
+            bool EOF = false;
+            bool Started = true;
+
+            do
+            {
+                TagType ID;
+                if (ListType == TagType.UNKNOWN)
+                {
+                    int B = ByteStream.ReadByte();
+                    ID = (TagType) B;
+                    if (B == -1)
+                    {
+                        EOF = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    ID = ListType;
+                }
+                string name = "";
+                if (ListItemsRemaining < 0 && ID != TagType.End)
+                    name = ReadShortPrefixedString(ByteStream);
+
+                switch (ID)
+                {
+                    case TagType.End:
+                        XMLBuilder.Append("</compound>");
+                        --UnfinishedCompounds;
+                        break;
+                    
+                    case TagType.Byte:
+                        XMLBuilder.Append("<byte ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+                        XMLBuilder.Append(ByteStream.ReadByte().ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+
+                    case TagType.Short:
+                        XMLBuilder.Append("<short ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+                        
+                        int one = ByteStream.ReadByte();
+                        int two = ByteStream.ReadByte();
+                        short S = (short) (one * 256 + two);
+
+                        XMLBuilder.Append(S.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.Int:
+                        XMLBuilder.Append("<int ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+
+                        buffer = new byte[4];
+                        ByteStream.Read(buffer, 0, 4);
+                        int I = BitConverter.ToInt32(buffer,0);
+
+                        XMLBuilder.Append(I.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.Long:
+                        XMLBuilder.Append("<long ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+
+                        buffer = new byte[8];
+                        ByteStream.Read(buffer, 0, 8);
+                        long L = BitConverter.ToInt64(buffer, 0);
+
+                        XMLBuilder.Append(L.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.Float:
+                        XMLBuilder.Append("<single ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+
+                        buffer = new byte[4];
+                        ByteStream.Read(buffer, 0, 4);
+                        float F = BitConverter.ToSingle(buffer, 0);
+
+                        XMLBuilder.Append(F.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.Double:
+                        XMLBuilder.Append("<double ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+
+                        buffer = new byte[8];
+                        ByteStream.Read(buffer, 0, 8);
+                        double D = BitConverter.ToDouble(buffer, 0);
+
+                        XMLBuilder.Append(D.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.ByteArray:
+                        XMLBuilder.Append("<byte_array ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+
+                        buffer = new byte[4];
+                        ByteStream.Read(buffer, 0, 4);
+                        int length = BitConverter.ToInt32(buffer, 0);
+
+                        buffer = new byte[length];
+                        ByteStream.Read(buffer, 0, length);
+                        string RawValue = Convert.ToBase64String(buffer);
+
+                        XMLBuilder.Append(RawValue.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+
+                    case TagType.String:
+                        XMLBuilder.Append("<string ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" value=\"");
+
+                        string value = ReadShortPrefixedString(ByteStream);
+
+                        XMLBuilder.Append( value.ToString());
+                        XMLBuilder.Append("\" />");
+                        break;
+                    
+                    case TagType.List:
+                        XMLBuilder.Append("<list ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" >");
+
+                        ListType = (TagType) ByteStream.ReadByte();
+                        
+                        ListItemsRemaining = 0;
+                        ListItemsRemaining += ByteStream.ReadByte() << 24;
+                        ListItemsRemaining += ByteStream.ReadByte() << 16;
+                        ListItemsRemaining += ByteStream.ReadByte() << 8;
+                        ListItemsRemaining += ByteStream.ReadByte();
+                        break;
+                        //throw new NotImplementedException();
+                    
+                    case TagType.Compound:
+                        XMLBuilder.Append("<compound ");
+                        if (name != "")
+                        {
+                            XMLBuilder.Append("name=\"");
+                            XMLBuilder.Append(name);
+                            XMLBuilder.Append("\"");
+                        }
+                        XMLBuilder.Append(" >");
+                        ++UnfinishedCompounds;
+                        Started = true;
+                        break;
+                    
+                    default:
+                        throw new IOException("The parser exploded.");
+                }
+
+                if (ListItemsRemaining >= 0)
+                {
+                    --ListItemsRemaining;
+                    if (ListItemsRemaining == 0)
+                    {
+                        ListType = TagType.UNKNOWN;
+                        XMLBuilder.Append("</list>");
+                    }
+                }
+
+                //if ()//Started && UnfinishedCompounds == 0)
+                  //  EOF = true;
+
+            }
+            while (!EOF);
+
+            MemoryStream M = new MemoryStream(UTF8Encoding.UTF8.GetBytes(XMLBuilder.ToString()));
+            return new XmlTextReader(M);
+
         }
 
+        private static string ReadShortPrefixedString(Stream ByteStream)
+        {
+            int one = ByteStream.ReadByte();
+            int two = ByteStream.ReadByte();
+            short len = (short) (one * 256 + two);
+
+            byte[] buffer = new byte[len];
+            ByteStream.Read(buffer, 0, len);
+            return UTF8Encoding.UTF8.GetString(buffer);
+        }
     }
 
     public enum TagType : byte
     {
+        UNKNOWN = 255,
         End = 0,
         Byte = 1,
         Short =2, 
@@ -195,6 +504,5 @@ namespace spacecraft
 
     }
 
-
-
+    
 }
