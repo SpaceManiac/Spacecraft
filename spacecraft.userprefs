@@ -1,8 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Server.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ctype="Workbench">
     <Files>
-      <File FileName="Scripting\ScriptHandler.cs" Line="382" Column="36" />
+      <File FileName="Scripting\ScriptHandler.cs" Line="1" Column="1" />
       <File FileName="Server.cs" Line="176" Column="63" />
       <File FileName="Map\Map.cs" Line="1" Column="1" />
       <File FileName="ConsolePlayer.cs" Line="1" Column="1" />
@@ -16,8 +16,9 @@
           <Node name="spacecraft" expanded="True">
             <Node name="References" expanded="True" />
             <Node name="Scripting" expanded="True" />
-            <Node name="Server.cs" selected="True" />
+            <Node name="AssemblyInfo.cs" selected="True" />
           </Node>
+          <Node name="SpacecraftTestingSuite" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

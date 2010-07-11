@@ -32,6 +32,10 @@ namespace spacecraft
 					return LoadFCM(filename);
 				case ".dat":
 					return DatLoading.Load(filename);
+				case ".nbt":
+				case ".mclevel":
+				case ".mclvl":
+					return McLevelLoading.Load(filename);
 				default:
 					throw new FileLoadException("Unknown map file format.");
 			}
