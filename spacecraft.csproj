@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Map\MapPhysics.cs" />
     <Compile Include="Map\McLevelFactory.cs" />
+    <Compile Include="Map\McLevelLoading.cs" />
+    <Compile Include="Map\NBT.cs" />
     <Compile Include="Scripting\ScriptHandler.cs" />
     <Compile Include="Skeet_Conversion\BigEndianBitConverter.cs" />
     <Compile Include="Skeet_Conversion\EndianBitConverter.cs" />
@@ -65,7 +67,7 @@
     <Compile Include="Map\Map.cs" />
     <Compile Include="ServerPackets.cs" />
     <Compile Include="Spacecraft.cs" />
-    <Compile Include="Map\DatLoading.cs" />
+    <Compile Include="Map\DatLevelFactory.cs" />
     <Compile Include="Map\MapIO.cs" />
     <Compile Include="Map\PhysicsTask.cs" />
     <Compile Include="Map\EscherMath.cs" />
