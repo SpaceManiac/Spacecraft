@@ -10,7 +10,7 @@ using System.Net;
 
 namespace spacecraft
 {
-	public static class DatLoading
+	public static class DatLevelFactory
 	{
 		public static Map Load(string fileName) {
 			Spacecraft.Log("Converting " + fileName);
@@ -117,6 +117,12 @@ namespace spacecraft
 			Spacecraft.Log("Conversion completed succesfully");
 			return map;
 		}
+
+        public static void Save(Map Object, string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
 
 		static bool MemCmp( byte[] data, int offset, string value ) {
 			for( int i = 0; i < value.Length; i++ ) {

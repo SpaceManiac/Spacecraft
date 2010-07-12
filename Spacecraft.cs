@@ -71,7 +71,8 @@ namespace spacecraft
 
 		public static void Log(string text)
 		{
-			CalculateFilenames();
+            if ( dateString == "")
+                CalculateFilenames();
 			lock (logfileMutex) {
 				StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
 				if (text == "") {

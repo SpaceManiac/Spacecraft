@@ -55,12 +55,14 @@ namespace spacecraft
 
 		public void Start()
 		{
-			// Initialize the map, using the saved one if it exists.
+			/*// Initialize the map, using the saved one if it exists.
 			if (File.Exists(Map.levelName)) {
 				map = Map.Load(Map.levelName);
 			} else if(File.Exists("server_level.dat")) {
 				map = Map.Load("server_level.dat");
-			}
+			}*/
+
+            map = Map.Load("test.mclevel");
 
 			if (map == null) {
 				map = new Map();

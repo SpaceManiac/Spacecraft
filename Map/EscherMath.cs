@@ -17,7 +17,7 @@ namespace spacecraft
 	// TODO: Fix all this to cast properly, etc. We only need to do that when we actually implement EscherMode.
 
 	/*
-		public static Pair<byte[], BlockPosition> MapDataTo(Map map, EscherMode mode)
+		public static Pair<byte[], BlockPosition> MapDataTo(MapTag map, EscherMode mode)
 		{
 			byte[] newmap = new byte[map.data.Length];
 			BlockPosition dim = new BlockPosition(map.xdim, map.ydim, map.zdim);
@@ -27,15 +27,15 @@ namespace spacecraft
 					for(short zDiff = 0; zDiff < map.zdim; ++zDiff) {
 						BlockPosition p = new BlockPosition(xDiff, yDiff, zDiff);
 						BlockPosition p2 = CoordsTo(map, p, mode);
-						newmap[Map.BlockIndex(p2.xDiff, p2.yDiff, p2.zDiff, newdim.xDiff, newdim.zDiff)] =
-							map.data[Map.BlockIndex(p.xDiff, p.yDiff, p.zDiff, dim.xDiff, dim.zDiff)];
+						newmap[MapTag.BlockIndex(p2.xDiff, p2.yDiff, p2.zDiff, newdim.xDiff, newdim.zDiff)] =
+							map.data[MapTag.BlockIndex(p.xDiff, p.yDiff, p.zDiff, dim.xDiff, dim.zDiff)];
 					}
 				}
 			}
 			return new Pair<byte[], BlockPosition>(newmap, newdim);
 		}
 
-		public static BlockPosition CoordsTo(Map map, BlockPosition pos, EscherMode mode)
+		public static BlockPosition CoordsTo(MapTag map, BlockPosition pos, EscherMode mode)
 		{
 			int xmax, ymax, zmax;
 			if(map == null) {
@@ -66,7 +66,7 @@ namespace spacecraft
 			}
 		}
 
-		public static BlockPosition CoordsFrom(Map map, BlockPosition pos, EscherMode mode)
+		public static BlockPosition CoordsFrom(MapTag map, BlockPosition pos, EscherMode mode)
 		{
 			int xmax, ymax, zmax;
 			if(map == null) {

@@ -14,7 +14,7 @@ namespace spacecraft
 	{
 		public const string levelName = "level.fcm";
 
-		// continued in Map.cs
+		// continued in MapTag.cs
 
 		// ==== Loading ====
 
@@ -30,12 +30,13 @@ namespace spacecraft
 			{
 				case ".fcm":
 					return LoadFCM(filename);
+                    // TODO: FCMFactory class.
 				case ".dat":
-					return DatLoading.Load(filename);
+					return DatLevelFactory.Load(filename);
 				case ".nbt":
 				case ".mclevel":
 				case ".mclvl":
-					return McLevelLoading.Load(filename);
+					return McLevelFactory.Load(filename);
 				default:
 					throw new FileLoadException("Unknown map file format.");
 			}
@@ -66,7 +67,7 @@ namespace spacecraft
 			}
 			/*catch (Exception ex)
 			{
-				Spacecraft.Log("Map.Load: Error trying to read from \"" + filename + "\": " + ex.Message);
+				Spacecraft.Log("MapTag.Load: Error trying to read from \"" + filename + "\": " + ex.Message);
 				return null;
 			}*/
 			finally

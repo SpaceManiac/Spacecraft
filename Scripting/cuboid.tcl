@@ -83,8 +83,8 @@ proc cuboidSetBlock {sender x y z block oldblock} {
 			set z2 $temp
 		}
 		
-		if {($x2 - $x1) > 20 || ($y2 - $y1) > 20 || ($z2 - $z1) > 20} {
-			tell $sender "[getColorCode commandError]Cuboid too big! Must be <20 in each dimension."
+		if {($x2 - $x1 + 1) * ($y2 - $y1 + 1) * ($z2 - $z1 + 1) > 1000} {
+			tell $sender "[getColorCode commandError]Cuboid too big! Must be <1000 total blocks"
 		} else {
 			set type $cuboid($sender,type)
 			set total [expr {($x2 - $x1) * ($y2 - $y1) * ($z2 - $z1)}]
@@ -96,14 +96,14 @@ proc cuboidSetBlock {sender x y z block oldblock} {
 			for {set x $x1} {$x <= $x2} {incr x} {
 				for {set y $y1} {$y <= $y2} {incr y} {
 					for {set z $z1} {$z <= $z2} {incr z} {
-						set time [expr {$i * 5}]
+						set time [expr {$i * 10}]
 						after $time "setTile $x $y $z $type"
 						incr i
 					}
 				}
 			}
 			after [expr {$i * 5}] [format {tell %s "[getColorCode commandResult]Cuboid complete"; cuboidFinish %s} $sender $sender]
-			scLog "$sender used /cuboid $type ([expr $x2-$x1]x[expr $y2-$y1]x[expr $z2-$z1] == $i)"
+			scLog "$sender used /cuboid $type ([expr $x2-$x1+1]x[expr $y2-$y1+1]x[expr $z2-$z1+1] == $i)"
 		}
 	}
 }
