@@ -62,7 +62,7 @@ namespace spacecraft
 				map = Map.Load("server_level.dat");
 			}*/
 
-            map = Map.Load("test.mclevel");
+            map = Map.Load("level.fcm");
 
 			if (map == null) {
 				map = new Map();
