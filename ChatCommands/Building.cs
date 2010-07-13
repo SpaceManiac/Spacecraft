@@ -125,9 +125,9 @@ namespace spacecraft {
 				BlockPosition pos = new BlockPosition((short)(sender.pos.x / 32), (short)(sender.pos.y / 32), (short)(sender.pos.z / 32));
 
 				int i = 0;
-				for (short x = pos.x - 20; x <= pos.x + 20; x++) {
-					for (short y = pos.y - 20; y <= pos.y + 20; y++) {
-						for (short z = pos.z - 20; z <= pos.z + 20; z++) {
+				for (short x = (short) (pos.x - 20); x <= pos.x + 20; x++) {
+					for (short y = (short) (pos.y - 20); y <= pos.y + 20; y++) {
+						for (short z = (short) (pos.z - 20); z <= pos.z + 20; z++) {
 							if (map.GetTile(x, y, z) == From && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20)) {
 								++i;
 								map.SetTile(x, y, z, To);
