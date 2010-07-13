@@ -128,6 +128,7 @@ namespace spacecraft
 			double lastPhysics = -0.5;
 			double lastBookend = 0;
 			double lastIpAttempt = -10;
+			double lastTclUpdateCall = 0;
 			bool tclOnWorldTick = true;
 			int ipFailures = 0;
 
@@ -183,6 +184,13 @@ namespace spacecraft
 					Spacecraft.Log("=======================================================");
 					lastBookend = clock.Elapsed.TotalSeconds;
 				}
+				
+				if(clock.Elapsed.TotalSeconds - lastTclUpdateCall >= 0.03) {
+					// Call this at least every 1/30th of a second
+					// This processes the Tcl event loop. Things get wonky
+					Scripting.Interpreter.EvalScript("update");
+				}
+				
 				Thread.Sleep(10);
 			}
 		}

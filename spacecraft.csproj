@@ -78,11 +78,6 @@
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripting\levelgen.tcl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="tcl84.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -95,5 +90,8 @@
     <None Include="Scripting\cuboid.tcl" />
     <None Include="Scripting\spelunker.tcl" />
     <None Include="Scripting\walls.tcl" />
+    <None Include="Scripting\buildRank.tcl" />
+    <None Include="Scripting\dropship.tcl" />
+    <None Include="Scripting\libSpacecraft.tcl" />
   </ItemGroup>
 </Project>
