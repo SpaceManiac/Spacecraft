@@ -77,7 +77,5 @@ namespace spacecraft
 
             return MapInProgress;
 		}
-
-		
 	}
 }

@@ -87,11 +87,23 @@
     <None Include="Scripting\startup.tcl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripting\cuboid.tcl" />
-    <None Include="Scripting\spelunker.tcl" />
-    <None Include="Scripting\walls.tcl" />
-    <None Include="Scripting\buildRank.tcl" />
-    <None Include="Scripting\dropship.tcl" />
-    <None Include="Scripting\libSpacecraft.tcl" />
+    <None Include="Scripting\cuboid.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\spelunker.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\walls.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\buildRank.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\dropship.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\libSpacecraft.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
