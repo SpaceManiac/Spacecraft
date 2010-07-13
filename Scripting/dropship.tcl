@@ -3,7 +3,7 @@
 # if you really need details. It's quite specialized for the current shape of
 # the test dropship.
 
-namespace dropship {
+namespace eval dropship {
 	proc signature {x y z} {
 		set signature ""
 		for {set xx [expr {$x - 1}]} {$xx <= ($x + 1)} {incr xx} {

@@ -3,7 +3,7 @@
 
 # Requires libSpacecraft (for performCuboid)
 
-namespace cuboid {
+namespace eval cuboid {
 	array set cuboid {}
 
 	proc cuboid {sender args} {

@@ -137,7 +137,7 @@ namespace spacecraft {
 				}
 
 				sender.PrintMessage(Color.CommandResult + "Converted " + i.ToString() + " " + From.ToString() + " to " + To.ToString());
-				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
+				Spacecraft.Log(sender.name + " converted " + From.ToString().ToLower() + " to " + To.ToString().ToLower());
 			}
 		}
 

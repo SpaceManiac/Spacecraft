@@ -2,7 +2,7 @@
 # This is a fancy Spelunker minigame. Get to the end of the course without
 # placing or destroying any blocks. Be sure to change spelunker_party.
 
-namespace spelunker {
+namespace eval spelunker {
 	# Set this to 0 if you're not on the test server
 	set spelunker_party 1
 

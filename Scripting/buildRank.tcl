@@ -2,7 +2,7 @@
 # This script will allow you to set a minimum rank for building.
 # Change the pointed-out line below to set the default rank.
 
-namespace buildRank {
+namespace eval buildRank {
 	
 	# Change this line to set the default rank on startup
 	set rankRequired "Builder"
