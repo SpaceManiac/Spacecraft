@@ -83,26 +83,29 @@ proc cuboidSetBlock {sender x y z block oldblock} {
 			set z2 $temp
 		}
 		
-		if {($x2 - $x1 + 1) * ($y2 - $y1 + 1) * ($z2 - $z1 + 1) > 1000} {
+		set i [expr {($x2 - $x1 + 1) * ($y2 - $y1 + 1) * ($z2 - $z1 + 1)}]
+		if {$i > 1000} {
 			tell $sender "[getColorCode commandError]Cuboid too big! Must be <1000 total blocks"
 		} else {
 			set type $cuboid($sender,type)
 			set total [expr {($x2 - $x1) * ($y2 - $y1) * ($z2 - $z1)}]
-			set eta [expr {$total/200}]
+			set eta [expr {$total / 50}]
 			if {$eta > 5} {
 				tell $sender "[getColorCode commandResult]Cuboid running, ETA $eta seconds"
 			}
-			set i 0
+			
 			for {set x $x1} {$x <= $x2} {incr x} {
 				for {set y $y1} {$y <= $y2} {incr y} {
 					for {set z $z1} {$z <= $z2} {incr z} {
-						set time [expr {$i * 10}]
-						after $time "setTile $x $y $z $type"
-						incr i
+						if {[getTile $x $y $z] == "adminium"} {
+							tell $sender "[getColorCode commandError]Can't cuboid through adminium!"
+							return
+						}
 					}
 				}
 			}
-			after [expr {$i * 5}] [format {tell %s "[getColorCode commandResult]Cuboid complete"; cuboidFinish %s} $sender $sender]
+			
+			performCuboid $x1 $y1 $z1 $x2 $y2 $z2 $type [format {tell %s "[getColorCode commandResult]Cuboid complete"; cuboidFinish %s} $sender $sender]
 			scLog "$sender used /cuboid $type ([expr $x2-$x1+1]x[expr $y2-$y1+1]x[expr $z2-$z1+1] == $i)"
 		}
 	}

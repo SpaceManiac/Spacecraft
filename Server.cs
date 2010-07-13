@@ -85,11 +85,11 @@ namespace spacecraft
 
 				Running = true;
 
-				Thread T = new Thread(AcceptClientThread);
+				Thread T = new Thread(AcceptClientThread, Spacecraft.StackSize);
 				T.Name = "AcceptClient Thread";
 				T.Start();
 
-				Thread T2 = new Thread(TimerThread);
+				Thread T2 = new Thread(TimerThread, Spacecraft.StackSize);
 				T2.Name = "Timer thread";
 				T2.Start();
 
@@ -334,6 +334,7 @@ namespace spacecraft
 			foreach (Player P in temp) {
 				P.PlayerDisconnects(ID);
 			}
+			Spacecraft.Log(Player.name + " (" + Player.ipAddress + ") has disconnected");
 			MessageAll(Color.Yellow + Player.name + " has left");
 			
 			if (Scripting.Initialized && Scripting.HookDefined("onPlayerDepart")) {
@@ -394,6 +395,7 @@ namespace spacecraft
 			}
 
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
+			Spacecraft.Log(sender.name + " (" + sender.ipAddress + ") has connected");
 			MessageAll(Color.Yellow + sender.name + " has joined!");
 			
 			if (Scripting.Initialized && Scripting.HookDefined("onPlayerJoin")) {

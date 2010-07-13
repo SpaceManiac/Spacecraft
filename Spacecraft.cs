@@ -11,6 +11,9 @@ namespace spacecraft
 		public const bool DEBUG = true;
 		public static Random random;
 		public static string dateString;
+		
+		// For testing purposes.
+		public const int StackSize = 1 * 1024 * 1024;
 
 #if WIN32 
 		public static PerformanceCounter cpuCounter; // This is apparently not implemented on Mono, so debug constants time!
@@ -19,7 +22,7 @@ namespace spacecraft
 		public static void Main(string[] args)
 		{
 			try {				
-				Log("");		
+				Log("");
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
 					Log("Note: admins.txt does not exist, creating a blank one. Be sure to add yourself!");

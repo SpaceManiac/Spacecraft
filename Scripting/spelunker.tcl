@@ -1,8 +1,8 @@
 # spelunker.tcl
 # procedures for the /spelunker minigame
 
-# Change this if you're not on the test server
-set spelunker_party 0
+# Set this to 0 if you're not on the test server
+set spelunker_party 1
 
 set spelunker {}
 set spelunker_started 0
@@ -85,7 +85,7 @@ proc spelunkerEnd {} {
 		set spelunker_started 0
 		broadcast "Spelunker: The game has ended."
 	}
-}
+}	
 
 proc spelunkerDepart {name} {
 	global spelunker
@@ -116,11 +116,16 @@ proc spelunkerTick {} {
 	set time "${spelunker_time}s"
 	
 	set markInfo [landmarkInfo spelunkerend]
+	set markx [expr {int([lindex $markInfo 0]/32)}]
+	set marky [expr {int([lindex $markInfo 1]/32)}]
+	set markz [expr {int([lindex $markInfo 2]/32)}]
+		
 	foreach player $spelunker {
 		set info [playerInfo $player]
-		if {int([lindex $info 1]/32) == int([lindex $markInfo 0]/32) &&
-			int([lindex $info 2]/32) == int([lindex $markInfo 1]/32) &&
-			int([lindex $info 3]/32) == int([lindex $markInfo 2]/32)} {
+		set playerx [expr {int([lindex $info 1]/32)}]
+		set playery [expr {int([lindex $info 2]/32)}]
+		set playerz [expr {int([lindex $info 3]/32)}]
+		if {abs($playerx - $markx) <= 1 && abs($playery - $marky) <= 1 && abs($playerz - $markz) <= 1} {
 			if {$spelunker_started == 2} {
 				broadcast "Spelunker: $player crossed the finish line ($time)!"
 			} else {

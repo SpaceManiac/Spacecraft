@@ -23,6 +23,7 @@ proc cmdQs {sender args} {
 createChatCommand "qsrc" Admin "Quicksource the given script file" cmdQs
 
 # lremove
+# needed for spelunker
 
 proc lremove args {
 	array set opts {-all 0 pattern -exact}
@@ -49,6 +50,23 @@ proc lremove args {
 	return $l
 }
 
+# performCuboid
+# needed for cuboid and spelunker
+
+proc performCuboid {x1 y1 z1 x2 y2 z2 type callback} {
+	set i 0
+	for {set x $x1} {$x <= $x2} {incr x} {
+		for {set y $y1} {$y <= $y2} {incr y} {
+			for {set z $z1} {$z <= $z2} {incr z} {
+				set time [expr {$i * 20}]
+				after $time "setTile $x $y $z $type"
+				incr i
+			}
+		}
+	}
+	after [expr {$i * 20}] $callback
+}
+
 # add Tcl event loop update hook
 # useful for the "after" command
 
@@ -56,3 +74,4 @@ onWorldTick update
 qs levelgen.tcl
 qs spelunker.tcl
 qs cuboid.tcl
+qs guestsCantBuild.tcl
