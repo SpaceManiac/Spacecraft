@@ -35,6 +35,10 @@ namespace spacecraft
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
+        public Dictionary<Position, string> teleportNames = new Dictionary<Position, string>();
+        public Dictionary<Position, Pair<Position, byte>> teleportDests = new Dictionary<Position, Pair<Position, byte>>();
+
+
 		public Map()
 		{
 			physicsCount = 0;
@@ -60,12 +64,9 @@ namespace spacecraft
 
 		public string[] GetLandmarkList()
 		{
-			List<string> l = new List<string>();
-			foreach (KeyValuePair<string, Pair<Position, byte>> pair in landmarks)
-			{
-				l.Add(pair.Key);
-			}
-			return l.ToArray();
+			string[] l = new string[landmarks.Keys.Count];
+            landmarks.Keys.CopyTo(l, 0);
+			return l;
 		}
 
 		public void SetSpawn(Position p, byte heading)
@@ -91,7 +92,7 @@ namespace spacecraft
 
 			DateTime Begin = DateTime.Now;
 
-			if (Scripting.Initialized && Scripting.HookDefined("onLevelGeneration") && !skipTcl)
+			if (Scripting.Initialized && !skipTcl && Scripting.HookDefined("onLevelGeneration"))
 			{
 				int value = Scripting.ExecuteHook("onLevelGeneration", xdim + " " + ydim + " " + zdim);
 				if (!Scripting.IsOk(value))
