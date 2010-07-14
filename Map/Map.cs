@@ -153,7 +153,7 @@ namespace spacecraft
 		{
 			for (int i = 0; i < data.Length; ++i)
 			{
-				if (data[i] > (byte)Block.Maximum)
+				if (data[i] > (byte)Block.Obsidian)
 				{
 					return false;
 				}
@@ -162,11 +162,11 @@ namespace spacecraft
 		}
 
         /// <summary>
-        /// Search/replace blocks. Max = -1 for no limit.
+        /// Search/replace blocks.
         /// </summary>
-        /// <param name="From"></param>
-        /// <param name="To"></param>
-        /// <param name="max"></param>
+        /// <param name="From">The Block to do a search for.</param>
+        /// <param name="To">The Block to replace with.</param>
+        /// <param name="max">The limit on how many blocks to replace; use -1 for no limit.</param>
 		public void ReplaceAll(Block From, Block To, int max)
 		{
 			lock (PhysicsMutex)
@@ -220,8 +220,7 @@ namespace spacecraft
 			if(calcHeights) {
 				RecalculateHeight(x, y, z, BlockInfo.IsOpaque(tile));
 	
-				if (Heights[x, z] == y && tile == Block.Dirt)
-				{
+				if (Heights[x, z] == y && tile == Block.Dirt) {
 					tile = Block.Grass;
 				}
 			}

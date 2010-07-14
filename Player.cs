@@ -48,6 +48,8 @@ namespace spacecraft
 		public Position pos { get; protected set; }
 		public byte heading { get; protected set; }
 		public byte pitch { get; protected set; }
+		
+		public string ipAddress { get { return "/" + conn.ipaddr; } }
 
 		public bool placing;
 		public Block placeType;

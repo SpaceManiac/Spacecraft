@@ -125,11 +125,10 @@ namespace spacecraft {
 				BlockPosition pos = new BlockPosition((short)(sender.pos.x / 32), (short)(sender.pos.y / 32), (short)(sender.pos.z / 32));
 
 				int i = 0;
-				for (short x = 0; x < map.xdim; x++) {
-					for (short y = 0; y < map.ydim; y++) {
-						for (short z = 0; z < map.zdim; z++) {
-							if (map.GetTile(x, y, z) == From && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20))
-							{
+				for (short x = (short) (pos.x - 20); x <= pos.x + 20; x++) {
+					for (short y = (short) (pos.y - 20); y <= pos.y + 20; y++) {
+						for (short z = (short) (pos.z - 20); z <= pos.z + 20; z++) {
+							if (map.GetTile(x, y, z) == From && (Math.Abs(pos.x - x) + Math.Abs(pos.y - y) + Math.Abs(pos.z - z) < 20)) {
 								++i;
 								map.SetTile(x, y, z, To);
 							}
@@ -137,8 +136,8 @@ namespace spacecraft {
 					}
 				}
 
-				sender.PrintMessage("Converted " + i.ToString() + " " + From.ToString() + " to " + To.ToString());
-				Spacecraft.Log(sender.name + " converted " + From.ToString() + " to " + To.ToString());
+				sender.PrintMessage(Color.CommandResult + "Converted " + i.ToString() + " " + From.ToString() + " to " + To.ToString());
+				Spacecraft.Log(sender.name + " converted " + From.ToString().ToLower() + " to " + To.ToString().ToLower());
 			}
 		}
 

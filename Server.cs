@@ -62,7 +62,7 @@ namespace spacecraft
 				map = Map.Load("server_level.dat");
 			}*/
 
-            map = Map.Load("test.mclevel");
+            map = Map.Load("level.fcm");
 
 			if (map == null) {
 				map = new Map();
@@ -85,11 +85,11 @@ namespace spacecraft
 
 				Running = true;
 
-				Thread T = new Thread(AcceptClientThread);
+				Thread T = new Thread(AcceptClientThread, Spacecraft.StackSize);
 				T.Name = "AcceptClient Thread";
 				T.Start();
 
-				Thread T2 = new Thread(TimerThread);
+				Thread T2 = new Thread(TimerThread, Spacecraft.StackSize);
 				T2.Name = "Timer thread";
 				T2.Start();
 
@@ -128,6 +128,7 @@ namespace spacecraft
 			double lastPhysics = -0.5;
 			double lastBookend = 0;
 			double lastIpAttempt = -10;
+			double lastTclUpdateCall = 0;
 			bool tclOnWorldTick = true;
 			int ipFailures = 0;
 
@@ -183,6 +184,13 @@ namespace spacecraft
 					Spacecraft.Log("=======================================================");
 					lastBookend = clock.Elapsed.TotalSeconds;
 				}
+				
+				if(clock.Elapsed.TotalSeconds - lastTclUpdateCall >= 0.03) {
+					// Call this at least every 1/30th of a second
+					// This processes the Tcl event loop. Things get wonky
+					Scripting.Interpreter.EvalScript("update");
+				}
+				
 				Thread.Sleep(10);
 			}
 		}
@@ -334,6 +342,7 @@ namespace spacecraft
 			foreach (Player P in temp) {
 				P.PlayerDisconnects(ID);
 			}
+			Spacecraft.Log(Player.name + " (" + Player.ipAddress + ") has disconnected");
 			MessageAll(Color.Yellow + Player.name + " has left");
 			
 			if (Scripting.Initialized && Scripting.HookDefined("onPlayerDepart")) {
@@ -394,6 +403,7 @@ namespace spacecraft
 			}
 
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
+			Spacecraft.Log(sender.name + " (" + sender.ipAddress + ") has connected");
 			MessageAll(Color.Yellow + sender.name + " has joined!");
 			
 			if (Scripting.Initialized && Scripting.HookDefined("onPlayerJoin")) {

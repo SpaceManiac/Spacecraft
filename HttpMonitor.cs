@@ -26,7 +26,7 @@ namespace spacecraft {
 			
 			Running = true;
 			
-			Thread T = new Thread(HttpMonitorThread);
+			Thread T = new Thread(HttpMonitorThread, Spacecraft.StackSize);
 			T.Name = "HttpMonitor Thread";
 			T.Start();
 		}

@@ -33,6 +33,8 @@ namespace spacecraft
 		private object SendQueueMutex = new object();
 		Queue<ServerPacket> SendQueue; // Packets that are queued to be sent to the client.
 		
+		public string ipaddr = "";
+		
 		Player player;
 
 		TcpClient _client;
@@ -44,14 +46,18 @@ namespace spacecraft
 			SendQueue = new Queue<ServerPacket>();
 
 			_client = c;
+			ipaddr = "127.0.0.1:tty";
+			if(c != null) {
+				ipaddr = c.Client.RemoteEndPoint.ToString();
+			}
 		}
 
 		public void Start() {
-			Thread T = new Thread(ReadThread);
+			Thread T = new Thread(ReadThread, Spacecraft.StackSize);
 			T.Name = _client.GetHashCode().ToString() + " Read";
 			T.Start();
 
-			Thread T2 = new Thread(WriteThread);
+			Thread T2 = new Thread(WriteThread, Spacecraft.StackSize);
 			T2.Name = _client.GetHashCode().ToString() + " Write";
 			T2.Start();
 		}
@@ -137,7 +143,7 @@ namespace spacecraft
 			}
 
 			if (IncomingPacket.Version != PROTOCOL_VERSION) {
-				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version);
+				Spacecraft.Log("Hmm, got a protocol version of " + IncomingPacket.Version + " from /" + ipaddr + "(" + IncomingPacket.Username.ToString() + ")");
 				SendKick("Wrong protocol version!");
 				Server.theServ.RemovePlayer(player);
 				return;
@@ -145,7 +151,7 @@ namespace spacecraft
 			bool success = IsHashCorrect(IncomingPacket.Username.ToString(), IncomingPacket.Key.ToString());
 
 			if (Config.GetBool("verify-names", true) && !success) {
-				Spacecraft.Log(IncomingPacket.Username.ToString() + " attempted to join, but didn't verify");
+				Spacecraft.Log("/" + ipaddr + " (" + IncomingPacket.Username.ToString() + ") attempted to join, but didn't verify");
 				SendKick("Your name wasn't verified by minecraft.net!");
 				Server.theServ.RemovePlayer(player);
 				return;

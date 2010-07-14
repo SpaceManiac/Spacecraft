@@ -20,7 +20,7 @@ namespace spacecraft
 		
 		public new void Start()
 		{
-			Thread T = new Thread(ReadConsoleThread);
+			Thread T = new Thread(ReadConsoleThread, Spacecraft.StackSize);
 			T.Name = "ConsoleRead";
 			T.Start();
 		}

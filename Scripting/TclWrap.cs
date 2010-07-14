@@ -37,6 +37,7 @@ namespace TclWrap {
 	}
 
 	public class TclInterpreter {
+		private object interpreterMutex = new object();
 		private IntPtr interp;
 		private List<TclAPI.TclCommand> delegates;
 
@@ -56,15 +57,19 @@ namespace TclWrap {
 		}
 		
 		public void Close() {
-			TclAPI.Tcl_DeleteInterp(interp);
-			interp = IntPtr.Zero;
+			lock(interpreterMutex) {
+				TclAPI.Tcl_DeleteInterp(interp);
+				interp = IntPtr.Zero;
+			}
 		}
 
 		public int EvalScript(string script) {
 			if (interp == IntPtr.Zero) {
 				throw new SystemException("Attempted to call a closed Tcl interpeter!");
 			}
-			return TclAPI.Tcl_Eval(interp, script);
+			lock(interpreterMutex) {
+				return TclAPI.Tcl_Eval(interp, script);
+			}
 		}
 		
 		public int SourceFile(string filename) {
@@ -79,7 +84,9 @@ namespace TclWrap {
 			if (interp == IntPtr.Zero) {
 				throw new SystemException("Attempted to call a closed Tcl interpeter!");
 			}
-			TclAPI.Tcl_CreateCommand(interp, commandName, Marshal.GetFunctionPointerForDelegate(cmd), IntPtr.Zero, IntPtr.Zero);
+			lock(interpreterMutex) {
+				TclAPI.Tcl_CreateCommand(interp, commandName, Marshal.GetFunctionPointerForDelegate(cmd), IntPtr.Zero, IntPtr.Zero);
+			}
 			// We must maintain a reference to the delegate or the garbage collector will release it
 			delegates.Add(cmd);
 		}
@@ -90,7 +97,9 @@ namespace TclWrap {
 					throw new SystemException("Attempted to call a closed Tcl interpeter!");
 				}
 				try {
-					return TclAPI.Tcl_GetStringResult(interp);
+					lock(interpreterMutex) {
+						return TclAPI.Tcl_GetStringResult(interp);
+					}
 				}
 				catch(Exception) {
 					return "Tcl done asploded!";

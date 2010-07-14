@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,14 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Map\MapPhysics.cs" />
@@ -50,10 +43,6 @@
     <Compile Include="Map\McLevelLoading.cs" />
     <Compile Include="Map\NBT.cs" />
     <Compile Include="Scripting\ScriptHandler.cs" />
-    <Compile Include="Skeet_Conversion\BigEndianBitConverter.cs" />
-    <Compile Include="Skeet_Conversion\EndianBitConverter.cs" />
-    <Compile Include="Skeet_Conversion\Endianness.cs" />
-    <Compile Include="Skeet_Conversion\LittleEndianBitConverter.cs" />
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
@@ -89,24 +78,31 @@
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripting\levelgen.tcl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="tcl84.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="Scripting\bother.tcl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Scripting\startup.tcl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripting\testcmd.tcl">
+    <None Include="Scripting\cuboid.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\spelunker.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\walls.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\buildRank.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\dropship.tcl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripting\libSpacecraft.tcl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
