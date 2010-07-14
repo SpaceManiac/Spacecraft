@@ -181,7 +181,7 @@ namespace spacecraft
 							if (GetTile(x, y, z) == From)
 							{
 								SetTile(x, y, z, To);
-								if (++total >= max || max != -1) return;
+								if (++total >= max && max != -1) return;
 							}
 						}
 					}
