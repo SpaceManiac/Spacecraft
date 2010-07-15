@@ -162,7 +162,7 @@ namespace spacecraft
 
             ClientTranslations = new Dictionary<Block, Block>()
             {
-                {Block.Unobtanium, Block.Iron},
+                {Block.Unobtanium, Block.Water},
             };
 
 
