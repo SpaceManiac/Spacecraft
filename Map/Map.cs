@@ -128,8 +128,13 @@ namespace spacecraft
 			Spacecraft.Log("Generation complete. Took " + (End - Begin).TotalMilliseconds + "ms");
 		}
 
+        public void GetCompressedCopy(Stream stream, bool prependBlockCount)
+        {
+            GetCompressedCopy(stream, prependBlockCount, true);
+        }
+
 		// zips a copy of the block array
-		public void GetCompressedCopy(Stream stream, bool prependBlockCount)
+		public void GetCompressedCopy(Stream stream, bool prependBlockCount, bool translateForClient)
 		{
 			using (GZipStream compressor = new GZipStream(stream, CompressionMode.Compress))
 			{
@@ -140,8 +145,21 @@ namespace spacecraft
 					// write block count to gzip stream
 					compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, sizeof(int));
 				}
-				compressor.Write(data, 0, data.Length);
+
+                byte[] temp = data;
+
+                if (translateForClient)
+                {
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        temp[i] = (byte) BlockInfo.Translate((Block)temp[i]);
+                    }
+
+                }
+				compressor.Write(temp, 0, temp.Length);
 			}
+
+            GC.Collect();
 		}
 
 		public void CopyBlocks(byte[] source, int offset)
@@ -216,6 +234,7 @@ namespace spacecraft
 
 		public void SetTile(short x, short y, short z, Block tile, bool calcHeights)
 		{
+
             if (tile == Block.Undefined)
                 throw new ArgumentException("Tried to set undefined block.");
 
@@ -228,9 +247,7 @@ namespace spacecraft
 					tile = Block.Grass;
 				}
 			}
-		
-
-
+		            
 
 			BlockPosition pos = new BlockPosition(x, y, z);
 

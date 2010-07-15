@@ -288,7 +288,6 @@ namespace spacecraft
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Sand));
 						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
 					}
-
 					break;
 
 				case Block.Gravel:
@@ -299,6 +298,23 @@ namespace spacecraft
 					}
 
 					break;
+
+                case Block.Unobtanium:
+                    if (BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
+                    {
+                        AddPhysicsUpdate(new PhysicsTask(X, (short)(Y + 1), Z, Block.Unobtanium));
+                        AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
+                    }
+                    else
+                    {
+                        if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 2), Z)))
+                        {
+                            AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Unobtanium));
+                            AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
+                        }
+                    }
+                    break;
+
 
 				default:
 					break;

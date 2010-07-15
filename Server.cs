@@ -66,7 +66,7 @@ namespace spacecraft
             {
                 map = Map.Load("level.fcm");
             }
-            catch (IOException E)
+            catch (IOException)
             {
                 map = new Map();
                 map.Generate();
