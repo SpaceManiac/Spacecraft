@@ -7,6 +7,10 @@ namespace eval cuboid {
 	array set cuboid {}
 
 	proc cuboid {sender args} {
+		if {[namespace exists ::buildRank] && ![buildRank::mayBuild $sender]} {
+			tell $sender "[getColorCode commandError]You may not cuboid due to build rank restrictions"
+			return
+		}
 		variable cuboid
 		
 		if {[llength $args] != 1} {
@@ -29,8 +33,8 @@ namespace eval cuboid {
 		
 		set rank [lindex [playerInfo $sender] 6]
 		set type [string tolower $type]
-		if {$rank != "Mod" && $rank != "Admin" && ($type == "water" || $type == "lava" || $type == "adminium")} {
-			tell $sender "[getColorCode commandError]Not allowed to place!"
+		if {[string match *water* $type] || [string match *lava* $type] || [string match *admin* $type]} {
+			tell $sender "[getColorCode commandError]Blocks of $type are uncuboidable!"
 			return
 		}
 		
@@ -50,6 +54,9 @@ namespace eval cuboid {
 	}
 
 	proc cuboidSetBlock {sender x y z block oldblock} {
+		if {[namespace exists ::buildRank] && ![buildRank::mayBuild $sender]} {
+			return
+		}
 		variable cuboid
 		if {![info exists cuboid($sender)]} {
 			return
@@ -108,7 +115,7 @@ namespace eval cuboid {
 					}
 				}
 				
-				performCuboid $x1 $y1 $z1 $x2 $y2 $z2 $type [format {tell %s "[getColorCode commandResult]Cuboid complete"; cuboidFinish %s} $sender $sender]
+				performCuboid $x1 $y1 $z1 $x2 $y2 $z2 $type [format {tell %s "[getColorCode commandResult]Cuboid complete"; cuboid::cuboidFinish %s} $sender $sender]
 				scLog "$sender used /cuboid $type ([expr $x2-$x1+1]x[expr $y2-$y1+1]x[expr $z2-$z1+1] == $i)"
 			}
 		}

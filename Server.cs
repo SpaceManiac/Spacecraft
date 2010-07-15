@@ -20,6 +20,8 @@ namespace spacecraft
 		private TcpListener Listener;
 
 		public List<Player> Players { get; private set; }
+		public List<Robot> Robots { get; private set; }
+		
 		public Map map { get; protected set; }
 		public int salt { get; protected set; }
 		public int port { get; protected set; }
@@ -55,14 +57,12 @@ namespace spacecraft
 
 		public void Start()
 		{
-			/*// Initialize the map, using the saved one if it exists.
+			// Initialize the map, using the saved one if it exists.
 			if (File.Exists(Map.levelName)) {
 				map = Map.Load(Map.levelName);
 			} else if(File.Exists("server_level.dat")) {
 				map = Map.Load("server_level.dat");
-			}*/
-
-            map = Map.Load("level.fcm");
+			}
 
 			if (map == null) {
 				map = new Map();
@@ -75,6 +75,7 @@ namespace spacecraft
 			try
 			{
 				Players = new List<Player>();
+				Robots = new List<Robot>();
 
 				Listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
 				Listener.Start();
@@ -128,7 +129,8 @@ namespace spacecraft
 			double lastPhysics = -0.5;
 			double lastBookend = 0;
 			double lastIpAttempt = -10;
-			double lastTclUpdateCall = 0;
+			double lastFrame = 0;
+			
 			bool tclOnWorldTick = true;
 			int ipFailures = 0;
 
@@ -185,10 +187,14 @@ namespace spacecraft
 					lastBookend = clock.Elapsed.TotalSeconds;
 				}
 				
-				if(clock.Elapsed.TotalSeconds - lastTclUpdateCall >= 0.03) {
-					// Call this at least every 1/30th of a second
-					// This processes the Tcl event loop. Things get wonky
+				if(clock.Elapsed.TotalSeconds - lastFrame >= 0.03) {
+					// For frame-wise updates
+					// First of all, tell Tcl to evaluate pending afters
 					Scripting.Interpreter.EvalScript("update");
+					// Then update all the mobs
+					foreach(Robot R in new List<Robot>(Robots)) {
+						R.Update();
+					}
 				}
 				
 				Thread.Sleep(10);
@@ -215,6 +221,22 @@ namespace spacecraft
 
 				Thread.Sleep(10);
 			}
+		}
+
+		public Robot SpawnRobot(Position pos, string name)
+		{
+			Robot Robot = new Robot(name);
+			Robot.pos = pos;
+
+			Robot.Spawn += new Robot.RobotSpawnHandler(Robot_Spawn);
+			//Robot.Message += new Player.PlayerMsgHandler(Player_Message);
+			Robot.Move += new Robot.RobotMoveHandler(Robot_Move);
+			//Robot.BlockChange += new Player.PlayerBlockChangeHandler(Player_BlockChange);
+			Robot.Disconnect += new Robot.RobotDisconnectHandler(Robot_Disconnect);
+
+			Robots.Add(Robot);
+			Robot.Start();
+			return Robot;
 		}
 
 		public Player GetPlayer(string name)
@@ -401,6 +423,10 @@ namespace spacecraft
 				P.PlayerJoins(sender);
 				sender.PlayerJoins(P);
 			}
+			
+			foreach (Robot R in new List<Robot>(Robots)) {
+				sender.PlayerJoins(R);
+			}
 
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
 			Spacecraft.Log(sender.name + " (" + sender.ipAddress + ") has connected");
@@ -413,6 +439,39 @@ namespace spacecraft
 				}
 			}
 		}
+		
+		void Robot_Spawn(Robot sender)
+		{
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
+				P.PlayerJoins(sender);
+			}
+
+			Spacecraft.Log("Bot " + sender.name + " has booted");
+			MessageAll(Color.Announce + "Bot " + Spacecraft.StripColors(sender.name) + " has joined!");
+		}
+
+		void Robot_Move(Robot sender, Position dest, byte heading, byte pitch)
+		{
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
+				P.PlayerMoves(sender, dest, heading, pitch);
+			}
+		}
+
+		void Robot_Disconnect(Robot Player)
+		{
+			byte ID = Player.playerID;
+			Robots.Remove(Player);
+			List<Player> temp = new List<Player>(Players);
+			foreach (Player P in temp) {
+				P.PlayerDisconnects(ID);
+			}
+			Spacecraft.Log("Bot " + Player.name + " has shut down");
+			MessageAll(Color.Announce + "Bot " + Spacecraft.StripColors(Player.name) + " has left");
+		}
+		
+		// -----
 
 		public void MessageAll(string message)
 		{
