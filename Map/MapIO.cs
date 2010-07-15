@@ -30,7 +30,7 @@ namespace spacecraft
 			{
 				case ".fcm":
 					return LoadFCM(filename);
-                    // TODO: FCMFactory class.
+					// TODO: FCMFactory class.
 				case ".dat":
 					return DatLevelFactory.Load(filename);
 				case ".nbt":

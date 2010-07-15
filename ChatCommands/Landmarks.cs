@@ -114,97 +114,96 @@ namespace spacecraft {
 			}
 		}
 
+		public class TeleportAdd : ChatCommandBase
+		{
+			public override Rank RankNeeded
+			{
+				get { return Rank.Mod; }
+			}
 
-        public class TeleportAdd : ChatCommandBase
-        {
-            public override Rank RankNeeded
-            {
-                get { return Rank.Mod; }
-            }
+			public override string HelpMsg
+			{
+				get { return "tp_add [name] [x] [y] [z] [heading]: Adds a teleport leading from current position to the given position."; }
+			}
 
-            public override string HelpMsg
-            {
-                get { return "tp_add [name] [x] [y] [z] [heading]: Adds a teleport leading from current position to the given position."; }
-            }
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				string[] parts = arg.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+				if (parts.Length < 5)
+				{
+					sender.PrintMessage("Too few arguments!");
+					return;
+				}
 
-            public override void Run(Player sender, string cmd, string arg)
-            {
-                string[] parts = arg.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 5)
-                {
-                    sender.PrintMessage("Too few arguments!");
-                    return;
-                }
+				string name = parts[0];
+				byte x, y, z, heading;
 
-                string name = parts[0];
-                byte x, y, z, heading;
+				try
+				{
+					x = byte.Parse(parts[1]);
+					y = byte.Parse(parts[2]);
+					z = byte.Parse(parts[3]);
+					heading = byte.Parse(parts[4]);
+				}
+				catch
+				{
+					sender.PrintMessage("Invalid arguments!");
+					return;
+				}
 
-                try
-                {
-                    x = byte.Parse(parts[1]);
-                    y = byte.Parse(parts[2]);
-                    z = byte.Parse(parts[3]);
-                    heading = byte.Parse(parts[4]);
-                }
-                catch
-                {
-                    sender.PrintMessage("Invalid arguments!");
-                    return;
-                }
+				Position Dest = new Position(x, y, z);
+				Position Start = sender.pos;
 
-                Position Dest = new Position(x, y, z);
-                Position Start = sender.pos;
+				Start = new Position() { 
+					x = (short)(Start.x / 32),
+					y = (short)(Start.y / 32),
+					z = (short)(Start.z / 32)
+				};
 
-                Start = new Position() { 
-                    x = (short)(Start.x / 32),
-                    y = (short)(Start.y / 32),
-                    z = (short)(Start.z / 32)
-                };
+				Server.theServ.map.teleportDests.Add(Start, new Pair<Position, byte>(Dest, heading));
+			}
+		}
 
-                Server.theServ.map.teleportDests.Add(Start, new Pair<Position, byte>(Dest, heading));
-            }
-        }
+		public class TeleportRemove : ChatCommandBase
+		{
+			public override Rank RankNeeded
+			{
+				get { return Rank.Mod; }
+			}
 
-        public class TeleportRemove : ChatCommandBase
-        {
-            public override Rank RankNeeded
-            {
-                get { return Rank.Mod; }
-            }
+			public override string HelpMsg
+			{
+				get { return "tp_remove [name]: Remove the named teleporter.";}
+			}
 
-            public override string HelpMsg
-            {
-                get { return "tp_remove [name]: Remove the named teleporter.";}
-            }
+			public override void Run(Player sender, string cmd, string arg)
+			{
+				string name = arg;
+				bool found = false;
+				Position FoundKey = new Position() { x = 0, y = 0, z = 0 };
 
-            public override void Run(Player sender, string cmd, string arg)
-            {
-                string name = arg;
-                bool found = false;
-                Position FoundKey = new Position() { x = 0, y = 0, z = 0 };
+				foreach(var K in Server.theServ.map.teleportNames)
+				{
+					if (K.Value == name)
+					{
+						found = true;
+						FoundKey = K.Key;
+					}
+				}
 
-                foreach(var K in Server.theServ.map.teleportNames)
-                {
-                    if (K.Value == name)
-                    {
-                        found = true;
-                        FoundKey = K.Key;
-                    }
-                }
+				if (found)
+				{
+					Server.theServ.map.teleportNames.Remove(FoundKey);
+					Server.theServ.map.teleportDests.Remove(FoundKey);
+					sender.PrintMessage("Removed teleport " + name);
+				}
+				else
+				{
+					sender.PrintMessage("Teleport " + name + " does not exist.");
+				}
 
-                if (found)
-                {
-                    Server.theServ.map.teleportNames.Remove(FoundKey);
-                    Server.theServ.map.teleportDests.Remove(FoundKey);
-                    sender.PrintMessage("Removed teleport " + name);
-                }
-                else
-                {
-                    sender.PrintMessage("Teleport " + name + " does not exist.");
-                }
-
-            }
-        }
+			}
+		}
 
 	}
 }

@@ -5,18 +5,16 @@
 namespace eval buildRank {
 	
 	# Change this line to set the default rank on startup
-	set rankRequired "Builder"
-
-	proc changeBlockCallback {sender x y z newType oldType} {
+	set rankRequired "Admin"
+	
+	proc mayBuild {name} {
 		variable rankRequired
-		if {$rankRequired == "Guest"} {
-			return
-		}
-		
-		set rank [lindex [playerInfo $sender] 6]
+		set rank [lindex [playerInfo $name] 6]
 		set canBuild 0
 		
-		if {$rankRequired == "Builder"} {
+		if {$rankRequired == "Guest"} {
+			set canBuild 1
+		} elseif {$rankRequired == "Builder"} {
 			if {$rank != "Guest"} {
 				set canBuild 1
 			}
@@ -30,7 +28,12 @@ namespace eval buildRank {
 			}
 		}
 		
-		if {!$canBuild} {
+		return $canBuild
+	}
+
+	proc changeBlockCallback {sender x y z newType oldType} {
+		variable rankRequired
+		if {![mayBuild $sender]} {
 			setTile $x $y $z $oldType
 			tell $sender "[getColorCode red]Only ranks $rankRequired and up may build!"
 		}
@@ -38,7 +41,7 @@ namespace eval buildRank {
 	
 	proc changeBuildRank {newRank} {
 		variable rankRequired
-		if {$newRank == "Guest" || $newRank == "Builder" || $newRank == "Mod" || $newrank == "Admin"} {
+		if {$newRank == "Guest" || $newRank == "Builder" || $newRank == "Mod" || $newRank == "Admin"} {
 			set rankRequired $newRank
 			return 1
 		} else {

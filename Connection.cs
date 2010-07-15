@@ -367,6 +367,21 @@ namespace spacecraft
 			SendPacket(packet);
 		}
 
+		public void SendPlayerMovement(Robot player, Position dest, byte heading, byte pitch, bool self)
+		{
+			PlayerMovePacket packet = new PlayerMovePacket();
+			packet.PlayerID = player.playerID;
+			if (self)
+				packet.PlayerID = 255;
+			packet.X = player.pos.x;
+			packet.Y = player.pos.y;
+			packet.Z = player.pos.z;
+			packet.Heading = heading;
+			packet.Pitch = pitch;
+
+			SendPacket(packet);
+		}
+
 		internal void SendPlayerDisconnect(byte ID)
 		{
 			DespawnPacket packet = new DespawnPacket();
@@ -380,6 +395,19 @@ namespace spacecraft
 			packet.PlayerID = Player.playerID;
 			if(self)
 				packet.PlayerID = 255;
+			packet.Name = Player.name;
+			packet.X = Player.pos.x;
+			packet.Y = Player.pos.y;
+			packet.Z = Player.pos.z;
+			packet.Heading = Player.heading;
+			packet.Pitch = Player.pitch;
+			SendPacket(packet);
+		}
+
+		public void HandlePlayerSpawn(Robot Player)
+		{
+			PlayerSpawnPacket packet = new PlayerSpawnPacket();
+			packet.PlayerID = Player.playerID;
 			packet.Name = Player.name;
 			packet.X = Player.pos.x;
 			packet.Y = Player.pos.y;

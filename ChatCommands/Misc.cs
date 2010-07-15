@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace spacecraft {
 	namespace ChatCommands {
@@ -78,13 +79,29 @@ namespace spacecraft {
 
 			public override string HelpMsg
 			{
-				get { return "Spawn an AI mob (unimplemented)."; }
+				get { return "Spawn an AI mob."; }
 			}
 
 			public override void Run(Player sender, string cmd, string args)
 			{
-				throw new NotImplementedException();
-				//Server.theServ.SpawnMob(sender._player, args);
+				string[] argv = args.Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+				if(argv.Length != 2) {
+					sender.PrintMessage(Color.CommandError + "Usage: /mob action param");
+					return;
+				}
+				string action = argv[0];
+				string param = argv[1];
+				if(action == "actions") {
+					sender.PrintMessage(Color.CommandResult + "Actions: spawn kill");
+				} else if(action == "spawn") {
+					Server.theServ.SpawnRobot(sender.pos, param);
+				} else if(action == "kill") {
+					foreach(Robot r in new List<Robot>(Server.theServ.Robots)) {
+						if(r.name == param || param == "*") {
+							r.Stop();
+						}
+					}
+				}
 			}
 		}
 

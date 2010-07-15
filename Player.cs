@@ -59,8 +59,20 @@ namespace spacecraft
 		{
 			pos = Server.theServ.map.spawn;
 			conn = new Connection(client, this);
-
-			playerID = 0;
+			
+			playerID = AssignID();
+			
+			conn.PlayerMove += new Connection.PlayerMoveHandler(conn_PlayerMove);
+			conn.PlayerSpawn += new Connection.PlayerSpawnHandler(conn_PlayerSpawn);
+			conn.ReceivedUsername += new Connection.UsernameHandler(conn_ReceivedUsername);
+			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
+			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
+			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
+		}
+		
+		public static byte AssignID()
+		{
+			byte playerID = 0;
 			for(byte i = 1; i <= 255; ++i) {
 				if(!InUseIDs.Contains(i)) {
 					playerID = i;
@@ -71,13 +83,7 @@ namespace spacecraft
 			if(playerID == 0) {
 				throw new SpacecraftException("Bah, all out of player IDs! This is quite bad.");
 			}
-
-			conn.PlayerMove += new Connection.PlayerMoveHandler(conn_PlayerMove);
-			conn.PlayerSpawn += new Connection.PlayerSpawnHandler(conn_PlayerSpawn);
-			conn.ReceivedUsername += new Connection.UsernameHandler(conn_ReceivedUsername);
-			conn.BlockSet += new Connection.BlockSetHandler(conn_BlockSet);
-			conn.ReceivedMessage += new Connection.MessageHandler(conn_ReceivedMessage);
-			conn.Disconnect += new Connection.DisconnectHandler(conn_Disconnect);
+			return playerID;
 		}
 		
 		~Player() {
@@ -131,11 +137,16 @@ namespace spacecraft
 			placing = false;
 			painting = false;
 			placeType = Block.Undefined;
-		}	
+		}
 
 		public virtual void PlayerJoins(Player Player)
 		{
 			conn.HandlePlayerSpawn(Player, Player == this);
+		}
+
+		public virtual void PlayerJoins(Robot Player)
+		{
+			conn.HandlePlayerSpawn(Player);
 		}
 
 		public virtual void PlayerMoves(Player Player, Position dest, byte heading, byte pitch)
@@ -145,6 +156,11 @@ namespace spacecraft
 			}
 
 			conn.SendPlayerMovement(Player, dest, heading, pitch, Player == this);
+		}
+
+		public virtual void PlayerMoves(Robot Player, Position dest, byte heading, byte pitch)
+		{
+			conn.SendPlayerMovement(Player, dest, heading, pitch, false);
 		}
 
 		public void PlayerDisconnects(Player P) {

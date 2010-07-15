@@ -35,7 +35,7 @@ namespace eval spelunker {
 			after 87000 {broadcast "Spelunker: 3..."}
 			after 88000 {broadcast "Spelunker: 2..."}
 			after 89000 {broadcast "Spelunker: 1..."}
-			after 90000 {spelunkerStart}
+			after 90000 {spelunker::spelunkerStart}
 		} else {
 			if {$spelunker_started} {
 				tell $sender "[getColorCode commandError]The game is in progress!"
@@ -147,7 +147,7 @@ namespace eval spelunker {
 				} else {
 					set spelunker_started 2
 					broadcast "Spelunker: $player WINS ($time)! 90 seconds remain."
-					after 90000 spelunkerEnd
+					after 90000 spelunker::spelunkerEnd
 				}
 				set spelunker [lremove $spelunker $player]
 			}

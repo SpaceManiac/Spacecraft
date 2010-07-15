@@ -90,6 +90,9 @@ namespace eval dropship {
 		if {($r != "Mod" && $r != "Admin") || $newType != "air" || ($type != "glass" && $type != "leaves")} {
 			return
 		}
+		if {[namespace exists ::buildRank] && ![buildRank::mayBuild $sender]} {
+			return
+		}
 		
 		set signature "wood.teal.rock.brick.green.brick.rock.brick.wood."
 		
