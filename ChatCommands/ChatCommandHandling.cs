@@ -53,6 +53,10 @@ namespace spacecraft
 			Commands.Add("mod", new ChatCommands.RankMod());
 			Commands.Add("tcl", new ChatCommands.ExecuteTcl());
 
+            Commands.Add("tp_add", new ChatCommands.TeleportAdd());
+            Commands.Add("tp_remove", new ChatCommands.TeleportRemove());
+
+
 			if(File.Exists("rules.txt")) {
 				RulesText = File.ReadAllText("rules.txt").TrimEnd();
 				if (RulesText != "")

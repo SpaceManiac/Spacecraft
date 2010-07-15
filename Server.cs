@@ -403,6 +403,12 @@ namespace spacecraft
 
 		void Player_Move(Player sender, Position dest, byte heading, byte pitch)
 		{
+            if (map.teleportDests.ContainsKey(dest))
+            {
+                MovePlayer(sender, map.teleportDests[dest].First, map.teleportDests[dest].Second, pitch);
+                return;
+            }
+            
 			List<Player> temp = new List<Player>(Players);
 			foreach (Player P in temp) {
 				if(P != sender) {

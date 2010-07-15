@@ -64,12 +64,21 @@ namespace spacecraft
 		/* indev only
 		Torch = 50,
 		Fire = 51,
-		InfiniteWater = 52,*/
+		InfiniteWater = 52,
+        InfiniteLava = 53,
+         */
+
+        Unobtanium = 100,
+
 	}
 
 	public static class BlockInfo
 	{
 		public static Dictionary<string, Block> names;
+
+        private static Dictionary<Block, Block> ClientTranslations; // To translate our custom blocks into blocks clients can understnad.
+        // Private because we have .Translate. No need to get to the dictionary directly. 
+
 		public const int SpongeRadius = 2;
 
 		public static bool IsFluid(Block block)
@@ -100,8 +109,13 @@ namespace spacecraft
 		
 		public static bool RequiresPhysics(Block B)
 		{
-			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge || B == Block.Gravel);
+			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge || B == Block.Gravel || B == Block.Unobtanium);
 		}
+
+        public static bool IsCustom(Block B)
+        {
+            return ((byte)B >= 100);
+        }
 
 		static BlockInfo()
 		{
@@ -145,12 +159,32 @@ namespace spacecraft
 			names["mossyrocks"] = Block.MossyCobblestone;
 			names["mossystones"] = Block.MossyCobblestone;
 			names["dark"] = Block.Obsidian;
+
+            ClientTranslations = new Dictionary<Block, Block>()
+            {
+                {Block.Unobtanium, Block.Iron},
+            };
+
+
 		}
 
 		public static bool NameExists(string key)
 		{
 			return names.ContainsKey(key);
 		}
+
+        /// <summary>
+        /// Translate custom types for clients.
+        /// </summary>
+        /// <param name="B"></param>
+        /// <returns></returns>
+        public static Block Translate(Block B)
+        {
+            if (ClientTranslations.ContainsKey(B))
+                return ClientTranslations[B];
+            else
+                return B;
+        }
 
 		public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
 	

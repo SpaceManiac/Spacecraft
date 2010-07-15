@@ -35,6 +35,10 @@ namespace spacecraft
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
+        public Dictionary<Position, string> teleportNames = new Dictionary<Position, string>();
+        public Dictionary<Position, Pair<Position, byte>> teleportDests = new Dictionary<Position, Pair<Position, byte>>();
+
+
 		public Map()
 		{
 			physicsCount = 0;
@@ -60,12 +64,9 @@ namespace spacecraft
 
 		public string[] GetLandmarkList()
 		{
-			List<string> l = new List<string>();
-			foreach (KeyValuePair<string, Pair<Position, byte>> pair in landmarks)
-			{
-				l.Add(pair.Key);
-			}
-			return l.ToArray();
+			string[] l = new string[landmarks.Keys.Count];
+            landmarks.Keys.CopyTo(l, 0);
+			return l;
 		}
 
 		public void SetSpawn(Position p, byte heading)
@@ -91,7 +92,7 @@ namespace spacecraft
 
 			DateTime Begin = DateTime.Now;
 
-			if (Scripting.Initialized && Scripting.HookDefined("onLevelGeneration") && !skipTcl)
+			if (Scripting.Initialized && !skipTcl && Scripting.HookDefined("onLevelGeneration"))
 			{
 				int value = Scripting.ExecuteHook("onLevelGeneration", xdim + " " + ydim + " " + zdim);
 				if (!Scripting.IsOk(value))
@@ -127,8 +128,13 @@ namespace spacecraft
 			Spacecraft.Log("Generation complete. Took " + (End - Begin).TotalMilliseconds + "ms");
 		}
 
+        public void GetCompressedCopy(Stream stream, bool prependBlockCount)
+        {
+            GetCompressedCopy(stream, prependBlockCount, true);
+        }
+
 		// zips a copy of the block array
-		public void GetCompressedCopy(Stream stream, bool prependBlockCount)
+		public void GetCompressedCopy(Stream stream, bool prependBlockCount, bool translateForClient)
 		{
 			using (GZipStream compressor = new GZipStream(stream, CompressionMode.Compress))
 			{
@@ -139,8 +145,21 @@ namespace spacecraft
 					// write block count to gzip stream
 					compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, sizeof(int));
 				}
-				compressor.Write(data, 0, data.Length);
+
+                byte[] temp = data;
+
+                if (translateForClient)
+                {
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        temp[i] = (byte) BlockInfo.Translate((Block)temp[i]);
+                    }
+
+                }
+				compressor.Write(temp, 0, temp.Length);
 			}
+
+            GC.Collect();
 		}
 
 		public void CopyBlocks(byte[] source, int offset)
@@ -181,7 +200,7 @@ namespace spacecraft
 							if (GetTile(x, y, z) == From)
 							{
 								SetTile(x, y, z, To);
-								if (++total >= max || max != -1) return;
+								if (++total >= max && max != -1) return;
 							}
 						}
 					}
@@ -215,6 +234,10 @@ namespace spacecraft
 
 		public void SetTile(short x, short y, short z, Block tile, bool calcHeights)
 		{
+
+            if (tile == Block.Undefined)
+                throw new ArgumentException("Tried to set undefined block.");
+
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 
 			if(calcHeights) {
@@ -224,7 +247,8 @@ namespace spacecraft
 					tile = Block.Grass;
 				}
 			}
-		
+		            
+
 			BlockPosition pos = new BlockPosition(x, y, z);
 
 			data[BlockIndex(x, y, z)] = (byte)tile;
@@ -234,6 +258,15 @@ namespace spacecraft
 				BlockChange(this, pos, tile);
 		}
 
+
+        /// <summary>
+        /// Sets a tile and bypasses all of the validation checks, height calculations, physics calculations and events. USE WITH EXTREME CAUTION
+        /// HERE BE DRAGONS!
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="tile"></param>
 		public void SetTile_Fast(short x, short y, short z, Block tile)
 		{
 			data[BlockIndex(x, y, z)] = (byte)tile;

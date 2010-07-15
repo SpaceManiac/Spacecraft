@@ -29,6 +29,7 @@ namespace spacecraft
 					File.Create("admins.txt").Close();
 				}
 
+
 #if WIN32
 				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
 				cpuCounter.NextValue();
@@ -76,8 +77,12 @@ namespace spacecraft
 		{
             if ( dateString == "")
                 CalculateFilenames();
+
+            if (!Directory.Exists("logs"))
+                Directory.CreateDirectory("logs");
+
 			lock (logfileMutex) {
-				StreamWriter sw = new StreamWriter("server-" + dateString + ".log", true);
+				StreamWriter sw = new StreamWriter("logs\\server-" + dateString + ".log", true);
 				if (text == "") {
 					sw.WriteLine();
 				} else {
@@ -97,14 +102,22 @@ namespace spacecraft
 
 		public static void LogError(string text, Exception e)
 		{
-			if(e == null) {
-				Log("Error: " + text);
-				return;
-			}
-			CalculateFilenames();
+            if (e == null)
+            {
+                Log("Error: " + text);
+                return;
+            }
+
+            if (dateString == "")
+                CalculateFilenames();
+
+            if (!Directory.Exists("errors"))
+                Directory.CreateDirectory("errors");
+
+            
 			lock (errorfileMutex)
 			{
-				StreamWriter sw = new StreamWriter("error-" + dateString + ".log", true);
+				StreamWriter sw = new StreamWriter("errors\\error-" + dateString + ".log", true);
 
 				sw.Write("==== ");
 				sw.Write(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));

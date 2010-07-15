@@ -348,7 +348,7 @@ namespace spacecraft
 		{
 			DisconnectPacket P = new DisconnectPacket();
 			P.Reason = reason;
-			TransmitPacket(P); // Send the packet immediatly, as we have no need for players who haven't verified.
+			TransmitPacket(P); // Send the packet immediatly, to free up bandwidth.
 			Quit();
 		}
 

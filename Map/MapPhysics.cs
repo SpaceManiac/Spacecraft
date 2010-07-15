@@ -31,7 +31,7 @@ namespace spacecraft
 			get { return ActiveBlocks.Count; }
 		}
 		
-		public int UpdatedLastTick { get; protected set; }
+		public int UpdatesLastTick { get; protected set; }
 
 		System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -126,7 +126,7 @@ namespace spacecraft
 				}
 
 				// Process physics updates.
-				int x = 0;
+                UpdatesLastTick = 0;
 				foreach (PhysicsTask task in PhysicsUpdates.Values)
 				{
 					if(task.To == Block.Undefined) {
@@ -141,9 +141,8 @@ namespace spacecraft
 					}
 					
 					SetTile(task.x, task.y, task.z, task.To);
-					++x;
+                    ++UpdatesLastTick;
 				}
-				UpdatedLastTick = x;
 			}
 		}
 
@@ -196,7 +195,7 @@ namespace spacecraft
 						}
 					}
 					
-					// turn lava directly above the water level into lava.
+					// turn lava directly above the water level into rock.
 					// without this, lava above water will not form stone.
 					if(GetTile(X, (short)(Y + 1), Z) == Block.Lava) {
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y + 1), Z, Block.Rock));
@@ -289,7 +288,6 @@ namespace spacecraft
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Sand));
 						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
 					}
-
 					break;
 
 				case Block.Gravel:
@@ -300,6 +298,23 @@ namespace spacecraft
 					}
 
 					break;
+
+                case Block.Unobtanium:
+                    if (BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
+                    {
+                        AddPhysicsUpdate(new PhysicsTask(X, (short)(Y + 1), Z, Block.Unobtanium));
+                        AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
+                    }
+                    else
+                    {
+                        if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 2), Z)))
+                        {
+                            AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Unobtanium));
+                            AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
+                        }
+                    }
+                    break;
+
 
 				default:
 					break;
