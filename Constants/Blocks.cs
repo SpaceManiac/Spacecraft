@@ -103,6 +103,11 @@ namespace spacecraft
 			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge || B == Block.Gravel);
 		}
 
+        public static bool IsCustom(Block B)
+        {
+            return (B > 51);
+        }
+
 		static BlockInfo()
 		{
 			names = new Dictionary<string, Block>();

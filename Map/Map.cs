@@ -216,6 +216,9 @@ namespace spacecraft
 
 		public void SetTile(short x, short y, short z, Block tile, bool calcHeights)
 		{
+            if (tile == Block.Undefined)
+                throw new ArgumentException("Tried to set undefined block.");
+
 			if (x >= xdim || y >= ydim || z >= zdim || x < 0 || y < 0 || z < 0) return;
 
 			if(calcHeights) {
