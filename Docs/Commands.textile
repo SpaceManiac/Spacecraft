@@ -12,8 +12,6 @@ h1. Guest Commands
 h1. Builder Commands
 * /mark - Create a landmark.
 * /paint - Toggle painting mode. In painting mode, removes turn into places.
-* /teleport - Teleport to a player.
-* /tp - Teleport to a player.
 * /whois - Get information on a user.
 
 h1. Mod Commands
@@ -27,7 +25,7 @@ h1. Mod Commands
 * /diagnostics - Display some diagnostic information on physics and server usage.
 * /guest - Set a user of lesser rank to Guest.
 * /kick - Kick a player.
-* /mob - Spawn an AI mob (unimplemented).
+* /mob - Spawn an AI mob.
 * /physics - Get or change physics status.
 * /place - Place certain special blocks.
 * /rerank - Refresh the rank database
@@ -35,6 +33,10 @@ h1. Mod Commands
 * /rmmark - Remove a landmark.
 * /say - Broadcast a message in yellow text.
 * /summon - Teleport a player to you.
+* /teleport - tp_add [name] [x] [y] [z] [heading]: Adds a teleport leading from current position to the given position.
+* /tp - tp_add [name] [x] [y] [z] [heading]: Adds a teleport leading from current position to the given position.
+* /tp_add - tp_add [name] [x] [y] [z] [heading]: Adds a teleport leading from current position to the given position.
+* /tp_remove - tp_remove [name]: Remove the named teleporter.
 * /unban - Set a user of lesser rank to Guest.
 
 h1. Admin Commands
