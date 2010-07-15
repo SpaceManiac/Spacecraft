@@ -158,7 +158,7 @@ namespace spacecraft
 
 		public virtual void BlockSet(BlockPosition pos, Block type)
 		{
-			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)type);
+			conn.SendBlockSet(pos.x, pos.y, pos.z, (byte)BlockInfo.Translate(type));
 		}
 
 		/* ================================================================================

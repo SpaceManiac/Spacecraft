@@ -229,6 +229,9 @@ namespace spacecraft
 				}
 			}
 		
+
+
+
 			BlockPosition pos = new BlockPosition(x, y, z);
 
 			data[BlockIndex(x, y, z)] = (byte)tile;
@@ -238,6 +241,15 @@ namespace spacecraft
 				BlockChange(this, pos, tile);
 		}
 
+
+        /// <summary>
+        /// Sets a tile and bypasses all of the validation checks, height calculations, physics calculations and events. USE WITH EXTREME CAUTION
+        /// HERE BE DRAGONS!
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="tile"></param>
 		public void SetTile_Fast(short x, short y, short z, Block tile)
 		{
 			data[BlockIndex(x, y, z)] = (byte)tile;

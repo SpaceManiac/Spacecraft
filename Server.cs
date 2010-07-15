@@ -62,13 +62,16 @@ namespace spacecraft
 				map = Map.Load("server_level.dat");
 			}*/
 
-            map = Map.Load("level.fcm");
-
-			if (map == null) {
-				map = new Map();
-				map.Generate();
-				map.Save(Map.levelName);
-			}
+            try
+            {
+                map = Map.Load("level.fcm");
+            }
+            catch (IOException E)
+            {
+                map = new Map();
+                map.Generate();
+                map.Save(Map.levelName);
+            }
 
 			map.BlockChange += new Map.BlockChangeHandler(map_BlockChange);
 
