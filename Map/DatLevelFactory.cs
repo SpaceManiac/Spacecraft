@@ -118,11 +118,10 @@ namespace spacecraft
 			return map;
 		}
 
-        public static void Save(Map Object, string fileName)
-        {
-            throw new NotImplementedException();
-        }
-
+		public static void Save(Map Object, string fileName)
+		{
+			throw new NotImplementedException();
+		}
 
 		static bool MemCmp( byte[] data, int offset, string value ) {
 			for( int i = 0; i < value.Length; i++ ) {

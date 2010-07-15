@@ -76,20 +76,20 @@ namespace spacecraft
 			return Hooks.ContainsKey(hookName) && Hooks[hookName].Count > 0;
 		}
 
-        public static int ExecuteHook(string hookName, string arguments)
-        {
-            if (Config.GetBool("tcl", false))
-            {
-                foreach (string command in new List<String>(Hooks[hookName]))
-                {
-                    if (!IsOk(Interpreter.EvalScript(command + " " + arguments)))
-                    {
-                        return TclAPI.TCL_ERROR;
-                    }
-                }
-            }
-            return TclAPI.TCL_OK;
-        }
+		public static int ExecuteHook(string hookName, string arguments)
+		{
+			if (Config.GetBool("tcl", false))
+			{
+				foreach (string command in new List<String>(Hooks[hookName]))
+				{
+					if (!IsOk(Interpreter.EvalScript(command + " " + arguments)))
+					{
+						return TclAPI.TCL_ERROR;
+					}
+				}
+			}
+			return TclAPI.TCL_OK;
+		}
 		
 		static int ScriptEvalFile(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr)
 		{

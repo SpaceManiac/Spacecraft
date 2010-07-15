@@ -65,10 +65,10 @@ namespace spacecraft
 		Torch = 50,
 		Fire = 51,
 		InfiniteWater = 52,
-        InfiniteLava = 53,
-         */
+		InfiniteLava = 53,
+		 */
 
-        Unobtanium = 100,
+		Unobtanium = 100,
 
 	}
 
@@ -76,8 +76,8 @@ namespace spacecraft
 	{
 		public static Dictionary<string, Block> names;
 
-        private static Dictionary<Block, Block> ClientTranslations; // To translate our custom blocks into blocks clients can understnad.
-        // Private because we have .Translate. No need to get to the dictionary directly. 
+		private static Dictionary<Block, Block> ClientTranslations; // To translate our custom blocks into blocks clients can understnad.
+		// Private because we have .Translate. No need to get to the dictionary directly. 
 
 		public const int SpongeRadius = 2;
 
@@ -112,10 +112,10 @@ namespace spacecraft
 			return (B == Block.Water || B == Block.Lava || B == Block.Sand || B == Block.Sponge || B == Block.Gravel || B == Block.Unobtanium);
 		}
 
-        public static bool IsCustom(Block B)
-        {
-            return ((byte)B >= 100);
-        }
+		public static bool IsCustom(Block B)
+		{
+			return ((byte)B >= 100);
+		}
 
 		static BlockInfo()
 		{
@@ -160,11 +160,10 @@ namespace spacecraft
 			names["mossystones"] = Block.MossyCobblestone;
 			names["dark"] = Block.Obsidian;
 
-            ClientTranslations = new Dictionary<Block, Block>()
-            {
-                {Block.Unobtanium, Block.Iron},
-            };
-
+			ClientTranslations = new Dictionary<Block, Block>()
+			{
+				{Block.Unobtanium, Block.Iron},
+			};
 
 		}
 
@@ -173,18 +172,18 @@ namespace spacecraft
 			return names.ContainsKey(key);
 		}
 
-        /// <summary>
-        /// Translate custom types for clients.
-        /// </summary>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        public static Block Translate(Block B)
-        {
-            if (ClientTranslations.ContainsKey(B))
-                return ClientTranslations[B];
-            else
-                return B;
-        }
+		/// <summary>
+		/// Translate custom types for clients.
+		/// </summary>
+		/// <param name="B"></param>
+		/// <returns></returns>
+		public static Block Translate(Block B)
+		{
+			if (ClientTranslations.ContainsKey(B))
+				return ClientTranslations[B];
+			else
+				return B;
+		}
 
 		public static Comparison<Block> BlockSorter = new Comparison<Block>(BlockSort);
 	
