@@ -223,7 +223,7 @@ namespace spacecraft
 					{
 						WriteHeader(fs);
 						WriteMetadata(fs);
-						GetCompressedCopy(fs, false);
+						GetCompressedCopy(fs, false, false);
 					}
 					catch (IOException ex)
 					{

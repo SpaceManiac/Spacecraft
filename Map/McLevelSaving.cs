@@ -6,7 +6,6 @@ namespace spacecraft
 	{
 		public static void Save(Map M, string filename)
 		{
-
 		}
 	}
 }

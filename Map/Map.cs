@@ -234,6 +234,9 @@ namespace spacecraft
 		public void SetTile(short x, short y, short z, Block tile, bool calcHeights)
 		{
 
+            if (GetTile(x, y, z) == Block.Water || tile == Block.Water)
+            { int foo = 0; }
+
 			if (tile == Block.Undefined)
 				throw new ArgumentException("Tried to set undefined block.");
 

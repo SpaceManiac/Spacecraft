@@ -322,6 +322,9 @@ namespace spacecraft
 
 		void AddPhysicsUpdate(PhysicsTask task)
 		{
+            if (task.To == Block.Water)
+            { int a = 0; }
+
 			if (PhysicsUpdates.ContainsKey(task.GetHashCode()))
 				PhysicsUpdates.Remove(task.GetHashCode());
 			PhysicsUpdates.Add(task.GetHashCode(), task);

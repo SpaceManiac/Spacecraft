@@ -68,7 +68,7 @@ namespace spacecraft
 		InfiniteLava = 53,
 		 */
 
-		Unobtanium = 100,
+		Unobtanium = 200,
 
 	}
 
