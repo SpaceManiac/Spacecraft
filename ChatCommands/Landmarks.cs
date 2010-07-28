@@ -55,25 +55,21 @@ namespace spacecraft {
 
 			public override void Run(Player sender, string cmd, string args)
 			{
+				char[] denied = new char[] { '{', '[', ']', '}', ' ', '|', '!', '?' };
+				
 				args = args.Trim().ToLower();
 				Map map = Server.theServ.map;
-				if (args == "")
-				{
+				if (args == "") {
 					string marks = "Landmarks: " + String.Join(", ", map.GetLandmarkList());
 					ChatCommandHandling.WrapMessage(sender, marks);
-				}
-				else
-				{
-					if (map.landmarks.ContainsKey(args))
-					{
-						sender.PrintMessage(Color.CommandError + "Landmark " + args + " already exists");
-					}
-					else
-					{
-						byte heading = sender.heading;
-						map.landmarks.Add(args, new Pair<Position, byte>(sender.pos, heading));
-						Server.theServ.MessageAll(Color.Announce + sender.name + " created landmark " + args);
-					}
+				} else if (args.IndexOfAny(denied) >= 0) {
+					sender.PrintMessage(Color.CommandError + "Landmark name contains invalid characters");
+				} else if (map.landmarks.ContainsKey(args)) {
+					sender.PrintMessage(Color.CommandError + "Landmark " + args + " already exists");
+				} else {
+					byte heading = sender.heading;
+					map.landmarks.Add(args, new Pair<Position, byte>(sender.pos, heading));
+					Server.theServ.MessageAll(Color.Announce + sender.name + " created landmark " + args);
 				}
 			}
 		}
