@@ -35,9 +35,6 @@ namespace spacecraft
 		public Dictionary<string, string> meta = new Dictionary<string, string>();
 		public Dictionary<string, Pair<Position, byte>> landmarks = new Dictionary<string, Pair<Position, byte>>();
 
-		public Dictionary<Position, string> teleportNames = new Dictionary<Position, string>();
-		public Dictionary<Position, Pair<Position, byte>> teleportDests = new Dictionary<Position, Pair<Position, byte>>();
-
 		public Map()
 		{
 			physicsCount = 0;

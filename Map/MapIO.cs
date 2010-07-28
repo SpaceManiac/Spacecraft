@@ -286,22 +286,6 @@ namespace spacecraft
 				data.Append(",");
 				data.Append(heading);
 				WriteLengthPrefixedString(writer, data.ToString());
-
-				// This isn't actually written, so I'm commenting it out for now.
-				/*
-				StringBuilder HeightString = new StringBuilder();
-				for (int x = 0; x < Heights.GetLength(0); x++)
-				{
-					for (int z = 0; z < Heights.GetLength(1); z++)
-					{
-						HeightString.Append(x);
-						HeightString.Append(",");
-						HeightString.Append(z);
-						HeightString.Append(",");
-						HeightString.Append(Heights[x,z]);
-					}    
-				}
-				*/
 			}
 
 			foreach (KeyValuePair<string, string> pair in meta)

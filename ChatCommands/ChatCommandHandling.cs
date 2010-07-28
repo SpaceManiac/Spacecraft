@@ -61,8 +61,6 @@ namespace spacecraft
 			// Experimental commands
 			Commands.Add("mob", new ChatCommands.SpawnMob());
 			Commands.Add("resend", new ChatCommands.ResendMap());
-			Commands.Add("tp_add", new ChatCommands.TeleportAdd());
-			Commands.Add("tp_remove", new ChatCommands.TeleportRemove());
 
 			// Only add the /rules command if rules.txt exists.
 			if(File.Exists("rules.txt")) {
