@@ -13,49 +13,58 @@ namespace spacecraft
 		{
 			Commands = new Dictionary<String, ChatCommands.ChatCommandBase>();
 			
+			// Guest basics
 			Commands.Add("clear", new ChatCommands.ClearChat());
 			Commands.Add("go", new ChatCommands.LandmarkGoto());
 			Commands.Add("help", new ChatCommands.Help());
 			Commands.Add("me", new ChatCommands.ThirdPerson());
 			Commands.Add("staff", new ChatCommands.StaffList());
 			
+			// Builder basics
 			Commands.Add("mark", new ChatCommands.LandmarkAdd());
 			Commands.Add("paint", new ChatCommands.Paint());
 			Commands.Add("teleport", new ChatCommands.Teleport());
 			Commands.Add("tp", new ChatCommands.Teleport());
 			Commands.Add("whois", new ChatCommands.WhoIs());
 			
+			// Rank manipulation
 			Commands.Add("ban", new ChatCommands.RankBanned());
-			Commands.Add("bring", new ChatCommands.Summon());
-			Commands.Add("broadcast", new ChatCommands.Broadcast());
 			Commands.Add("builder", new ChatCommands.RankBuilder());
-			Commands.Add("conwiz", new ChatCommands.ConspiracyWizard());
-			Commands.Add("dehydrate", new ChatCommands.Dehydrate());
-			Commands.Add("diag", new ChatCommands.Diagnostics());
-			Commands.Add("diagnostics", new ChatCommands.Diagnostics());
 			Commands.Add("guest", new ChatCommands.RankGuest());
-			Commands.Add("kick", new ChatCommands.Kick());
-			Commands.Add("mob", new ChatCommands.SpawnMob());
+			Commands.Add("mod", new ChatCommands.RankMod());
+			Commands.Add("rerank", new ChatCommands.ReloadRanks());
+			Commands.Add("unban", new ChatCommands.RankGuest());
+			
+			// Map manipulation tools
+			Commands.Add("convert", new ChatCommands.Convert());
+			Commands.Add("dehydrate", new ChatCommands.Dehydrate());
 			Commands.Add("physics", new ChatCommands.Physics());
 			Commands.Add("place", new ChatCommands.Place());
-			Commands.Add("rerank", new ChatCommands.ReloadRanks());
+			
+			// Other moderator tools
+			Commands.Add("bring", new ChatCommands.Summon());
+			Commands.Add("broadcast", new ChatCommands.Broadcast());
+			Commands.Add("diag", new ChatCommands.Diagnostics());
+			Commands.Add("diagnostics", new ChatCommands.Diagnostics());
+			Commands.Add("kick", new ChatCommands.Kick());
 			Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
 			Commands.Add("say", new ChatCommands.Broadcast());
 			Commands.Add("summon", new ChatCommands.Summon());
-			Commands.Add("unban", new ChatCommands.RankGuest());
 			
+			// Global admin tools
 			Commands.Add("config", new ChatCommands.Configure());
-			Commands.Add("convert", new ChatCommands.Convert());
 			Commands.Add("exit", new ChatCommands.Exit());
-			Commands.Add("resend", new ChatCommands.ResendMap());
 			Commands.Add("save", new ChatCommands.SaveMap());
 			Commands.Add("setspawn", new ChatCommands.SetSpawn());
-			Commands.Add("mod", new ChatCommands.RankMod());
 			Commands.Add("tcl", new ChatCommands.ExecuteTcl());
 
+			// Experimental commands
+			Commands.Add("mob", new ChatCommands.SpawnMob());
+			Commands.Add("resend", new ChatCommands.ResendMap());
 			Commands.Add("tp_add", new ChatCommands.TeleportAdd());
 			Commands.Add("tp_remove", new ChatCommands.TeleportRemove());
 
+			// Only add the /rules command if rules.txt exists.
 			if(File.Exists("rules.txt")) {
 				RulesText = File.ReadAllText("rules.txt").TrimEnd();
 				if (RulesText != "")

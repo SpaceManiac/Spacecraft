@@ -19,7 +19,6 @@ h1. Mod Commands
 * /bring - Teleport a player to you.
 * /broadcast - Broadcast a message in yellow text.
 * /builder - Set a user of lesser rank to Builder.
-* /conwiz - What does /conwiz do? What DOESN'T it do?
 * /dehydrate - Remove all active water and lava from the map.
 * /diag - Display some diagnostic information on physics and server usage.
 * /diagnostics - Display some diagnostic information on physics and server usage.
