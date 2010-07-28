@@ -59,7 +59,7 @@ namespace spacecraft
 			Interpreter.CreateCommand("dropHook", new TclAPI.TclCommand(ScriptDropHook));
 
 			Spacecraft.Log("Reading startup.tcl...");
-			int status = Interpreter.SourceFile("Scripting/startup.tcl");
+			int status = Interpreter.SourceFile("scripts/startup.tcl");
 			if (!IsOk(status)) {
 				Spacecraft.Log("Error in startup.tcl: " + Interpreter.Result);
 			}

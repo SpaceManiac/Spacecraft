@@ -2,12 +2,13 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Scripting\ScriptHandler.cs" ctype="Workbench">
     <Files>
-      <File FileName="Scripting\ScriptHandler.cs" Line="517" Column="25" />
-      <File FileName="Robot.cs" Line="62" Column="4" />
-      <File FileName="Server.cs" Line="471" Column="19" />
-      <File FileName="Player.cs" Line="163" Column="63" />
-      <File FileName="Connection.cs" Line="410" Column="38" />
-      <File FileName="ChatCommands\Misc.cs" Line="94" Column="14" />
+      <File FileName="d:\projects\Downstairs\spacecraft\Map\MapPhysics.cs" Line="324" Column="4" />
+      <File FileName="d:\projects\Downstairs\spacecraft\Map\Map.cs" Line="250" Column="51" />
+      <File FileName="generate-documentation.tcl" Line="242" Column="12" />
+      <File FileName="bin\Debug\scripts\libSpacecraft.tcl" Line="32" Column="39" />
+      <File FileName="bin\Debug\scripts\startup.tcl" Line="6" Column="15" />
+      <File FileName="ChatCommands\Misc.cs" Line="166" Column="19" />
+      <File FileName="Scripting\ScriptHandler.cs" Line="72" Column="13" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -15,9 +16,8 @@
           <Node name="spacecraft" expanded="True">
             <Node name="ChatCommands" expanded="True" />
             <Node name="Scripting" expanded="True">
-              <Node name="buildRank.tcl" selected="True" />
+              <Node name="ScriptHandler.cs" selected="True" />
             </Node>
-            <Node name="Utils" expanded="True" />
           </Node>
         </State>
       </Pad>
