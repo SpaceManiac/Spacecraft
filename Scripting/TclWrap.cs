@@ -7,12 +7,12 @@ namespace TclWrap {
 	public class TclAPI {
 		public delegate int TclCommand(IntPtr clientData, IntPtr interp, int argc, IntPtr argsPtr);
 		
-		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateInterp();
-		[DllImport("tcl84.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
-		[DllImport("tcl84.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
-		[DllImport("tcl84.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
-		[DllImport("tcl84.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
-		[DllImport("tcl84.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
+		[DllImport("tcl85.dll")] public static extern IntPtr Tcl_CreateInterp();
+		[DllImport("tcl85.dll")] public static extern int Tcl_Eval(IntPtr interp, string script);
+		[DllImport("tcl85.dll")] public static extern void Tcl_SetResult(IntPtr interp, string result, IntPtr method);
+		[DllImport("tcl85.dll")] public static extern string Tcl_GetStringResult(IntPtr interp);
+		[DllImport("tcl85.dll")] public static extern IntPtr Tcl_CreateCommand(IntPtr interp, string name, IntPtr cmdProc, IntPtr clientData, IntPtr cmdDeleteProc);
+		[DllImport("tcl85.dll")] public static extern void Tcl_DeleteInterp(IntPtr interp);
 
 		public const int TCL_OK = 0;
 		public const int TCL_ERROR = 1;
@@ -29,10 +29,11 @@ namespace TclWrap {
 			}
 			return result.ToArray();
 		}
+			static string s = "result";
 		
 		public static void SetResult(IntPtr interp, string result) {
 			// (IntPtr) 1 is TCL_VOLATILE, meaning 'result' won't hang around once the call is complete
-			TclAPI.Tcl_SetResult(interp, result, (IntPtr) 1);
+			TclAPI.Tcl_SetResult(interp, s, (IntPtr) 0);
 		}
 	}
 

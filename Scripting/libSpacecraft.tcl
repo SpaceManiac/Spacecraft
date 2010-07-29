@@ -2,6 +2,8 @@
 # These are some Tcl functions you may want to use for other stuff.
 # They're quite useful and are designed to work with Spacecraft.
 
+puts "aa"
+
 # ------------------------------------------------------------------------------
 # We define 'haveLibSpacecraft' so that a script is allowed to complain
 #   if libSpacecraft isn't available. Sure, you could try to fool it, but
@@ -20,6 +22,8 @@ proc qf {var from to code} {
 		}
 	} $var $from $var $to $var $code]
 }
+
+puts "bbbb"
 
 # ------------------------------------------------------------------------------
 # qs: quick-source
@@ -41,8 +45,11 @@ proc cmdQs {sender args} {
 	qs [lindex $args 0]
 	tell $sender "[getColorCode privatemsg][lindex $args 0] quicksourced"
 }
+
+puts "eeee"
 createChatCommand "qsrc" Admin "Quicksource the given script file" cmdQs
 
+puts "dddddddd"
 # ------------------------------------------------------------------------------
 # lremove: list-remove
 #   Usage: lremove list ?remove? ?remove...?
@@ -95,3 +102,4 @@ proc performCuboid {x1 y1 z1 x2 y2 z2 type callback} {
 }
 
 # ------------------------------------------------------------------------------
+# import some of the 

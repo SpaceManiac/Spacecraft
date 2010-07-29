@@ -3,7 +3,7 @@
 # in its Scripting subdirectory. Feel free to load any other
 # script files you need, like libSpacecraft, here.
 
-source Scripting/libSpacecraft.tcl
+source scripts/libSpacecraft.tcl
 
 qs buildRank.tcl
 buildRank::init

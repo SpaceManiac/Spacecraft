@@ -27,7 +27,7 @@ namespace spacecraft
 			Hooks = new Dictionary<string, List<string>>();
 
 			// Overwrite standard source, since it seems to crash :|
-			Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
+			//Interpreter.CreateCommand("source", new TclAPI.TclCommand(ScriptEvalFile));
 			
 			// 1. Get static info
 			Interpreter.CreateCommand("getBlockName", new TclAPI.TclCommand(ScriptGetBlockName));
@@ -59,7 +59,7 @@ namespace spacecraft
 			Interpreter.CreateCommand("dropHook", new TclAPI.TclCommand(ScriptDropHook));
 
 			Spacecraft.Log("Reading startup.tcl...");
-			int status = Interpreter.SourceFile("scripts/startup.tcl");
+			int status = Interpreter.EvalScript("");//"source scripts/startup.tcl");
 			if (!IsOk(status)) {
 				Spacecraft.Log("Error in startup.tcl: " + Interpreter.Result);
 			}
@@ -144,12 +144,10 @@ namespace spacecraft
 				return TclAPI.TCL_ERROR;
 			}
 			
-			try {
-				int i = (int) (Block) Enum.Parse(typeof(Block), args[1], true);
-				TclAPI.SetResult(interp, i.ToString());
+			if (BlockInfo.NameExists(args[1])) {
+				TclAPI.SetResult(interp, ((int)BlockInfo.names[args[1]]).ToString());
 				return TclAPI.TCL_OK;
-			}
-			catch(ArgumentException) {
+			} else {
 				TclAPI.SetResult(interp, "unknown block name \"" + args[1] + "\"");
 				return TclAPI.TCL_ERROR;
 			}
@@ -222,7 +220,7 @@ namespace spacecraft
 			
 			Spacecraft.Log("[S] " + args[1]);
 
-			TclAPI.SetResult(interp, "");
+			TclAPI.SetResult(interp, ":D");
 			return TclAPI.TCL_OK;
 		}
 

@@ -83,11 +83,6 @@
     <Compile Include="Scripting\TclWrap.cs" />
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="tcl84.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Scripting\startup.tcl">
@@ -103,6 +98,9 @@
     <None Include="Scripting\dropship.tcl">
     </None>
     <None Include="Scripting\libSpacecraft.tcl">
+    </None>
+    <None Include="tcl85.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

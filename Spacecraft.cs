@@ -21,7 +21,9 @@ namespace spacecraft
 
 		public static void Main(string[] args)
 		{
-			try {				
+			try {			
+				CalculateFilenames();
+					
 				Log("");
 				Log("Spacecraft is starting...");
 				if (!File.Exists("admins.txt")) {
@@ -33,8 +35,6 @@ namespace spacecraft
 				cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
 				cpuCounter.NextValue();
 #endif
-
-				CalculateFilenames();
 
 				// allow an explicit seed
 				int seed = Config.GetInt("random-seed", -1);
