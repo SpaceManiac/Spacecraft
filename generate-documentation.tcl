@@ -20,7 +20,7 @@ set outputFolder "Docs"
 set uploadMode 0
 set genAll 1
 set gen [list]
-set canGen [list cmd conf tcl]
+set canGen [list cmd conf]
 
 foreach arg $argv {
 	if {[lsearch $canGen [string range $arg 1 end]] >= 0} {

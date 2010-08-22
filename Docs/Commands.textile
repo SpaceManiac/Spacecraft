@@ -1,7 +1,6 @@
 Spacecraft supports several commands for building and management. See [[User Ranks]] for more information on ranks.
 
 h1. Guest Commands
-* / - Get general help, a list of commands, or help on a specific command
 * /clear - Clear the chat log of the user
 * /go - Teleport to a landmark.
 * /help - Get general help, a list of commands, or help on a specific command
@@ -12,18 +11,15 @@ h1. Guest Commands
 h1. Builder Commands
 * /mark - Create a landmark.
 * /paint - Toggle painting mode. In painting mode, removes turn into places.
-* /teleport - Teleport to a player.
 * /tp - Teleport to a player.
 * /whois - Get information on a user.
 
 h1. Mod Commands
 * /ban - Ban a user of lesser rank.
 * /bring - Teleport a player to you.
-* /broadcast - Broadcast a message in yellow text.
 * /builder - Set a user of lesser rank to Builder.
 * /dehydrate - Remove all active water and lava from the map.
 * /diag - Display some diagnostic information on physics and server usage.
-* /diagnostics - Display some diagnostic information on physics and server usage.
 * /guest - Set a user of lesser rank to Guest.
 * /kick - Kick a player.
 * /mob - Spawn an AI mob.
@@ -33,7 +29,6 @@ h1. Mod Commands
 * /resend - Resend the map for testing purposes (unimplemented).
 * /rmmark - Remove a landmark.
 * /say - Broadcast a message in yellow text.
-* /summon - Teleport a player to you.
 * /unban - Set a user of lesser rank to Guest.
 
 h1. Admin Commands
@@ -43,7 +38,6 @@ h1. Admin Commands
 * /mod - Set a user of lesser rank to Mod.
 * /save - Saves the current map to disk.
 * /setspawn - Set the map's global spawn point
-* /tcl - Execute Tcl code.
 
 
 This documentation was auto-generated based on Spacecraft's source.
