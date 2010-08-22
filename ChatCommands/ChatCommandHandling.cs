@@ -23,7 +23,6 @@ namespace spacecraft
 			// Builder basics
 			Commands.Add("mark", new ChatCommands.LandmarkAdd());
 			Commands.Add("paint", new ChatCommands.Paint());
-			Commands.Add("teleport", new ChatCommands.Teleport());
 			Commands.Add("tp", new ChatCommands.Teleport());
 			Commands.Add("whois", new ChatCommands.WhoIs());
 			
@@ -43,20 +42,16 @@ namespace spacecraft
 			
 			// Other moderator tools
 			Commands.Add("bring", new ChatCommands.Summon());
-			Commands.Add("broadcast", new ChatCommands.Broadcast());
 			Commands.Add("diag", new ChatCommands.Diagnostics());
-			Commands.Add("diagnostics", new ChatCommands.Diagnostics());
 			Commands.Add("kick", new ChatCommands.Kick());
 			Commands.Add("rmmark", new ChatCommands.LandmarkRemove());
 			Commands.Add("say", new ChatCommands.Broadcast());
-			Commands.Add("summon", new ChatCommands.Summon());
 			
 			// Global admin tools
 			Commands.Add("config", new ChatCommands.Configure());
 			Commands.Add("exit", new ChatCommands.Exit());
 			Commands.Add("save", new ChatCommands.SaveMap());
 			Commands.Add("setspawn", new ChatCommands.SetSpawn());
-			Commands.Add("tcl", new ChatCommands.ExecuteTcl());
 
 			// Experimental commands
 			Commands.Add("mob", new ChatCommands.SpawnMob());
@@ -68,14 +63,6 @@ namespace spacecraft
 				if (RulesText != "")
 					Commands.Add("rules", new ChatCommands.Rules());
 			}
-		}
-		
-		static public void AddTclCommand(string commandName, string rankNeeded, string help, string script)
-		{
-			if(Commands.ContainsKey(commandName)) {
-				Commands.Remove(commandName);
-			}
-			Commands.Add(commandName, new ChatCommands.ExecuteTcl(rankNeeded, help, script));
 		}
 
 		/// <summary>

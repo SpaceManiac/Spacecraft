@@ -10,7 +10,6 @@
     <RootNamespace>spacecraft</RootNamespace>
     <AssemblyName>spacecraft</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <newfilesearch>OnLoad</newfilesearch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,7 +47,6 @@
     <Compile Include="Map\McLevelSaving.cs" />
     <Compile Include="Map\McLevelLoading.cs" />
     <Compile Include="Map\NBT.cs" />
-    <Compile Include="Scripting\ScriptHandler.cs" />
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
@@ -80,25 +78,10 @@
     <Compile Include="ChatCommands\Ranks.cs" />
     <Compile Include="ChatCommands\Management.cs" />
     <Compile Include="ChatCommands\Misc.cs" />
-    <Compile Include="Scripting\TclWrap.cs" />
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="Scripting\startup.tcl">
-    </None>
-    <None Include="Scripting\cuboid.tcl">
-    </None>
-    <None Include="Scripting\spelunker.tcl">
-    </None>
-    <None Include="Scripting\walls.tcl">
-    </None>
-    <None Include="Scripting\buildRank.tcl">
-    </None>
-    <None Include="Scripting\dropship.tcl">
-    </None>
-    <None Include="Scripting\libSpacecraft.tcl">
-    </None>
     <None Include="tcl85.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

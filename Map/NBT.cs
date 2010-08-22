@@ -71,17 +71,12 @@ namespace NBT
 			Builder.Append(indent).Append("}");
 			return Builder.ToString();
 		}
-		
-		private string ListToString (string indent)
-		{
-			return "???";
-		}
 
 		public override string ToString ()
 		{
 			switch(Type) {
 				case TagType.End:
-					return "TAG_End()";
+					return "TAG_End";
 				case TagType.Byte:
 					return "TAG_Byte" + NameString(Name) + ": " + (byte) Payload;
 				case TagType.Short:

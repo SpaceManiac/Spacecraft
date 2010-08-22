@@ -88,38 +88,27 @@ namespace spacecraft
 
 			DateTime Begin = DateTime.Now;
 
-			if (Scripting.Initialized && !skipTcl && Scripting.HookDefined("onLevelGeneration"))
-			{
-				int value = Scripting.ExecuteHook("onLevelGeneration", xdim + " " + ydim + " " + zdim);
-				if (!Scripting.IsOk(value))
-				{
-					Spacecraft.LogError("Tcl map generation failed", new SpacecraftException("Tcl map generation failed:\n" + Scripting.Interpreter.Result));
-					Generate(true);
-				}
-			}
-			else
-			{
-				physicsCount = 0;
-				spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
-				// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
+			physicsCount = 0;
+			spawn = new Position((short)(16 * xdim), (short)(16 * ydim + 48), (short)(16 * zdim));
+			// Spawn the player in the (approximate) center of the map. Each block is 32x32x32 pixels.
 
-				for (short x = 0; x < xdim; ++x)
-				{
-					if (x == (short)(xdim / 2)) {
-						Spacecraft.Log("Generation 50% complete");
-					}
-					
-					for (short z = 0; z < zdim; ++z) {
-						for (short y = 0; y < ydim / 2; ++y) {
-							if (y == ydim / 2 - 1) {
-								SetTile_Fast(x, y, z, Block.Grass);
-							} else {
-								SetTile_Fast(x, y, z, Block.Dirt);
-							}
+			for (short x = 0; x < xdim; ++x)
+			{
+				if (x == (short)(xdim / 2)) {
+					Spacecraft.Log("Generation 50% complete");
+				}
+				
+				for (short z = 0; z < zdim; ++z) {
+					for (short y = 0; y < ydim / 2; ++y) {
+						if (y == ydim / 2 - 1) {
+							SetTile_Fast(x, y, z, Block.Grass);
+						} else {
+							SetTile_Fast(x, y, z, Block.Dirt);
 						}
 					}
 				}
 			}
+			
 			DateTime End = DateTime.Now;
 			Spacecraft.Log("Generation complete. Took " + (End - Begin).TotalMilliseconds + "ms");
 		}

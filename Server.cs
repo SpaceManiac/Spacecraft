@@ -51,8 +51,6 @@ namespace spacecraft
 			maxplayers = Config.GetInt("max-players", 16);
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
-
-			Scripting.Initialize();
 		}
 
 		public void Start()
@@ -81,8 +79,8 @@ namespace spacecraft
 				Listener.Start();
 
 				Spacecraft.Log("Listening on port " + port.ToString());
-				Spacecraft.Log("Server name is " + name);
-				Spacecraft.Log("Server MOTD is " + motd);
+				Spacecraft.Log("Server name is " + Spacecraft.StripColors(name));
+				Spacecraft.Log("Server MOTD is " + Spacecraft.StripColors(motd));
 
 				Running = true;
 
@@ -131,7 +129,6 @@ namespace spacecraft
 			double lastIpAttempt = -10;
 			double lastFrame = 0;
 			
-			bool tclOnWorldTick = true;
 			int ipFailures = 0;
 
 			while(Running) {
@@ -163,19 +160,8 @@ namespace spacecraft
 				}
 				
 				if (clock.Elapsed.TotalSeconds - lastPhysics >= 0.5) {
-					// tcl tick
-					double now = clock.Elapsed.TotalSeconds;
-					if (tclOnWorldTick && Scripting.Initialized && Scripting.HookDefined("onWorldTick")) {
-						int status = Scripting.ExecuteHook("onWorldTick", "");
-						if (!Scripting.IsOk(status)) {
-							Spacecraft.LogError("Tcl onWorldTick failed", new SpacecraftException("Tcl onWorldTick failed:\n" + Scripting.Interpreter.Result));
-							tclOnWorldTick = false;
-						}
-					}
-					LastTclTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
-					
 					// physics tick
-					now = clock.Elapsed.TotalSeconds;
+					double now = clock.Elapsed.TotalSeconds;
 					map.DoPhysics();
 					lastPhysics = clock.Elapsed.TotalSeconds;
 					LastPhysicsTickTook = Math.Round(10*(clock.Elapsed.TotalSeconds - now))/10.0;
@@ -188,10 +174,7 @@ namespace spacecraft
 				}
 				
 				if(clock.Elapsed.TotalSeconds - lastFrame >= 0.03) {
-					// For frame-wise updates
-					// First of all, tell Tcl to evaluate pending afters
-					Scripting.Interpreter.EvalScript("update");
-					// Then update all the mobs
+					// For frame-wise updates: update all mobs. Just in case.
 					foreach(Robot R in new List<Robot>(Robots)) {
 						R.Update();
 					}
@@ -366,13 +349,6 @@ namespace spacecraft
 			}
 			Spacecraft.Log(Player.name + " (" + Player.ipAddress + ") has disconnected");
 			MessageAll(Color.Yellow + Player.name + " has left");
-			
-			if (Scripting.Initialized && Scripting.HookDefined("onPlayerDepart")) {
-				int status = Scripting.ExecuteHook("onPlayerDepart", Player.name);
-				if (!Scripting.IsOk(status)) {
-					Spacecraft.LogError("Tcl onPlayerDepart failed", new SpacecraftException("Tcl onPlayerDepart failed:\n" + Scripting.Interpreter.Result));
-				}
-			}
 		}
 
 		void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
@@ -382,23 +358,11 @@ namespace spacecraft
 				P.BlockSet(pos, BlockType);
 			}
 		}
-		
-		bool tclOnBlockChange = true;
 
 		void Player_BlockChange(Player sender, BlockPosition pos, Block BlockType)
 		{
 			Block was = map.GetTile(pos.x, pos.y, pos.z);
 			map.SetTile(pos.x, pos.y, pos.z, BlockType);
-			
-			if (tclOnBlockChange && Scripting.Initialized && Scripting.HookDefined("onPlayerChangeBlock")) {
-				string args = sender.name + " " + pos.x + " " + pos.y + " " + pos.z + " "
-					+ BlockType.ToString().ToLower() + " " + was.ToString().ToLower();
-				int status = Scripting.ExecuteHook("onPlayerChangeBlock", args);
-				if (!Scripting.IsOk(status)) {
-					Spacecraft.LogError("Tcl onPlayerChangeBlock failed (disabling!)", new SpacecraftException("Tcl onPlayerChangeBlock failed:\n" + Scripting.Interpreter.Result));
-					tclOnBlockChange = false;
-				}
-			}
 		}
 
 		void Player_Move(Player sender, Position dest, byte heading, byte pitch)
@@ -431,13 +395,6 @@ namespace spacecraft
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
 			Spacecraft.Log(sender.name + " (" + sender.ipAddress + ") has connected");
 			MessageAll(Color.Yellow + sender.name + " has joined!");
-			
-			if (Scripting.Initialized && Scripting.HookDefined("onPlayerJoin")) {
-				int status = Scripting.ExecuteHook("onPlayerJoin", sender.name);
-				if (!Scripting.IsOk(status)) {
-					Spacecraft.LogError("Tcl onPlayerJoin failed", new SpacecraftException("Tcl onPlayerJoin failed:\n" + Scripting.Interpreter.Result));
-				}
-			}
 		}
 		
 		void Robot_Spawn(Robot sender)

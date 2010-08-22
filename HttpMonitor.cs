@@ -83,12 +83,6 @@ namespace spacecraft {
 					
 					int i = Script.IndexOf('=');
 					Script = Script.Substring(i + 1);
-
-					int status = Scripting.Interpreter.EvalScript(Script);
-					commandResult = Scripting.Interpreter.Result;
-					if (!Scripting.IsOk(status)) {
-						commandResult = "<font color='red'>" + commandResult + "</font>";
-					}
 				}
 			}
 			catch(IOException) {}
