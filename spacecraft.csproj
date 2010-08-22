@@ -77,6 +77,12 @@
     <Compile Include="ChatCommands\Management.cs" />
     <Compile Include="ChatCommands\Misc.cs" />
     <Compile Include="HttpMonitor.cs" />
+    <Compile Include="Games\GameBase.cs" />
+    <Compile Include="Games\AirshipWars.cs" />
+    <Compile Include="Games\Airship.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Games\" />
+  </ItemGroup>
 </Project>

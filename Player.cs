@@ -28,7 +28,7 @@ namespace spacecraft
 		/// </summary>
 		public event PlayerBlockChangeHandler BlockChange;
 
-		public delegate void PlayerMsgHandler(string msg);
+		public delegate void PlayerMsgHandler(Player sender, string msg);
 		/// <summary>
 		/// Triggered when this client sends a message to the server.
 		/// </summary>
@@ -368,7 +368,7 @@ namespace spacecraft
 			}
 			else
 			{
-				if (Message != null) Message(name + ": " + msg);
+				if (Message != null) Message(this, msg);
 			}
 		}
 

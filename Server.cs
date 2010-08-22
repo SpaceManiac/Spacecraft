@@ -37,6 +37,8 @@ namespace spacecraft
 		public double LastHeartbeatTook { get; protected set; }
 		public double LastPhysicsTickTook { get; protected set; }
 		public double LastTclTickTook { get; protected set; }
+		
+		public GameBase Game;
 
 		public Server()
 		{
@@ -51,6 +53,8 @@ namespace spacecraft
 			maxplayers = Config.GetInt("max-players", 16);
 			name = Config.Get("server-name", "Minecraft Server");
 			motd = Config.Get("motd", "Powered by " + Color.Green + "Spacecraft");
+			
+			Game = new GameBase();
 		}
 
 		public void Start()
@@ -99,6 +103,8 @@ namespace spacecraft
 				console = new ConsolePlayer();
 				console.Message += new Player.PlayerMsgHandler(Player_Message);
 				console.Start();
+				
+				Game = new AirshipWars.AirshipWars();
 
 				OnExit.WaitOne();
 				Running = false;
@@ -351,6 +357,8 @@ namespace spacecraft
 			}
 			Spacecraft.Log(Player.name + " (" + Player.ipAddress + ") has disconnected");
 			MessageAll(Color.Yellow + Player.name + " has left");
+			
+			Game.PlayerQuits(Player);
 		}
 
 		void map_BlockChange(Map map, BlockPosition pos, Block BlockType)
@@ -364,7 +372,13 @@ namespace spacecraft
 		void Player_BlockChange(Player sender, BlockPosition pos, Block BlockType)
 		{
 			Block was = map.GetTile(pos.x, pos.y, pos.z);
+			if (!Game.CanBuild(sender, pos, BlockType)) {
+				sender.BlockSet(pos, was);
+				sender.PrintMessage(Color.DarkGreen + "You're not allowed to do that!");
+				return;
+			}
 			map.SetTile(pos.x, pos.y, pos.z, BlockType);
+			Game.PlayerBuilds(sender, pos, BlockType, was);
 		}
 
 		void Player_Move(Player sender, Position dest, byte heading, byte pitch)
@@ -377,9 +391,16 @@ namespace spacecraft
 			}
 		}
 
-		void Player_Message(string msg)
+		void Player_Message(Player sender, string msg)
 		{
-			MessageAll(msg);
+			string gameResult = Game.PlayerMessage(sender, msg);
+			if (gameResult == "") {
+				return;
+			} else if (gameResult == null) {
+				MessageAll(sender.name + ": " + msg);
+			} else {
+				MessageAll(gameResult);
+			}
 		}
 
 		void Player_Spawn(Player sender)
@@ -397,6 +418,8 @@ namespace spacecraft
 			MovePlayer(sender, map.spawn, map.spawnHeading, 0);
 			Spacecraft.Log(sender.name + " (" + sender.ipAddress + ") has connected");
 			MessageAll(Color.Yellow + sender.name + " has joined!");
+			
+			Game.PlayerJoins(sender);
 		}
 		
 		void Robot_Spawn(Robot sender)
