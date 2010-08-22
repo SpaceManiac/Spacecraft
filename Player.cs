@@ -94,6 +94,13 @@ namespace spacecraft
 		{
 			conn.Start();
 		}
+		
+		/// <summary>
+		/// Call to resend the map to the client.
+		/// </summary>		
+		public void ResendMap() {
+			conn.Spawn(name);
+		}
 
 		/// <summary>
 		/// Should be called to inform the player that they've been kicked.

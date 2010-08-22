@@ -86,17 +86,17 @@ namespace spacecraft
 
 			switch (IncomingPacket.PacketID)
 			{
-				case (byte)Packet.PacketType.Ident:
+				case (byte)PacketType.Ident:
 					HandlePlayerIdent((PlayerIDPacket)IncomingPacket);
 					break;
 
-				case (byte)Packet.PacketType.Message:
+				case (byte)PacketType.Message:
 					HandleMessage((ClientMessagePacket)IncomingPacket);
 					break;
-				case (byte)Packet.PacketType.PlayerSetBlock:
+				case (byte)PacketType.PlayerSetBlock:
 					HandleBlockSet((BlockUpdatePacket)IncomingPacket);
 					break;
-				case (byte)Packet.PacketType.PositionUpdate:
+				case (byte)PacketType.PositionUpdate:
 					HandlePositionUpdate((PositionUpdatePacket)IncomingPacket);
 					break;
 				default:
@@ -164,20 +164,22 @@ namespace spacecraft
 			if (ReceivedUsername != null)
 				ReceivedUsername(username);
 
+			Spawn(username);
+		}
+		
+		public void Spawn(string username)
+		{
 			// Send response packet.
 			ServerIdentPacket Ident = new ServerIdentPacket();
-
 			Ident.MOTD = Server.theServ.motd;
 			Ident.Name = Server.theServ.name;
 			Ident.Type = (byte)(RankInfo.IsOperator(Player.RankOf(username)) ? 0x64 : 0x00);
 			Ident.Version = PROTOCOL_VERSION;
-
 			TransmitPacket(Ident);
 
 			SendMap();
 
-			if (PlayerSpawn != null)
-			{
+			if (PlayerSpawn != null) {
 				PlayerSpawn();
 			}
 		}
@@ -199,15 +201,15 @@ namespace spacecraft
 			{
 				LevelChunkPacket P = new LevelChunkPacket(); // New packet.
 
-				byte[] Chunk = new byte[NetworkByteArray.Size];
+				byte[] Chunk = new byte[1024];
 
 				int remaining = compressedData.Length - bytesSent;
-				remaining = Math.Min(remaining, NetworkByteArray.Size);
+				remaining = Math.Min(remaining, 1024);
 
 				Array.Copy(compressedData, bytesSent, Chunk, 0, remaining);
 				bytesSent += remaining;
 
-				P.ChunkData = new NetworkByteArray(Chunk);
+				P.ChunkData = Chunk;
 				P.ChunkLength = (short) remaining;
 				P.PercentComplete = (byte) (100 * ((double)bytesSent / compressedData.Length));
 
@@ -252,11 +254,11 @@ namespace spacecraft
 					return null;
 				}
 			}
-			while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0])));
+			while (buffsize == 0 || buffsize < PacketLengthInfo.Lookup((PacketType)(buffer[0])));
 
 			ClientPacket P = ClientPacket.FromByteArray(buffer);
 
-			int len = PacketLengthInfo.Lookup((Packet.PacketType)(buffer[0]));
+			int len = PacketLengthInfo.Lookup((PacketType)(buffer[0]));
 			buffsize -= len;
 			byte[] newbuf = new byte[2048];
 			Array.Copy(buffer, len, newbuf, 0, buffsize);
@@ -269,7 +271,7 @@ namespace spacecraft
 		{
 			try
 			{
-				byte[] bytes = packet;
+				byte[] bytes = packet.ToByteArray();
 				_client.GetStream().Write(bytes, 0, bytes.Length);
 			}
 			catch (IOException)

@@ -119,8 +119,7 @@ namespace spacecraft {
 
 			public override void Run(Player sender, string cmd, string args)
 			{
-				throw new NotImplementedException();
-				//sender.ResendMap();
+				sender.ResendMap();
 			}
 		}
 	}

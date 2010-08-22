@@ -16,8 +16,8 @@ namespace spacecraft
 	{
 		public override byte PacketID { get { return 0x00; } }
 		public byte Version;
-		public NetworkString Name;
-		public NetworkString MOTD;
+		public string Name;
+		public string MOTD;
 		public byte Type;
 
 		public override byte[] ToByteArray()
@@ -25,8 +25,8 @@ namespace spacecraft
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
 			b.Append(Version);
-			b.Append(Name);
-			b.Append(MOTD);
+			b.Append(Packet.PackString(Name));
+			b.Append(Packet.PackString(MOTD));
 			b.Append(Type);
 			return b.ToArray();
 		}
@@ -70,15 +70,15 @@ namespace spacecraft
 	public class LevelChunkPacket : ServerPacket
 	{
 		public override byte PacketID { get { return 0x03; } }
-		public NetworkShort ChunkLength;
-		public NetworkByteArray ChunkData;
+		public short ChunkLength;
+		public byte[] ChunkData;
 		public byte PercentComplete;
 
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
-			b.Append(ChunkLength);
+			b.Append(Packet.PackShort(ChunkLength));
 			b.Append(ChunkData);
 			b.Append(PercentComplete);
 			return b.ToArray();
@@ -92,17 +92,17 @@ namespace spacecraft
 	public class LevelEndPacket : ServerPacket
 	{
 		public override byte PacketID { get { return 0x04; } }
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public short X;
+		public short Y;
+		public short Z;
 
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
-			b.Append(X);
-			b.Append(Y);
-			b.Append(Z);
+			b.Append(Packet.PackShort(X));
+			b.Append(Packet.PackShort(Y));
+			b.Append(Packet.PackShort(Z));
 			return b.ToArray();
 		}
 
@@ -112,10 +112,10 @@ namespace spacecraft
 	{
 		public override byte PacketID { get { return 0x07; } }
 		public byte PlayerID;
-		public NetworkString Name;
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public string Name;
+		public short X;
+		public short Y;
+		public short Z;
 		public byte Heading;
 		public byte Pitch;
 
@@ -124,10 +124,10 @@ namespace spacecraft
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
 			b.Append(PlayerID);
-			b.Append(Name);
-			b.Append(X);
-			b.Append(Y);
-			b.Append(Z);
+			b.Append(Packet.PackString(Name));
+			b.Append(Packet.PackShort(X));
+			b.Append(Packet.PackShort(Y));
+			b.Append(Packet.PackShort(Z));
 			b.Append(Heading);
 			b.Append(Pitch);
 			return b.ToArray();
@@ -137,18 +137,18 @@ namespace spacecraft
 	public class SetBlockPacket : ServerPacket
 	{
 		public override byte PacketID { get { return 0x06; } }
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public short X;
+		public short Y;
+		public short Z;
 		public byte Type;
 
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
-			b.Append(X);
-			b.Append(Y);
-			b.Append(Z);
+			b.Append(Packet.PackShort(X));
+			b.Append(Packet.PackShort(Y));
+			b.Append(Packet.PackShort(Z));
 			b.Append(Type);
 			return b.ToArray();
 		}
@@ -161,9 +161,9 @@ namespace spacecraft
 			get { return 0x08; }
 		}
 		public byte PlayerID;
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public short X;
+		public short Y;
+		public short Z;
 		public byte Heading;
 		public byte Pitch;
 
@@ -172,9 +172,9 @@ namespace spacecraft
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
 			b.Append(PlayerID);
-			b.Append(X);
-			b.Append(Y);
-			b.Append(Z);
+			b.Append(Packet.PackShort(X));
+			b.Append(Packet.PackShort(Y));
+			b.Append(Packet.PackShort(Z));
 			b.Append(Heading);
 			b.Append(Pitch);
 			return b.ToArray();
@@ -205,14 +205,14 @@ namespace spacecraft
 	{
 		public override byte PacketID { get { return 0x0d; } }
 		public byte PlayerID;
-		public NetworkString Message;
+		public string Message;
 
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
 			b.Append(PlayerID);
-			b.Append(Message);
+			b.Append(Packet.PackString(Message));
 			return b.ToArray();
 		}
 	}
@@ -222,17 +222,14 @@ namespace spacecraft
 	/// </summary>
 	public class DisconnectPacket : ServerPacket
 	{
-		public override byte PacketID
-		{
-			get { return 0x0e; }
-		}
-		public NetworkString Reason;
+		public override byte PacketID { get { return 0x0e; } }
+		public string Reason;
 
 		public override byte[] ToByteArray()
 		{
 			Builder<byte> b = new Builder<byte>();
 			b.Append(PacketID);
-			b.Append(Reason);
+			b.Append(Packet.PackString(Reason));
 			return b.ToArray();
 		}
 	}

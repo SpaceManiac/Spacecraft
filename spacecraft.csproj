@@ -50,7 +50,6 @@
     <Compile Include="Utils\Builder.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="NetworkTypes.cs" />
     <Compile Include="ClientPackets.cs" />
     <Compile Include="Utils\Pair.cs" />
     <Compile Include="Position.cs" />

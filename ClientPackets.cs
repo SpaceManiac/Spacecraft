@@ -1,18 +1,44 @@
 using System;
+using System.Text;
+using System.Net;
 
 namespace spacecraft
 {
-	public abstract partial class Packet  // Continued in Constants.cs, which defines enums.
+	public abstract class Packet  // Continued in Constants.cs, which defines enums.
 	{
-		protected const int BYTE_LENGTH = 1;
-		protected const int SHORT_LENGTH = 2;
-		protected const int STRING_LENGTH = NetworkString.Size;
-		protected const int ARRAY_LENGTH = NetworkByteArray.Size;
-
 		abstract public byte PacketID { get; }
 
 		abstract public byte[] ToByteArray();
-		public static implicit operator byte[](Packet P) { return P.ToByteArray(); }
+		
+		// Unpack string and short from byte array
+		public static string ExtractString(byte[] bytes, int offset) {
+			// Find last non-space.
+			for (int i = 63; i >= 0; --i) {
+				if (bytes[offset + i] != (byte)(' ')) {
+					// Return string up to and including that non-space.
+					return Encoding.ASCII.GetString(bytes, offset, i + 1);
+				}
+			}
+			return "";
+		}
+		
+		public static short ExtractShort(byte[] bytes, int offset) {
+			return IPAddress.NetworkToHostOrder(BitConverter.ToInt16(bytes, offset));
+		}
+		
+		// Pack string and short into byte array
+		public static byte[] PackString(string str) {
+			byte[] result = new byte[64];
+			for (int i = 0; i < 64; ++i) {
+				result[i] = (byte)(' ');
+			}
+			Array.Copy(Encoding.ASCII.GetBytes(str), result, str.Length);
+			return result;
+		}
+		
+		public static byte[] PackShort(short val) {
+			return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(val));
+		}
 	}
 
 	/// <summary>
@@ -22,29 +48,19 @@ namespace spacecraft
 	{
 		public static ClientPacket FromByteArray(byte[] array)
 		{
-			ClientPacket OutValue;
-
-			byte PacketID = array[0];
-
-			switch (PacketID)
+			switch ((PacketType) array[0])
 			{
-				case 0x00: // PlayerID Packet, announces a player joining.
-					OutValue = new PlayerIDPacket(array);
-					break;
-				case 0x05:
-					OutValue = new BlockUpdatePacket(array);
-					break;
-				case 0x08:
-					OutValue = new PositionUpdatePacket(array);
-					break;
-				case 0x0d:
-					OutValue = new ClientMessagePacket(array);
-					break;
+				case PacketType.Ident: // PlayerID Packet, announces a player joining.
+					return new PlayerIDPacket(array);
+				case PacketType.PlayerSetBlock:
+					return new BlockUpdatePacket(array);
+				case PacketType.PositionUpdate:
+					return new PositionUpdatePacket(array);
+				case PacketType.Message:
+					return new ClientMessagePacket(array);
 				default:
 					throw new ArgumentException("Byte array does not match any known packet");
 			}
-
-			return OutValue;
 		}
 	}
 
@@ -55,46 +71,27 @@ namespace spacecraft
 	{
 		override public byte PacketID { get { return 0x0; } }
 		public byte Version;
-		public NetworkString Username;
-		public NetworkString Key;
-		public byte Unknown; // Unused.
+		public string Username;
+		public string Key;
+		public byte Unused;
 
 		public PlayerIDPacket() { }
 
 		public PlayerIDPacket(byte[] raw)
 		{
 			Version = raw[1];
-
-			byte[] name = new byte[NetworkString.Size];
-
-			//TODO: Find a decent way of getting rid of the magic offsets.
-			for (int i = 0; i < name.Length; i++)
-			{
-				name[i] = raw[2 + i];
-			}
-
-			Username = new NetworkString(name);
-
-			byte[] key_bytes = new byte[NetworkString.Size];
-
-			for (int i = 0; i < name.Length; i++)
-			{
-				key_bytes[i] = raw[2 + NetworkString.Size + i];
-			}
-
-			Key = new NetworkString(key_bytes);
-
-			Unknown = 0xFF; // Fix this if this is actually used somewhere.
+			Username = Packet.ExtractString(raw, 2);
+			Key = Packet.ExtractString(raw, 66);
+			Unused = 0x00;
 		}
 
-		override public byte[] ToByteArray()
-		{
+		override public byte[] ToByteArray() {
 			Builder<Byte> builder = new Builder<byte>();
 			builder.Append(PacketID);
 			builder.Append(Version);
-			builder.Append(Username);
-			builder.Append(Key);
-			builder.Append(Unknown);
+			builder.Append(Packet.PackString(Username));
+			builder.Append(Packet.PackString(Key));
+			builder.Append(Unused);
 			return builder.ToArray();
 		}
 	}
@@ -105,9 +102,9 @@ namespace spacecraft
 	public class BlockUpdatePacket : ClientPacket
 	{
 		override public byte PacketID { get { return 0x05; } }
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public short X;
+		public short Y;
+		public short Z;
 		public byte Mode;
 		public byte Type;
 
@@ -115,20 +112,20 @@ namespace spacecraft
 
 		public BlockUpdatePacket(byte[] array)
 		{
-			X = new NetworkShort(array, 1);
-			Y = new NetworkShort(array, 1 + NetworkShort.Size);
-			Z = new NetworkShort(array, 1 + 2 * NetworkShort.Size);
-			Mode = array[1 + 3 * NetworkShort.Size];
-			Type = array[1 + 3 * NetworkShort.Size + 1];
+			X = Packet.ExtractShort(array, 1);
+			Y = Packet.ExtractShort(array, 3);
+			Z = Packet.ExtractShort(array, 5);
+			Mode = array[7];
+			Type = array[8];
 		}
 
 		override public byte[] ToByteArray()
 		{
 			Builder<Byte> b = new Builder<byte>();
 			b.Append(PacketID);
-			b.Append(X);
-			b.Append(Y);
-			b.Append(Z);
+			b.Append(Packet.PackShort(X));
+			b.Append(Packet.PackShort(Y));
+			b.Append(Packet.PackShort(Z));
 			b.Append(Mode);
 			b.Append(Type);
 			return b.ToArray();
@@ -142,9 +139,9 @@ namespace spacecraft
 	{
 		override public byte PacketID { get { return 0x08; } }
 		public byte PlayerID;
-		public NetworkShort X;
-		public NetworkShort Y;
-		public NetworkShort Z;
+		public short X;
+		public short Y;
+		public short Z;
 		public byte Heading;
 		public byte Pitch;
 
@@ -153,11 +150,11 @@ namespace spacecraft
 		public PositionUpdatePacket(byte[] array)
 		{
 			PlayerID = array[1];
-			X = new NetworkShort(array, 2);
-			Y = new NetworkShort(array, 2 + NetworkShort.Size);
-			Z = new NetworkShort(array, 2 + 2 * NetworkShort.Size);
-			Heading = array[2 + 3 * NetworkShort.Size];
-			Pitch = array[2 + 3 * NetworkShort.Size + 1];
+			X = Packet.ExtractShort(array, 2);
+			Y = Packet.ExtractShort(array, 4);
+			Z = Packet.ExtractShort(array, 6);
+			Heading = array[8];
+			Pitch = array[9];
 		}
 
 		override public byte[] ToByteArray()
@@ -165,9 +162,9 @@ namespace spacecraft
 			Builder<Byte> builder = new Builder<byte>();
 			builder.Append(PacketID);
 			builder.Append(PlayerID);
-			builder.Append(X);
-			builder.Append(Y);
-			builder.Append(Z);
+			builder.Append(Packet.PackShort(X));
+			builder.Append(Packet.PackShort(Y));
+			builder.Append(Packet.PackShort(Z));
 			builder.Append(Heading);
 			builder.Append(Pitch);
 			return builder.ToArray();
@@ -181,16 +178,14 @@ namespace spacecraft
 	{
 		override public byte PacketID { get { return 0x0d; } }
 		public byte Unused;
-		public NetworkString Message;
+		public string Message;
 
 		public ClientMessagePacket() { }
 
 		public ClientMessagePacket(byte[] input)
 		{
 			Unused = input[1];
-			byte[] namebytes = new byte[NetworkString.Size];
-			Array.Copy(input, 2, namebytes, 0, NetworkString.Size);
-			Message = new NetworkString(namebytes);
+			Message = Packet.ExtractString(input, 2);
 		}
 
 		override public byte[] ToByteArray()
@@ -198,7 +193,7 @@ namespace spacecraft
 			Builder<Byte> b = new Builder<byte>();
 			b.Append(PacketID);
 			b.Append(Unused);
-			b.Append(Message);
+			b.Append(Packet.PackString(Message));
 			return b.ToArray();
 		}
 	}
