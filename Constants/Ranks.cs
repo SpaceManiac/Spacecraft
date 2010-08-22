@@ -17,7 +17,7 @@ namespace spacecraft {
 
 		public static string RankColor(Rank rank)
 		{
-			if(colors.ContainsKey(rank)) {
+			if (colors.ContainsKey(rank)) {
 				return colors[rank];
 			} else {
 				return Color.Black;

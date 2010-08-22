@@ -62,7 +62,6 @@
     <Compile Include="Map\DatLevelFactory.cs" />
     <Compile Include="Map\MapIO.cs" />
     <Compile Include="Map\PhysicsTask.cs" />
-    <Compile Include="Map\EscherMath.cs" />
     <Compile Include="Map\BlockPosition.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Constants\Packets.cs" />
@@ -80,9 +79,4 @@
     <Compile Include="HttpMonitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <None Include="tcl85.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>

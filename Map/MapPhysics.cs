@@ -89,6 +89,13 @@ namespace spacecraft
 						if (BlockInfo.RequiresPhysics(GetTile(newX, newY,newZ))) {
 							AddActiveBlock(new BlockPosition(newX, newY, newZ));
 						}
+						
+						// Map edges should turn to water
+						if ((GetTile(newX, newY, newZ) == Block.Air) &&
+							(newX == 0 || newZ == 0 || newX == xdim-1 || newZ == zdim-1) &&
+							(newY == ydim/2 - 1 || newY == ydim/2 - 2)) {
+							SetTile(newX, newY, newZ, Block.Water);
+						}
 					}
 				}
 			}
@@ -158,6 +165,7 @@ namespace spacecraft
 			switch (block)
 			{
 				case Block.Water:
+					// flowing water
 					for (int x = -1; x <= 1; x++)
 					{
 						for (int y = -1; y <= 0; y++)
@@ -204,6 +212,7 @@ namespace spacecraft
 					break;
 
 				case Block.Lava:
+					// flowing of lava
 					for (int x = -1; x <= 1; x++)
 					{
 						for (int y = -1; y <= 0; y++)
@@ -239,6 +248,7 @@ namespace spacecraft
 					break;
 
 				case Block.Sponge:
+					// prevent water/lava flow
 					for (int xDiff = -BlockInfo.SpongeRadius; xDiff <= BlockInfo.SpongeRadius; xDiff++)
 					{
 						for (int yDiff = -BlockInfo.SpongeRadius; yDiff <= BlockInfo.SpongeRadius; yDiff++)
@@ -276,13 +286,14 @@ namespace spacecraft
 					
 					// So the sponge stays active even if water doesn't directly touch it
 					// We have the Contains here so we don't end up with the same sponge on the list
-					// a bajillion times (which apparently is a severe issue :P)
+					// a bajillion times (which apparently is a severe issue otherwise :P)
 					if(!ActiveBlocks.Contains(new BlockPosition(X, Y, Z))) {
 						AddActiveBlock(new BlockPosition(X, Y, Z));
 					}
 					break;
 
 				case Block.Sand:
+					// gravitize sand
 					if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
 					{
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Sand));
@@ -291,6 +302,7 @@ namespace spacecraft
 					break;
 
 				case Block.Gravel:
+					// gravitize gravel
 					if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
 					{
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Gravel));
@@ -300,13 +312,12 @@ namespace spacecraft
 					break;
 
 				case Block.Unobtanium:
+					// for testing purposes
 					if (BlockInfo.IsSolid(GetTile(X, (short)(Y - 1), Z)))
 					{
 						AddPhysicsUpdate(new PhysicsTask(X, (short)(Y + 1), Z, Block.Unobtanium));
 						AddPhysicsUpdate(new PhysicsTask(X, Y, Z, Block.Air));
-					}
-					else
-					{
+					} else {
 						if (!BlockInfo.IsSolid(GetTile(X, (short)(Y - 2), Z)))
 						{
 							AddPhysicsUpdate(new PhysicsTask(X, (short)(Y - 1), Z, Block.Unobtanium));
